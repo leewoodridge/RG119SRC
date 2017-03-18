@@ -1,8 +1,5 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
 
-{$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
+{ Add date msg was posted--- Automessage Posted By: X On: 11/11/1999 }
 
 UNIT AutoMsg;
 
@@ -136,7 +133,7 @@ BEGIN
   Assign(AutoMsgFile,General.MiscPath+'AUTO.ASC');
   Reset(AutoMsgFile);
   IF (IOResult <> 0) THEN
-    Print('%LFNo auto-message to reply to.')
+    Print('No auto-message to reply to.')
   ELSE
   BEGIN
     ReadLn(AutoMsgFile,TempStr);
@@ -150,7 +147,7 @@ BEGIN
     ELSE
       LastAuthor := SearchUser(TempStr,CoSysOp);
     IF (LastAuthor = 0) THEN
-      Print('%LFUnable to reply to an anonymous message!')
+	  Print('Unable to reply to an anonymous message!')
     ELSE
     BEGIN
       InResponseTo := 'Your auto-message';

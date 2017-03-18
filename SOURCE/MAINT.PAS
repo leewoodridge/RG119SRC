@@ -42,7 +42,7 @@ VAR
   RecNum: LongInt;
   BSince: Boolean;
 
-  PROCEDURE UpdateUserInformation;
+{  PROCEDURE UpdateUserInformation;
   VAR
     UpdateArray: ARRAY [0..10] OF Integer;
     Counter,
@@ -124,7 +124,7 @@ VAR
       PauseScr(FALSE);
     END;
   END;
-
+ }
   FUNCTION CheckBirthday: Boolean;
   VAR
     BDate: LongInt;
@@ -379,7 +379,7 @@ BEGIN
     IF (FindOnlyOnce) THEN
       PrintF('ONCEONLY');
 
-    UpdateUserInformation;
+    {UpdateUserInformation;} { could be reenabled after dummy info added to new user }
 
     IF (General.LogonQuote) THEN
       RGQuote('LGNQUOTE');
@@ -549,7 +549,7 @@ BEGIN
         Print('You must select a new password every '+IntToStr(General.PasswordChange)+' days.');
         NL;
       END;
-      CStuff(9,3,ThisUser);
+      CStuff(22,3,ThisUser);
     END;
 
   FastLogon := FALSE;

@@ -1,7 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$IFDEF MSDOS}
 {$M 35500,0,131072}
 {$ENDIF}
@@ -176,6 +172,31 @@ BEGIN
     Inc(Counter);
     IF ((SC(ParamStr(Counter),1) = '-') OR (SC(ParamStr(Counter),1) = '/')) THEN
       CASE SC(ParamStr(Counter),2) OF
+	    '?' : BEGIN
+			    { Command Line Parameters Help }
+				TextColor(White);
+				TextBackground(Blue);
+				WriteLn(PadLeftStr(' þ Renegade BBS Command-Line Parameters',80));	
+				TextColor(LightGray);
+				TextBackground(Black);
+				WriteLn('Renegade BBS supports the following command-line parameters, please see the ');
+				WriteLn('manual for more detailed information.');
+				WriteLn('');
+				WriteLn('/B###### : User Already Connected At ##### Baud');
+				WriteLn('/EE###   : Critical Error Aborts To DOS With Errorlevel ###');
+				WriteLn('/EN###   : With /Q, Exits With Errorlevel 2 If New EchoMail, Or 0 If None ');
+				WriteLn('/I###    : Passes Caller ID Information');
+				WriteLn('/K##     : 25/43/50 Line Display Mode');
+				WriteLn('/L       : Local Mode');
+				WriteLn('/M#      : Create QWK Packet For User #, Then Return To DOS');
+				WriteLn('/N#      : Specifies Which Node To Load');
+				WriteLn('/P       : Pack Message Bases, Then Return To DOS');
+				WriteLn('/S       : Sort File Areas, Then Return To DOS');
+				WriteLn('/Q       : Renegade Exits To DOS When User Logs Off');
+				WriteLn('/U#      : Upload REP Packet For User #, Then Return To DOS');
+				WriteLn('/X####   : Logs User Off In #### Minutes For External Event');
+				Halt;
+			  END;
         '5' : TextMode(259);
         'B' : AnswerBaud := StrToInt(Copy(ParamStr(Counter),3,255));
         'C' : Reliable := (Pos(AllCaps(Liner.Reliable),AllCaps(ParamStr(Counter))) > 0);

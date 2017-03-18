@@ -94,23 +94,16 @@ BEGIN
   END;
   Abort := FALSE;
   Next := FALSE;
-  (*
-  CLS;
-  PrintACR('|03здддддбдддддбддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©');
-  PrintACR('Ё|11|17 Num |03|16Ё|11|17Votes|03|16Ё|11|17 Choice                                   '+
-           '                       |03|16Ё');
-  PrintACR('юдддддадддддаддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды');
-  *)
-  lRGLngStr(61,FALSE);
+  lRGLngStr(61,FALSE); { HEADER }
   Reset(VotingFile);
   TopicNum := 1;
   WHILE (TopicNum <= NumTopics) AND (NOT Abort) AND (NOT HangUp) DO
   BEGIN
     Seek(VotingFile,(AvailableTopics[TopicNum] - 1));
     Read(VotingFile,Topic);
-    PrintACR('|07'+PadRightInt(TopicNum,5)+
-             '|10'+PadRightInt(Topic.NumVotedQuestion,7)+
-             '|14  '+Topic.Question1);
+    PrintACR(' '+'|17|15'+PadRightInt(TopicNum,4)+'XX'+
+             '|18|15'+PadRightInt(Topic.NumVotedQuestion,4)+'XX'+
+             '|19|15'+Topic.Question1);
     IF (Topic.Question2 <> '') THEN
       PrintACR(PadRightStr('',12)+'|14  '+Topic.Question2);
     WKey;
@@ -145,13 +138,7 @@ BEGIN
   NL;
   PrintACR('^5Created By: ^3'+Topic.CreatedBy);
   NL;
-  (*
-  PrintACR('|03здддбдддддбддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©');
-  PrintACR('Ё|11|17 N |03|16Ё|11|17  %  |03|16'+
-           'Ё|11|17 Choice                                                            |03|16Ё');
-  PrintACR('юдддадддддаддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды');
-  *)
-  lRGLngStr(62,FALSE);
+  lRGLngStr(62,FALSE); { HEADER }
   ChoiceNum := 1;
   WHILE (ChoiceNum <= Topic.ChoiceNumber) AND (NOT Abort) AND (NOT HangUp) DO
   BEGIN

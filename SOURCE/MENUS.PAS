@@ -113,6 +113,7 @@ BEGIN
   Counter := 1;
   WHILE (Counter <= NumCmds) AND (NewMenuCmd = '') AND (NOT Done) AND (NOT HangUp) DO
   BEGIN
+  {Print('Here I Am!');}
     IF (MemCmd^[Counter].Ckeys = AutoCmd) then
       IF (AACS(MemCmd^[Counter].ACS)) THEN
       BEGIN
@@ -447,6 +448,7 @@ BEGIN
   ShowThisMenu;
 
   AutoExecCmd('EVERYTIME');
+  
 
   IF (General.MultiNode) THEN
     Check_Status;
@@ -822,8 +824,14 @@ BEGIN
             NoCmd := TRUE;
           END;
     'O' : CASE Cmd[2] OF
-            '1','2' :
-                  TShuttleLogon := Ord(Cmd[2]) - 48;
+            '1' : TShuttleLogon := 1; { Login }
+			'2' : TShuttleLogon := 2; { Apply }
+	        '3' : Begin               { Check Validation Level }
+			        If ThisUser.Sl <= Validation.NewSL Then
+			          RGNoteStr(31,FALSE) { Not Validated }
+				    Else
+				      Print('Your account has been validated to level '+IntToStr(ThisUser.SL)); { Validated }
+			      End;				   
             'A' : AutoValidationCmd(MenuOption);
             'B' : GetUserStats(MenuOption);
             'C' : RequestSysOpChat(MenuOption);

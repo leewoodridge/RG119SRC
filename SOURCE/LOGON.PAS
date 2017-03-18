@@ -427,7 +427,7 @@ BEGIN
     Inc(Tries);
     IF (Tries >= General.MaxLogonTries) THEN
     BEGIN
-      IF (General.NewUserToggles[20] = 0) OR (RGMainStr(6, TRUE) = '') 
+      IF (General.NewUserToggles[23] = False) OR (RGMainStr(6, TRUE) = '') 
          {(General.ForgotPWQuestion = '')} OR (ThisUser.ForgotPWAnswer = '') THEN
         HangUp := TRUE
       ELSE
@@ -763,7 +763,6 @@ BEGIN
   TimeOn := GetPackDateTime;
   ChatChannel := 0;
   Update_Node(RGNoteStr(35,TRUE){ Logging on },TRUE);  (* New *)
-
   LoadNode(ThisNode);     (* New *)
   NodeR.GroupChat := FALSE;
   SaveNode(ThisNode);
@@ -883,7 +882,7 @@ BEGIN
     Doshuttle;
   Setc(7);
   CLS;
-  Print(Centre(VerLine(1)));
+  Print(Centre(VerLine(1))); { Version & Copyright Information }
   Print(Centre(VerLine(2)));
   Print(Centre(VerLine(3)));
   PrintF('PRELOGON');
