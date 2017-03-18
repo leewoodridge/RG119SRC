@@ -1,6 +1,3 @@
-
-{ Add date msg was posted--- Automessage Posted By: X On: 11/11/1999 }
-
 UNIT AutoMsg;
 
 INTERFACE
@@ -12,6 +9,7 @@ PROCEDURE ReplyAutoMsg;
 IMPLEMENTATION
 
 USES
+  Dos,
   Common,
   Email,
   Mail0,
@@ -23,6 +21,8 @@ VAR
   TempStr: AStr;
   Counter,
   LenTempStr: Byte;
+  FileDateTime: LongInt;
+  FileDateTime2: DateTime;
 BEGIN
   Assign(AutoMsgFile,General.MiscPath+'AUTO.ASC');
   Reset(AutoMsgFile);
@@ -42,8 +42,13 @@ BEGIN
               TempStr := 'Anonymous';
     END;
     NL;
-    Print(lRGLngStr(10,TRUE){FString.AutoMsgT}+TempStr);
-    LenTempStr := 0;
+	GetFileDateTime(General.MiscPath+'AUTO.ASC',FileDateTime);
+	UnpackTime(FileDateTime,FileDateTime2);
+	With FileDateTime2 Do
+	  Begin
+        Print(lRGLngStr(10,TRUE){FString.AutoMsgT}+TempStr+' on '+IntToStr(Month)+'/'+IntToStr(Day)+'/'+IntToStr(Year));
+      End;
+	LenTempStr := 0;
     REPEAT
       ReadLn(AutoMsgFile,TempStr);
       IF (LennMCI(TempStr) > LenTempStr) THEN
