@@ -1,8 +1,6 @@
 Renegade v1.19
 ==============
 
-This is a port of the current version of Renegade: v1.19.  My port of the older Y2Ka2 version can be found here: https://github.com/rickparrish/Renegade<br />
-<br />
 This is a fork of the official v1.19 release, which can be found here: https://github.com/Renegade-Exodus/RG119SRC<br />
 
 Copyright Cott Lang, Patrick Spence, Gary Hall, Jeff Herrings, T.J. McMillen, Chris Hoppman, and Lee Palmer<br />
