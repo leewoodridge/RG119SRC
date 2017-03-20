@@ -89,13 +89,16 @@ BEGIN
   IF (NOT HangUp) THEN
   BEGIN
     PrintF('NEWUSER');
+
+    { Fill user account fields toggled off with dummy info here? }
+
     Counter := 1;
-    WHILE (Counter <= 20) AND (NOT HangUp) DO
+    WHILE (Counter <= 23) AND (NOT HangUp) DO
     BEGIN
-      IF (General.NewUserToggles[Counter] <> 0) THEN
+      IF (General.NewUserToggles[Counter] = True) THEN
       BEGIN
         Update_Screen;
-        CStuff(General.NewUserToggles[Counter],1,ThisUser);
+        CStuff(Counter,1,ThisUser);
       END;
       Inc(Counter);
     END;

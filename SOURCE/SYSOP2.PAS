@@ -62,8 +62,26 @@ BEGIN
     BEGIN
       Abort := FALSE;
       Next := FALSE;
-      RGSysCfgStr(0,FALSE);
-      OneK(Cmd,'QABCDEFGHIJKLM12345678'^M,TRUE,TRUE);
+      {RGSysCfgStr(0,FALSE);}
+          Cls;
+
+          Print(PadLeftStr('|17|15 þ Renegade BBS Configuration',80));
+
+PrintACR('|07(|15A|07) Main BBS Configuration                 |07(|15B|07) Modem/Node Configuration');
+PrintACR('|07(|15C|07) System ACS Settings                    |07(|15D|07) System Variables');
+PrintACR('|07(|15E|07) System Toggles                         |07(|15F|07) File System Configuration');
+PrintACR('|07(|15G|07) Subscription/Validation System         |07(|15H|07) Network Configuration');
+PrintACR('|07(|15I|07) Offline Mail Configuration             |07(|15J|07) Color Configuration');
+PrintACR('|07(|15K|07) Archive Configuration                  |07(|15L|07) Credit System Configuration');
+PrintACR('|07(|15M|07) New User Application Toggles');
+Nl;
+PrintACR('|07(|151|07) Time Allowed Per %CD                  |07(|152|07) Max Calls Per Day');
+PrintACR('|07(|153|07) UL/DL # Files Ratio                    |07(|154|07) UL/DL Kbytes Ratio');
+PrintACR('|07(|155|07) Post/Call Ratio                        |07(|156|07) Max Downloads Per Day');
+PrintACR('|07(|157|07) Max Download Kbytes Per Day            |07(|158|07) Update System Averages');
+Nl;
+Prt('|07Enter Selection or (|15Q|07)uit: |15');
+      OneK(Cmd,'QABCDEFGHIJKLM12345678',TRUE,TRUE);
       CASE Cmd OF
         'A' : MainBBSConfiguration;
         'B' : ModemConfiguration;

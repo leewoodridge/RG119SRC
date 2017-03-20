@@ -1,9 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
-{$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
-
 UNIT CUser;
 
 INTERFACE
@@ -22,7 +16,7 @@ USES
   MiscUser;
 
 VAR
-  CallFromArea: Integer;
+  CountryNum: Integer;
 
 PROCEDURE CStuff(Which,How: Byte; VAR User: UserRecordType);
 VAR
@@ -30,19 +24,19 @@ VAR
   Done,
   Done1: Boolean;
 
-  PROCEDURE FindArea;
+  PROCEDURE DoCountry;
   VAR
     Cmd: Char;
   BEGIN
-    Print('Are you calling from:');
+    Print('Which country are you calling from?');
     NL;
-    Print('(1) United States');
+    Print('(1) United States Of America');
     Print('(2) Canada');
-    Print('(3) Other country');
+    Print('(3) Other Country');
     NL;
-    Prt('Select (1-3): ');
+    Prt('Select (123): ');
     OneK(Cmd,'123',TRUE,TRUE);
-    CallFromArea := (Ord(Cmd) - 48);
+    CountryNum := (Ord(Cmd) - 48);
     Done1 := TRUE;
   END;
 
@@ -79,15 +73,15 @@ VAR
     User.ScanFilesQWK := PYNQ('Would you like a new files listing in your QWK packet? ',0,FALSE);
     NL;
     User.PrivateQWK := PYNQ('Do you want your private mail in your QWK packet? ',0,FALSE);
-    NL;
+    {NL;}
   END;
 
   PROCEDURE DoAddress;
   VAR
     TempStreet: Str30;
   BEGIN
-    Print('Enter your street address:');
-    Prt(': ');
+    {Print('Enter your street address:');}
+    Prt('Enter your street address: ');
     MPL((SizeOf(User.Street) - 1));
     IF (How = 3) THEN
       InputL(TempStreet,(SizeOf(User.Street) - 1))
@@ -119,8 +113,8 @@ VAR
     END;
     REPEAT
       Redo := False;
-      Print('Enter your date of birth (mm/dd/yyyy):');
-      Prt(': ');
+      {Print('Enter your date of birth (mm/dd/yyyy):');}
+      Prt('Enter your date of birth (MM/DD/YYYY): ');
       InputFormatted('',TempDate,'##/##/####',(How = 3));
       IF (TempDate <> '') THEN
       BEGIN
@@ -167,15 +161,15 @@ VAR
     s2: AStr;
   BEGIN
     CASE How OF
-      2 : FindArea;
-      3 : CallFromArea := 1;
+      2 : DoCountry;
+      3 : CountryNum := 1;
     END;
-    IF (CallFromArea <> 3) THEN
+    IF (CountryNum <> 3) THEN
     BEGIN
       IF (How = 3) THEN
       BEGIN
-        Print('Enter new city & state abbreviation:');
-        Prt(': ');
+        {Print('Enter new city & state abbreviation:');}
+        Prt('Enter your city & state abbreviation: ');
         MPL((SizeOf(User.CityState) - 1));
         InputL(s,(SizeOf(User.CityState) - 1));
         IF (s <> '') THEN
@@ -184,8 +178,8 @@ VAR
         Exit;
       END;
 
-      Print('Enter only your city:');
-      Prt(': ');
+      {Print('Enter only your city:');}
+      Prt('Enter your city: ');
       MPL(((SizeOf(User.CityState) - 1) - 4));
       InputCaps(s,((SizeOf(User.CityState) - 1) - 4));
       IF (Pos(',',s) <> 0) THEN
@@ -197,7 +191,7 @@ VAR
       NL;
       IF (Length(s) < 3) THEN
         Exit;
-      Prompt('Enter your '+AOnOff((CallFromArea = 1),'state','province')+' abbreviation: ');
+      Prompt('Enter your '+AOnOff((CountryNum = 1),'state','province')+' abbreviation: ');
       MPL(2);
       Input(s1,2);
       User.CityState := s+', '+s1;
@@ -205,15 +199,15 @@ VAR
     END
     ELSE
     BEGIN
-      Print('First enter your city name only:');
-      Prt(': ');
+      {Print('First enter your city name only:');}
+      Prt('Enter your city: ');
       MPL(26);
       InputCaps(s1,26);
       IF (Length(s1) < 2) THEN
         Exit;
        NL;
-      Print('Now enter your country name:');
-      Prt(': ');
+      {Print('Now enter your country name:');}
+      Prt('Enter your country: ');
       MPL(26);
       InputCaps(s2,26);
       IF (Length(s2) < 2) THEN
@@ -237,9 +231,9 @@ VAR
     s: Str35;
   BEGIN
     CASE QuestionNum OF
-      1 : UserDefQues := lRGLngStr(38,TRUE); {'Is ALL of your information REAL & CORRECT? (Yes/No)'}
-      2 : UserDefQues := lRGLngStr(39,TRUE); {'Do you run a Telnet BBS? (If so, type in address below)'}
-      3 : UserDefQues := lRGLngStr(40,TRUE); {'What BBS or Web Site did you hear about this BBS? (Specific Please)'}
+      1 : UserDefQues := lRGLngStr(38,TRUE); { SysOp Defined Question #1 }
+      2 : UserDefQues := lRGLngStr(39,TRUE);                        { #2 }
+      3 : UserDefQues := lRGLngStr(40,TRUE);                        { #3 }
     END;
     IF (UserDefQues = '') THEN
     BEGIN
@@ -359,7 +353,7 @@ VAR
     END;
   END;
 
-  PROCEDURE DoPhone;
+ PROCEDURE DoPhone;
   VAR
     TempPhone: AStr;
   BEGIN
@@ -371,12 +365,12 @@ VAR
               IEMSIRec.Ph := '';
             END;
           END;
-      2 : FindArea;
-      3 : CallFromArea := 1;
+      2 : DoCountry;
+      3 : CountryNum := 1;
     END;
-    Print('Enter your phone number:');
-    Prt(': ');
-    IF (((How = 1) AND (CallFromArea = 3)) OR (How = 3)) THEN
+    {Print('Enter your phone number:');}
+    Prt('Enter your phone number: ');
+    IF (((How = 1) AND (CountryNum = 3)) OR (How = 3)) THEN
     BEGIN
       MPL(12);
       Input(TempPhone,12);
@@ -519,8 +513,8 @@ VAR
         Buf := IEMSIRec.UserName;
         IEMSIRec.UserName := '';
       END;
-    Print('Enter your real first & last name:');
-    Prt(': ');
+    {Print('Enter your real first & last name:');}
+    Prt('Enter your REAL first & last name: ');
     MPL((SizeOf(User.RealName) - 1));
     IF (How = 3) THEN
       InputL(TempRealName,(SizeOf(User.RealName) - 1))
@@ -562,62 +556,67 @@ VAR
     END;
   END;
 
-  PROCEDURE DoScreen;
+  PROCEDURE DoScreen; { Would be nice if defaults were in the input field }
   BEGIN
     InputByteWOC('How wide is your screen',User.LineLen,[DisplayValue,NumbersOnly],32,132);
-    InputByteWOC('%LFHow many lines per page',User.PageLen,[DisplayValue,NumbersOnly],4,50);
+	Nl;
+    InputByteWOC('How many lines per page',User.PageLen,[DisplayValue,NumbersOnly],4,50);
     Done1 := TRUE;
   END;
 
-  PROCEDURE DoSex;
+  PROCEDURE DoSex; { Simplified this a bit, check to see if it's ok }
   VAR
     Cmd: Char;
   BEGIN
+    Print('What''s your gender identity?');
+    Nl;
+    Print('(M) Male');
+    Print('(F) Female');
+    Print('(O) Other/Non-Binary');
+    Nl;
+    Prt('Select (MFO): ');
     IF (How = 3) THEN
-    BEGIN
-      Prt('New gender (M,F): ');
-      OneK(Cmd,'MF '^M,TRUE,TRUE);
-      IF (Cmd IN ['M','F']) THEN
-        User.Sex := Cmd;
-    END
+      BEGIN
+      OneK(Cmd,'MFO'^M,TRUE,TRUE);
+      IF (Cmd IN ['M','F','O']) THEN
+      User.Sex := Cmd;
+      END
     ELSE
-    BEGIN
-      User.Sex := #0;
-      Prt('Your gender (M,F)? ');
-      OneK(User.Sex,'MF',TRUE,TRUE);
-    END;
+      BEGIN
+        OneK(User.Sex,'MFO',TRUE,TRUE);
+      END;
     Done1 := TRUE;
   END;
 
-  PROCEDURE DoZIPCode;
+  PROCEDURE DoZipCode;
   VAR
     TempZipCode: Str10;
   BEGIN
     IF (How = 3) THEN
     BEGIN
-      FindArea;
+      DoCountry;
       NL;
     END;
-    CASE CallFromArea OF
+    CASE CountryNum OF
       1 : BEGIN
-            Print('Enter your zipcode (#####-####):');
-            Prt(': ');
+            {Print('Enter your zipcode (#####-####):');}
+            Prt('Enter your zip code (#####-####): ');
             InputFormatted('',TempZipCode,'#####-####',(How = 3));
             IF (TempZipCode <> '') THEN
               User.ZipCode := TempZipCode;
             Done1 := TRUE;
           END;
       2 : BEGIN
-            Print('Enter your postal code (LNLNLN format)');
-            Prt(': ');
+            {Print('Enter your postal code (LNLNLN format)');}
+            Prt('Enter your postal code (A#A#A#): ');
             InputFormatted('',TempZipCode,'@#@#@#',(How = 3));
             IF (TempZipCode <> '') THEN
               User.ZipCode := TempZipCode;
             Done1 := TRUE
           END;
       3 : BEGIN
-            Print('Enter your postal code:');
-            Prt(': ');
+            {Print('Enter your postal code:');}
+            Prt('Enter your postal code: ');
             MPL((SizeOf(User.ZipCode) - 1));
             Input(TempZipCode,(SizeOf(User.ZipCode) - 1));
             IF (Length(TempZipCode) > 2) THEN
@@ -661,7 +660,7 @@ VAR
       END;
     END;
     IF (How = 3) THEN
-      PauseSCr(FALSE);
+      PauseScr(FALSE);
   END;
 
   PROCEDURE MailBox;
@@ -669,18 +668,18 @@ VAR
     IF (NoMail IN User.Flags) THEN
     BEGIN
       Exclude(User.Flags,NoMail);
-      Print('Mail box is now open.');
+      Print('Your mailbox is open');
       IF (How = 3) THEN
         PauseScr(FALSE);
-      SysOpLog('Mail box is now open.');
+      {SysOpLog('Mail box is now open.');}
     END
     ELSE IF (User.ForUsr <> 0) THEN
     BEGIN
       User.ForUsr := 0;
-      Print('Mail is no longer being forwarded.');
+      Print('Your mail is no longer being forwarded');
       IF (How = 3) THEN
         PauseSCr(FALSE);
-      SysOpLog('Mail forwarding ended.');
+      {SysOpLog('Mail forwarding ended.');}
     END
     ELSE
     BEGIN
@@ -688,10 +687,10 @@ VAR
       BEGIN
         Include(User.Flags,NoMail);
         NL;
-        Print('Mail box is now closed.');
+        Print('Your mailbox is closed');
         IF (How = 3) THEN
-          PauseSCr(FALSE);
-        SysOpLog('Mail box is now closed.');
+          PauseScr(FALSE);
+        {SysOpLog('Your Mailbox is closed');}
       END
       ELSE
       BEGIN
@@ -703,20 +702,20 @@ VAR
     Done1 := TRUE;
   END;
 
-  PROCEDURE Toggle_ANSI;
+  PROCEDURE DoTermEmu;
   VAR
     Cmd: Char;
   BEGIN
     PrintF('TERMINAL');
-    Print('Which terminal emulation do you support?');
+    Print('Which emulation does your terminal client support?');
     NL;
     Print('(1) None');
     Print('(2) ANSI');
     Print('(3) Avatar');
     Print('(4) VT-100');
-    Print('(5) RIP Graphics');
+    Print('(5) RIP');
     NL;
-    Prt('Select (1-5): ');
+    Prt('Select (12345): ');
     OneK(Cmd,'12345',TRUE,TRUE);
     Exclude(User.Flags,ANSI);
     Exclude(User.Flags,Avatar);
@@ -727,7 +726,7 @@ VAR
       '3' : BEGIN
               Include(User.Flags,Avatar);
               NL;
-              IF PYNQ('Does your terminal program support ANSI fallback? ',0,TRUE) THEN
+              IF PYNQ('Does your terminal client support ANSI fallback? ',0,TRUE) THEN
                 Include(User.Flags,ANSI);
             END;
       '4' : Include(User.Flags,VT100);
@@ -747,123 +746,78 @@ VAR
       Exclude(User.SFlags,AutoDetect);
     Done1 := TRUE;
   END;
+ 
+  Procedure Toggle_Color;
+  Begin
+    If How = 2 Then
+      Begin
+        IF (Color In User.Flags) Then
+          Begin
+            Exclude(User.Flags,Color);
+            Print('ANSI color disabled');
+          End
+        Else
+          Begin
+          Include(User.Flags,Color);
+          Print('ANSI color enabled');
+          End;
+	    Done1 := True;
+	    PauseScr(False);
+	  End
+    Else
+      Begin
+        If PYNQ('Enable ANSI Colors? ',0,True) Then
+          Include(User.Flags,Color)
+        Else
+          Exclude(User.Flags,Color);
+        Done1 := TRUE;
+{ Text color bug happening if select no -- investigate }
+      End
+  End;
 
-  PROCEDURE Toggle_Color;
-  BEGIN
-    IF (Color IN User.Flags) THEN
-    BEGIN
-      Exclude(User.Flags,Color);
-      Print('ANSI Color disabled.');
-    END
-    ELSE
-    BEGIN
-      Include(User.Flags,Color);
-      Print('ANSI Color enabled.');
-    END;
-    Done1 := TRUE;
-  END;
-
-  PROCEDURE Toggle_Pause;
-  BEGIN
-    IF (Pause IN User.Flags) THEN
-    BEGIN
-      Exclude(User.Flags,Pause);
-      Print('Pause on screen disabled');
-    END
-    ELSE
-    BEGIN
-      Include(User.Flags,Pause);
-      Print('Pause on screen enabled');
-    END;
-    Done1 := TRUE;
-  END;
-
-  PROCEDURE Toggle_Editor;
-  BEGIN
-    Done1 := TRUE;
-    IF (NOT (ANSI IN User.Flags)) AND (NOT (Avatar IN User.Flags)) THEN
-    BEGIN
-      Print('You must use ANSI to use the full screen editor.');
-      Exclude(User.SFlags,FSEditor);
-      Exit;
-    END;
-    IF (FSEditor IN User.SFlags) THEN
-    BEGIN
-      Exclude(User.SFlags,FSEditor);
-      Print('Full screen editor disabled.');
-    END
-    ELSE
-    BEGIN
-      Include(User.SFlags,FSEditor);
-      Print('Full screen editor enabled.');
-    END;
-  END;
-
-  PROCEDURE Toggle_Input;
-  BEGIN
-    IF (HotKey IN User.Flags) THEN
-    BEGIN
-      Exclude(User.Flags,HotKey);
-      Print('Full line input.');
-    END
-    ELSE
-    BEGIN
-      Include(User.Flags,HotKey);
-      Print('Hot key input.');
-    END;
-    Done1 := TRUE;
-  END;
-
-  PROCEDURE Toggle_CLSMsg;
-  BEGIN
-    IF (CLSMsg IN User.SFlags) THEN
-    BEGIN
-      Exclude(User.SFlags,CLSMsg);
-      Print('Screen clearing off.');
-    END
-    ELSE
-    BEGIN
-      Include(User.SFlags,CLSMsg);
-      Print('Screen clearing on.');
-    END;
-    Done1 := TRUE;
-  END;
-
-  PROCEDURE Toggle_Expert;
-  BEGIN
-    IF (Novice IN User.Flags) THEN
-    BEGIN
-      Exclude(User.Flags,Novice);
-      CurHelpLevel := 1;
-      Print('Expert mode on.');
-    END
-    ELSE
-    BEGIN
-      Include(User.Flags,Novice);
-      CurHelpLevel := 2;
-      Print('Expert mode off.');
-    END;
-    Done1 := TRUE;
-  END;
+  Procedure Toggle_Editor;
+    Begin
+      Done1 := True;
+      If (Not (ANSI In User.Flags)) And (Not (Avatar In User.Flags)) Then
+        Begin
+          Print('Your terminal client must support ANSI to use the full screen editor');
+          Exclude(User.SFlags,FSEditor);
+          Exit;
+        End;
+      If (FSEditor In User.SFlags) Then
+        Begin
+          Exclude(User.SFlags,FSEditor);
+          Print('Line editor enabled');
+        End
+      Else
+        Begin
+          Include(User.SFlags,FSEditor);
+          Print('Full screen editor enabled');
+        End;
+	  PauseScr(False);
+    End;
 
   PROCEDURE Toggle_File_Area_LightBar;
   BEGIN
     IF (NOT General.UseFileAreaLightBar) THEN
     BEGIN
       NL;
-      Print('File area lightbar support is not available.');
+      Print('SysOp has disabled the file area lightbar');
+	  PauseScr(False);
     END
     ELSE
     BEGIN
       IF (FileAreaLightBar IN ThisUser.SFlags) THEN
       BEGIN
         Exclude(ThisUser.SFlags,FileAreaLightBar);
-        Print('File area lightbar support is now off.');
+        Print('File area lightbar disabled');
+		PauseScr(False);
       END
       ELSE
       BEGIN
         Include(ThisUser.SFlags,FileAreaLightBar);
-        Print('File area lightbar support is now on.');
+        Print('File area lightbar enabled');
+		PauseScr(False);
       END;
     END;
     Done1 := TRUE;
@@ -874,35 +828,38 @@ VAR
     IF (NOT General.UseMsgAreaLightBar) THEN
     BEGIN
       NL;
-      Print('Message area lightbar support is not available.');
+      Print('SysOp has disabled the message area lightbar');
+	  PauseScr(False);
     END
     ELSE
     BEGIN
       IF (MsgAreaLightBar IN ThisUser.SFlags) THEN
       BEGIN
         Exclude(ThisUser.SFlags,MsgAreaLightBar);
-        Print('Message area lightbar support is now off.');
+        Print('Message area lightbar disabled');
+		PauseScr(False);
       END
       ELSE
       BEGIN
         Include(ThisUser.SFlags,MsgAreaLightBar);
-        Print('Message area lightbar support is now on.');
+        Print('Message area lightbar enabled');
+		PauseScr(False);
       END;
     END;
     Done1 := TRUE;
   END;
 
-  PROCEDURE CHColors;
+  PROCEDURE DoColorScheme; { Would be nice if ENTER selected default (#1) }
   VAR
     AScheme: SchemeRec;
     i,
     Onlin: SmallInt;
   BEGIN
     Reset(SchemeFile);
-    CLS;
+    {CLS;}
     Abort := FALSE;
     Next := FALSE;
-    PrintACR('Available Color schemes:');
+    PrintACR('Available Color Schemes:');
     NL;
     i := 1;
     Onlin := 0;
@@ -911,7 +868,7 @@ VAR
     BEGIN
       Read(SchemeFile,AScheme);
       Inc(Onlin);
-      Prompt(PadLeftInt(i,2)+'. ^3'+PadLeftStr(AScheme.Description,35));
+      Prompt('('+PadLeftInt(i,2)+') '+PadLeftStr(AScheme.Description,35));
       IF (OnLin = 2) THEN
       BEGIN
         NL;
@@ -935,95 +892,182 @@ VAR
     LastError := IOResult;
   END;
 
-  PROCEDURE CheckWantPause;
-  BEGIN
-    IF PYNQ('Pause after each screen? ',0,TRUE) THEN
-      Include(User.Flags,Pause)
-    ELSE
-      Exclude(User.Flags,Pause);
-    Done1 := TRUE;
-  END;
+  Procedure Toggle_Pause;
+    Begin
+      If How = 2 Then
+        Begin
+          If (Pause In User.Flags) Then
+            Begin
+              Exclude(User.Flags,Pause);
+              Print('Pause after each screen disabled');
+            End
+          Else
+            Begin
+              Include(User.Flags,Pause);
+              Print('Pause after each screen enabled');
+            End;
+          Done1 := True;
+	      PauseScr(False);
+        End
+      Else
+        Begin
+          If PYNQ('Pause after each screen? ',0,True) Then
+            Include(User.Flags,Pause)
+          Else
+            Exclude(User.Flags,Pause);
+        Done1 := True;
+        End
+    End;
+  
+  Procedure Toggle_HotKey;
+    Begin
+      If How = 2 Then
+        Begin
+          If (HotKey In User.Flags) Then
+            Begin
+              Exclude(User.Flags,HotKey);
+              Print('Full line input enabled');
+            End
+          Else
+            Begin
+              Include(User.Flags,HotKey);
+              Print('Hot key input enabled');
+            End;
+          Done1 := True;
+          PauseScr(False);
+        End
+      Else
+        Begin
+          If PYNQ('Do you want to use Hot Keys? ',0,True) Then
+            Include(User.Flags,HotKey)
+          Else
+            Exclude(User.Flags,HotKey);
+          Done1 := True;
+        End
+    End;
+  
+  Procedure Toggle_Expert;
+    Begin
+      If How = 2 Then
+        Begin
+          If (Novice In User.Flags) Then
+            Begin
+              Exclude(User.Flags,Novice);
+              CurHelpLevel := 1;
+              Print('Expert mode enabled');
+            End
+          Else
+            Begin
+              Include(User.Flags,Novice);
+              CurHelpLevel := 2;
+              Print('Expert mode disabled');
+            End;
+          Done1 := True;
+	      PauseScr(False);
+        End
+      Else
+        Begin
+          If PYNQ('Do you want to be in expert mode? ',0,False) Then
+            Exclude(User.Flags,Novice)
+          Else
+            Include(User.Flags,Novice);
+          Done1 := True;
+        End
+    End;
+  
+  Procedure Toggle_Clear;
+    Begin
+      If How = 2 Then
+        Begin
+          If (CLSMsg In User.SFlags) Then
+            Begin
+              Exclude(User.SFlags,CLSMsg);
+              Print('Screen clearing disabled');
+            End
+          Else
+            Begin
+              Include(User.SFlags,CLSMsg);
+              Print('Screen clearing enabled');
+            End;
+          Done1 := True;
+          PauseScr(False);
+        End
+      Else
+        Begin
+          If PYNQ('Clear screen before each message read? ',0,True) Then
+            Include(User.SFlags,CLSMsg)
+          ELSE
+            Exclude(User.SFlags,CLSMsg);
+          Done1 := True;
+        End
+    End;
+  
+  Procedure WW(www: Byte);
+  Begin
+    Nl;
+    Case www Of
+        01 : DoName;            { (!) Handle, or Real Name *MANDATORY* }
+        02 : DoRealName;        { (A) Real Name }
+        03 : DoCountry;         { (B) Country }
+        04 : DoCityState;       { (C) City State }
+        05 : DoAddress;         { (D) Address }
+        06 : DoZipCode;         { (E) Zip Code }
+        07 : DoPhone;           { (F) Phone Number }
+        08 : DoAge;             { (G) Birthdate }
+        09 : DoSex;             { (H) Gender Identity }
+        10 : DoUserDef(1);      { (I) Sysop Defined Question #1 }
+        11 : DoUserDef(2);      { (J) Sysop Defined Question #2 }
+        12 : DoUserDef(3);      { (K) Sysop Defined Question #3 }
+        13 : DoTermEmu;         { (L) Terminal Emulation }
+        14 : Toggle_Color;      { (M) ANSI Colors }
+        15 : DoColorScheme;     { (N) Color Scheme }
+        16 : DoScreen;          { (O) Screen Size }
+        17 : Toggle_Clear;      { (P) Screen Clearing }
+        18 : Toggle_Pause;      { (R) Screen Pause }
+        19 : Toggle_HotKey;     { (S) Hot Keys }
+        20 : ConfigureQWK;      { (T) QWK Configuration } { Is This Relevent Anymore? }
+        21 : Toggle_Expert;     { (U) Expert Mode }
+        22 : DoPW;              { (!) Password *MANDATORY* }
+        23 : DoForgotPW;        { (V) Forgot Password Answer }
 
-  PROCEDURE CheckWantInput;
-  BEGIN
-    IF PYNQ('Do you want to use Hot Keys? ',0,TRUE) THEN
-      Include(User.Flags,HotKey)
-    ELSE
-      Exclude(User.Flags,HotKey);
-    Done1 := TRUE;
-  END;
+{       Commands above can be toggled on or off for new user application,
+        Commands below are accessible through account settings menu and user editor }
 
-  PROCEDURE CheckWantExpert;
-  BEGIN
-    IF PYNQ('Do you want to be in expert mode? ',0,FALSE) THEN
-      Exclude(User.Flags,Novice)
-    ELSE
-      Include(User.Flags,Novice);
-    Done1 := TRUE;
-  END;
+        24 : MailBox;                           { Mail Forwarding }
+        25 : Toggle_Editor;                     { Fullscreen or Line Editor }
+        26 : Toggle_File_Area_LightBar;         { File Area Lightbar }
+        27 : Toggle_Message_Area_LightBar;      { Message Area Lightbar }
+    End;
+  End;
 
-  PROCEDURE CheckWantCLSMsg;
-  BEGIN
-    IF PYNQ('Clear screen before each message read? ',0,TRUE) THEN
-      Include(User.SFlags,CLSMsg)
-    ELSE
-      Exclude(User.SFlags,CLSMsg);
-    Done1 := TRUE;
-  END;
-
-  PROCEDURE WW(www: Byte);
-  BEGIN
-    NL;
-    CASE www OF
-      1 : DoAddress;
-      2 : DoAge;
-      3 : Toggle_ANSI;
-      4 : DoCityState;
-      5 : DoUserDef(1);
-      6 : DoUserDef(2);
-      7 : DoName;
-      8 : DoPhone;
-      9 : DoPW;
-     10 : DoRealName;
-     11 : DoScreen;
-     12 : DoSex;
-     13 : DoUserDef(3);
-     14 : DoZIPCode;
-     15 : MailBox;
-     16 : Toggle_ANSI;
-     17 : Toggle_Color;
-     18 : Toggle_Pause;
-     19 : Toggle_Input;
-     20 : Toggle_CLSMsg;
-     21 : CHColors;
-     22 : Toggle_Expert;
-     23 : FindArea;
-     24 : CheckWantPause;
-     25 : CheckWantInput;
-     26 : Toggle_Editor;
-     27 : ConfigureQWK;
-     28 : CheckWantExpert;
-     29 : CheckWantCLSMsg;
-     30 : DoForgotPW;
-     31 : Toggle_File_Area_LightBar;
-     32 : Toggle_Message_Area_LightBar;
-    END;
-  END;
-
-BEGIN
+Begin
   Try := 0;
-  Done1 := FALSE;
-  CASE How OF
-    1 : REPEAT
+  Done1 := False;
+  Case How Of
+    1 : Repeat { 1 = New User Application }
           WW(Which)
-        UNTIL (Done1) OR (HangUp);
+        Until (Done1) Or (HangUp);
     2,3 :
-        BEGIN
+        Begin { 2 = Menu Command OP, 3 = User Editor, Maint }
           WW(Which);
-          IF (NOT Done1) THEN
+          If (Not Done1) Then
             Print('Function aborted!');
-        END;
-  END;
-END;
+        End;
+  End;
+End;
 
-END.
+(*
+  Procedure Toggle_Something;
+    Begin
+      If How = 2 Then
+        Begin
+         { for 2 }
+        End
+      Else
+        Begin
+          { for not 2 }
+        End
+    End;
+*)
+
+End.

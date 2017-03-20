@@ -772,7 +772,7 @@ BEGIN
   for i := 1 to Len do
   begin
     CRC := CRC_32_TAB[Byte(Crc XOR LongInt(Octet^))] XOR ((Crc SHR 8) AND $00FFFFFF);
-	Inc(Octet);
+        Inc(Octet);
   end;
   UpdateCRC32 := CRC;
 END;
@@ -1172,7 +1172,7 @@ END;
 FUNCTION PHours(CONST DisplayStr: AStr; LoTime,HiTime: Integer): AStr;
 BEGIN
   IF (LoTime <> HiTime) THEN
-    PHours := ZeroPad(IntToStr(LoTime DIV 60))+':'+ZeroPad(IntToStr(LoTime MOD 60))+'....'+
+    PHours := ZeroPad(IntToStr(LoTime DIV 60))+':'+ZeroPad(IntToStr(LoTime MOD 60))+' - '+
               ZeroPad(IntToStr(HiTime DIV 60))+':'+ZeroPad(IntToStr(HiTime MOD 60))
   ELSE
     PHours := DisplayStr;
@@ -2651,20 +2651,20 @@ BEGIN
             c := CInKey;
         END;
         CASE Char(c) OF
-          'A' : InKey := F_UP;      {UpArrow}
-          'B' : InKey := F_DOWN;    {DownArrow}
-          'C' : InKey := F_RIGHT;   {RightArrow}
-          'D' : InKey := F_LEFT;    {LeftArrow}
-          'H' : InKey := F_HOME;    {Home}
-          'K' : InKey := F_END;    {END - PROCOMM+}
-          'R' : InKey := F_END;     {END - GT}
+          'A' : InKey := F_UP;    {UpArrow}
+          'B' : InKey := F_DOWN;  {DownArrow}
+          'C' : InKey := F_RIGHT; {RightArrow}
+          'D' : InKey := F_LEFT;  {LeftArrow}
+          'H' : InKey := F_HOME;  {Home}
+          'K' : InKey := F_END;   {END - PROCOMM+}
+          'R' : InKey := F_END;   {END - GT}
           '4' : BEGIN
                   InKey := F_END;
                   c := CInKey;
                 END;
-          'r' : InKey := F_PGUP;    {PgUp}
-          'q' : InKey := F_PGDN;    {PgDn}
-          'n' : InKey := F_INS;     {Ins}
+          'r' : InKey := F_PGUP;  {PgUp}
+          'q' : InKey := F_PGDN;  {PgDn}
+          'n' : InKey := F_INS;   {Ins}
         END;
         Exit;
       END;
@@ -4504,7 +4504,7 @@ BEGIN
   ELSE
     BEGIN
       IF NOT (PauseIsNull) THEN
-      { Prompt({FString.lPause); }
+
       lRGLngStr(5,FALSE);
     END;
   LIL := 1;
@@ -4745,6 +4745,7 @@ BEGIN
                         END;
                 END;
           'E' : CASE UpCase(S[Index + 2]) OF
+		          'C' : Add := ''; { Add ANSI Escape Character }
                   'D' : Add := AOnOff((Expiration = 0),'Never',ToDate8(PD2Date(Expiration)));
                   'S' : Add := FormatNumber(EmailSent);
                   'T' : Add := IntToStr(General.EventWarningTime);
@@ -4768,7 +4769,10 @@ BEGIN
                   'T' : Add := IntToStr(NumFileAreas);
                 END;
           'G' : CASE UpCase(S[Index + 2]) OF
-                  'N' : AOnOff((Sex = 'M'),'Mr.','Ms.');
+                  'N' : {AOnOff((Sex = 'M'),'Mr.','Ms.');}
+                        If (Sex = 'M') Then Add := 'Mr.' Else
+                        If (Sex = 'F') Then Add := 'Ms.' Else
+                        If (Sex = 'O') Then Add := '';
                 END;
           'H' : CASE UpCase(S[Index + 2]) OF
                   '1' : Add := CTim(General.lLowTime);  (* Verify All CTim *)
@@ -4915,7 +4919,9 @@ BEGIN
                   'N' : Add := General.SysopName;
                   'P' : Add := IntToStr(General.TotalPosts);
                   'U' : Add := IntToStr(General.TotalUloads);
-                  'X' : Add := AOnOff((Sex = 'M'),'Male','Female');
+                  'X' : If (Sex = 'M') Then Add := 'Male' Else
+                        If (Sex = 'F') Then Add := 'Female' Else
+                        If (Sex = 'O') Then Add := 'Other';
                 END;
           'T' : CASE UpCase(S[Index + 2]) OF
                   '1' : Add := FormatNumber(General.TimeAllow[SL]);

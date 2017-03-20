@@ -1,9 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
-{$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
-
 UNIT AutoMsg;
 
 INTERFACE
@@ -15,6 +9,7 @@ PROCEDURE ReplyAutoMsg;
 IMPLEMENTATION
 
 USES
+  Dos,
   Common,
   Email,
   Mail0,
@@ -26,6 +21,8 @@ VAR
   TempStr: AStr;
   Counter,
   LenTempStr: Byte;
+  FileDateTime: LongInt;
+  FileDateTime2: DateTime;
 BEGIN
   Assign(AutoMsgFile,General.MiscPath+'AUTO.ASC');
   Reset(AutoMsgFile);
@@ -45,8 +42,13 @@ BEGIN
               TempStr := 'Anonymous';
     END;
     NL;
-    Print(lRGLngStr(10,TRUE){FString.AutoMsgT}+TempStr);
-    LenTempStr := 0;
+	GetFileDateTime(General.MiscPath+'AUTO.ASC',FileDateTime);
+	UnpackTime(FileDateTime,FileDateTime2);
+	With FileDateTime2 Do
+	  Begin
+        Print(lRGLngStr(10,TRUE){FString.AutoMsgT}+TempStr+' on '+IntToStr(Month)+'/'+IntToStr(Day)+'/'+IntToStr(Year));
+      End;
+	LenTempStr := 0;
     REPEAT
       ReadLn(AutoMsgFile,TempStr);
       IF (LennMCI(TempStr) > LenTempStr) THEN
@@ -136,7 +138,7 @@ BEGIN
   Assign(AutoMsgFile,General.MiscPath+'AUTO.ASC');
   Reset(AutoMsgFile);
   IF (IOResult <> 0) THEN
-    Print('%LFNo auto-message to reply to.')
+    Print('No auto-message to reply to.')
   ELSE
   BEGIN
     ReadLn(AutoMsgFile,TempStr);
@@ -150,7 +152,7 @@ BEGIN
     ELSE
       LastAuthor := SearchUser(TempStr,CoSysOp);
     IF (LastAuthor = 0) THEN
-      Print('%LFUnable to reply to an anonymous message!')
+	  Print('Unable to reply to an anonymous message!')
     ELSE
     BEGIN
       InResponseTo := 'Your auto-message';

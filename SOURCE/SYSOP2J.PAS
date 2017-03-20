@@ -185,7 +185,9 @@ VAR
     REPEAT
       Abort := FALSE;
       Next := FALSE;
-      CLS; { starts at color 28 }
+      Cls;
+
+
       PrintACR('ÚÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄ¿');
       PrintACR('³ Msg# ³ Sender            ³ Receiver           ³  '+
                'Subject           ³! Posted ³');
@@ -760,6 +762,8 @@ VAR
     Abort := FALSE;
     Next := FALSE;
     CLS;
+	PrintACR(PadLeftStr('|17|15 ş Renegade BBS Configuration : Color Scheme Configuration',80));
+
     PrintACR('^0###^4:^3'+PadLeftStr('Description',30)+'^4:^3Colors');
     PrintACR('^4===:==============================:============================');
     Reset(SchemeFile);

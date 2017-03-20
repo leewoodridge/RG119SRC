@@ -45,13 +45,13 @@ VAR
     Counter: Byte;
   BEGIN
     TempStr := '';
-    Prompt('^5"^1');
+    Prompt('|15"|15');
     FOR Counter := 1 TO Length(S) DO
       IF (S[Counter] >= ' ') THEN
         TempStr := TempStr + S[Counter]
       ELSE
-        TempStr := TempStr +  '^3^'+Chr(Ord(S[Counter]) + 64)+'^1';
-    Prompt(PadLeftStr(TempStr,MaxLen)+'^5"');
+        TempStr := TempStr +  '^3^'+Chr(Ord(S[Counter]) + 64)+'|15';
+    Prompt(PadLeftStr(TempStr,MaxLen)+'|15"');
   END;
 
   PROCEDURE MMacroo(MacroNum: Byte);
@@ -60,8 +60,8 @@ VAR
     C: Char;
     Counter: Byte;
   BEGIN
-    Print('%CL^5Enter new F'+IntToStr(MacroNum + 1)+' macro now.');
-    Print('^5Enter ^Z to end recording. 100 character limit.%LF');
+    Print('%CL|15Enter new F'+IntToStr(MacroNum + 1)+' macro now.');
+    Print('|15Enter ^Z to end recording. 100 character limit.%LF');
     S := '';
     Counter := 1;
     REPEAT
@@ -90,7 +90,7 @@ VAR
           IF (C = ^M) THEN
             NL
           ELSE
-            Prompt('^3^'+Chr(Ord(C) + 64)+'^1');
+            Prompt('^3^'+Chr(Ord(C) + 64)+'|15');
           S[Counter] := C;
           Inc(Counter);
         END;
@@ -116,56 +116,58 @@ BEGIN
     BEGIN
       Abort := FALSE;
       Next := FALSE;
-      Print('%CL^5System Variables:');
-      NL;
-      PrintACR('^1A. Max private sent per call: ^5'+PadLeftInt(MaxPrivPost,6)+
-             '^1  B. Max feedback sent per call: ^5'+PadLeftInt(MaxFBack,6));
-      PrintACR('^1C. Max public posts per call: ^5'+PadLeftInt(MaxPubPost,6)+
-             '^1  D. Max chat attempts per call: ^5'+PadLeftInt(MaxChat,6));
-      PrintACR('^1E. Normal max mail waiting  : ^5'+PadLeftInt(MaxWaiting,6)+
-             '^1  F. CoSysOp max mail waiting  : ^5'+PadLeftInt(CSMaxWaiting,6));
-      PrintACR('^1G. Max mass mail list       : ^5'+PadLeftInt(MaxMassMailList,6)+
-             '^1  H. Logins before bday check  : ^5'+PadLeftInt(BirthDateCheck,6));
-      PrintACR('^1I. Swap shell should use    : ^5'+PadLeftStr(DisplaySwapTo(SwapTo),6)+
-             '^1  J. Number of logon attempts  : ^5'+PadLeftInt(MaxLogonTries,6));
-      PrintACR('^1K. Password change in days  : ^5'+PadLeftInt(PasswordChange,6)+
-             '^1  L. SysOp chat color          : ^5'+PadLeftInt(SysOpColor,6));
-      PrintACR('^1M. User chat color          : ^5'+PadLeftInt(UserColor,6)+
-             '^1  N. Min. space for posts      : ^5'+PadLeftInt(MinSpaceForPost,6));
-      PrintACR('^1O. Min. space for uploads   : ^5'+PadLeftInt(MinSpaceForUpload,6)+
-             '^1  P. Back SysOp Log keep days  : ^5'+PadLeftInt(BackSysOpLogs,6));
-      PrintACR('^1R. Blank WFC menu minutes   : ^5'+PadLeftInt(WFCBlankTime,6)+
-             '^1  S. Alert beep delay          : ^5'+PadLeftInt(AlertBeep,6));
-      PrintACR('^1T. Number of system callers : ^5'+PadLeftInt(CallerNum,6)+
-             '^1  U. Minimum logon baud rate   : ^5'+PadLeftInt(MinimumBaud,6));
-      PrintACR('^1V. Minimum D/L baud rate    : ^5'+PadLeftInt(MinimumDLBaud,6)+
-             '^1  W. Sec''s between Time Slices : ^5'+PadLeftInt(SliceTimer,6));
-      PrintACR('^1X. TB max time allowed      : ^5'+PadLeftInt(MaxDepositEver,6)+
-             '^1  Y. TB max per day deposit    : ^5'+PadLeftInt(MaxDepositPerDay,6));
-      PrintACR('^1Z. TB max per day withdrawal: ^5'+PadLeftInt(MaxWithDrawalPerDay,6));
+	  Cls;
+      PrintACR(PadLeftStr('|17|15 þ Renegade BBS Configuration : System Variables',80));
+	  
+      PrintACR('|07(|15A|07) Max Private Sent Per Call  : |15'+PadLeftInt(MaxPrivPost,6)+
+               '|07(|15B|07) Max Feedback Sent Per Call : |15'+PadLeftInt(MaxFBack,6));
+      PrintACR('|07(|15C|07) Max Public Posts Per Call  : |15'+PadLeftInt(MaxPubPost,6)+
+               '|07(|15D|07) Max Chat Attempts Per Call : |15'+PadLeftInt(MaxChat,6));
+      PrintACR('|07(|15E|07) Normal Max Mail Waiting    : |15'+PadLeftInt(MaxWaiting,6)+
+               '|07(|15F|07) CoSysOp Max Mail Waiting   : |15'+PadLeftInt(CSMaxWaiting,6));
+      PrintACR('|07(|15G|07) Max Mass Mail List         : |15'+PadLeftInt(MaxMassMailList,6)+
+               '|07(|15H|07) Logins Before BDay Check   : |15'+PadLeftInt(BirthDateCheck,6));
+      PrintACR('|07(|15I|07) Swap shell should use      : |15'+PadLeftStr(DisplaySwapTo(SwapTo),6)+
+               '|07(|15J|07) Number Of Logon Attempts   : |15'+PadLeftInt(MaxLogonTries,6));
+      PrintACR('|07(|15K|07) Password Change In Days    : |15'+PadLeftInt(PasswordChange,6)+
+               '|07(|15L|07) SysOp Chat Color           : |15'+PadLeftInt(SysOpColor,6));
+      PrintACR('|07(|15M|07) User Chat Color            : |15'+PadLeftInt(UserColor,6)+
+               '|07(|15N|07) Min. space for posts       : |15'+PadLeftInt(MinSpaceForPost,6));
+      PrintACR('|07(|15O|07) Min. space for uploads     : |15'+PadLeftInt(MinSpaceForUpload,6)+
+               '|07(|15P|07) Back SysOp Log keep days   : |15'+PadLeftInt(BackSysOpLogs,6));
+      PrintACR('|07(|15R|07) Blank WFC Menu Minutes     : |15'+PadLeftInt(WFCBlankTime,6)+
+               '|07(|15S|07) Alert Beep Delay           : |15'+PadLeftInt(AlertBeep,6));
+      PrintACR('|07(|15T|07) Number Of System Callers   : |15'+PadLeftInt(CallerNum,6)+
+               '|07(|15U|07) Minimum Logon Baud Rate    : |15'+PadLeftInt(MinimumBaud,6));
+      PrintACR('|07(|15V|07) Minimum DL Baud Rate       : |15'+PadLeftInt(MinimumDLBaud,6)+
+               '|07(|15W|07) Sec''s Between Time Slices  : |15'+PadLeftInt(SliceTimer,6));
+      PrintACR('|07(|15X|07) TB Max Time Allowed        : |15'+PadLeftInt(MaxDepositEver,6)+
+               '|07(|15Y|07) TB Max Daily Deposit       : |15'+PadLeftInt(MaxDepositPerDay,6));
+      PrintACR('|07(|15Z|07) TB Max Daily Withdraw      : |15'+PadLeftInt(MaxWithDrawalPerDay,6));
       NL;
       FOR TempB := 0 TO 9 DO
       BEGIN
-        Prompt('^1'+IntToStr(TempB)+'. F'+IntToStr(TempB + 1)+' Macro :^5');
+        Prompt('|15'+IntToStr(TempB)+'. F'+IntToStr(TempB + 1)+' Macro :|15');
         DisplayMacroo(Macro[TempB],21);
         IF Odd(TempB) THEN
           NL
         ELSE
           Prompt('   ');
       END;
-      Prt('%LFEnter selection [^5A^4-^5P^4,^5R^4-^5Z^4,^50^4-^59^4,^5Q^4=^5Quit^4]: ');
-      OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ1234567890'^M,TRUE,TRUE);
+	  Nl;
+      Prt('|07Enter Selection or (|15Q|07) to Quit: |15');
+      OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ1234567890',TRUE,TRUE);
       CASE Cmd OF
         '0'..'9' :
               MMacroo(Ord(Cmd) - Ord('0'));
         'I' : BEGIN
-                Print('%LF^5Swap locations:^1');
-                Print('%LF^1(^3D^1)isk');
-                Print('^1(^3E^1)MS');
-                Print('^1(^3X^1)MS');
-                Print('^1(^3N^1)on XMS Extended');
-                Print('^1(^3A^1)ny');
-                lOneK('%LFSwap to which? [^5D^4,^5E^4,^5X^4,^5N^4,^5A^4,^5<CR>^4=^5Quit^4]: ',Cmd,'DEXNA'^M,TRUE,TRUE);
+                Print('%LF|15Swap locations:|15');
+                Print('%LF|15(^3D|15)isk');
+                Print('|15(^3E|15)MS');
+                Print('|15(^3X|15)MS');
+                Print('|15(^3N|15)on XMS Extended');
+                Print('|15(^3A|15)ny');
+                lOneK('%LFSwap to which? [|15D^4,|15E^4,|15X^4,|15N^4,|15A^4,|15<CR>^4=|15Quit^4]: ',Cmd,'DEXNA'^M,TRUE,TRUE);
                 CASE Pos(Cmd,'DXENA') OF
                   1..3 : SwapTo := (Pos(Cmd,'DXE') - 1);
                      4 : SwapTo := 4;
