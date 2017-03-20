@@ -1180,63 +1180,63 @@ VAR
 BEGIN
   NL;
   IF (NOT General.MultiNode) THEN
-  BEGIN
-    Print('This BBS is currently not operating in Multi-Node.');
-    Exit;
-  END;
+    BEGIN
+      Print('This BBS is currently not operating in Multi-Node.');
+      Exit;
+    END;
   s := b;
   NodeNum := StrToInt(s);
   IF (b <> '') AND (IsInvisible) THEN
     Exit;
   Forced := (s <> '');
-  IF (NodeNum = 0) AND (Copy(s,1,1) <> '0') THEN
-  BEGIN
-    pick_node(NodeNum,TRUE);
-    Forced := FALSE;
-    IF (NodeNum = 0) THEN
-      Exit;
-  END;
+    IF (NodeNum = 0) AND (Copy(s,1,1) <> '0') THEN
+      BEGIN
+        pick_node(NodeNum,TRUE);
+        Forced := FALSE;
+        IF (NodeNum = 0) THEN
+          Exit;
+      END;
   IF (NodeNum = ThisNode) THEN
     Exit;
   IF (Forced OR AACS(General.TeleConfMCI)) THEN
     s := MCI(s);
   IF (NodeNum > 0) THEN
-  BEGIN
-    LoadNode(NodeNum);
-    IF (NodeR.User = 0) THEN
-      Exit;
-  END;
+    BEGIN
+      LoadNode(NodeNum);
+      IF (NodeR.User = 0) THEN
+        Exit;
+    END;
   IF (s <> '') THEN
     s := '^1'+Copy(s,(Pos(';',s) + 1),255)
   ELSE
-  BEGIN
+    BEGIN
     Prt('Message: ');
     InputMain(s,(SizeOf(s) - 1),[ColorsAllowed]);
-  END;
+    END;
   IF (Forced OR AACS(General.TeleConfMCI)) THEN
     s := MCI(s);
   IF (s <> '') THEN
-  BEGIN
-    IF (NOT Forced) THEN
     BEGIN
-      LoadNode(NodeNum);
-      IF (NOT ((ThisNode MOD 8) IN NodeR.Forget[ThisNode DIV 8])) THEN
-        LowLevelSend(^M^J'^5Message from '+Caps(ThisUser.Name)+' on node '+IntToStr(ThisNode)+':^1'^M^J,NodeNum)
-      ELSE
-        Print(^M^J'That node has forgotten you.');
-    END;
-    IF (NodeNum = 0) THEN
-      FOR NodeNum := 1 TO MaxNodes DO
-        IF (NodeNum <> ThisNode) THEN
+      IF (NOT Forced) THEN
         BEGIN
           LoadNode(NodeNum);
-          IF (NodeR.User > 0) THEN
-            LowLevelSend(s,NodeNum)
-        END
+          IF (NOT ((ThisNode MOD 8) IN NodeR.Forget[ThisNode DIV 8])) THEN
+            LowLevelSend(^M^J'^5Message from '+Caps(ThisUser.Name)+' on node '+IntToStr(ThisNode)+':^1'^M^J,NodeNum)
+          ELSE
+            Print(^M^J'That node has forgotten you.');
+        END;
+      IF (NodeNum = 0) THEN
+        FOR NodeNum := 1 TO MaxNodes DO
+          IF (NodeNum <> ThisNode) THEN
+            BEGIN
+              LoadNode(NodeNum);
+              IF (NodeR.User > 0) THEN
+                LowLevelSend(s,NodeNum)
+            END
         ELSE      (* Match up ELSE Statements ??? *)
         ELSE
-         LowLevelSend(s,NodeNum);
-  END;
+          LowLevelSend(s,NodeNum);
+    END;
 END;
 
 FUNCTION NodeListMCI(CONST s: ASTR; Data1,Data2: Pointer): STRING;
@@ -1253,17 +1253,17 @@ BEGIN
      ((NInvisible IN NodeRecPtr^.Status) AND
      (NOT CoSysOp)) THEN
   BEGIN
-    NodeListMCI := '-';
+    NodeListMCI := RGNoteStr(34,TRUE); { Spacer Char If Node Empty }
     WITH NodeRecPtr^ DO
       CASE s[1] OF
         'N' : IF (s[2] = 'N') THEN
                 NodeListMCI := IntToStr(NodeNum^);
         'A' : CASE s[2] OF
-                'C' : NodelistMCI := RGNoteStr(33,TRUE);
+                'C' : NodelistMCI := RGNoteStr(33,TRUE); { Waiting For Logon }
                 'V' : NodeListMCI := AOnOff((NAvail IN Status),'Y','N');
               END;
         'U' : IF (s[2] = 'N') THEN
-                NodeListMCI := RGNoteStr(34,TRUE);
+                NodeListMCI := RGNoteStr(34,TRUE); { Spacer Char If Node Empty }
       END;
   END
   ELSE

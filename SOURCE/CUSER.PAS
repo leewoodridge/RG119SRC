@@ -365,8 +365,8 @@ VAR
               IEMSIRec.Ph := '';
             END;
           END;
-      2 : DoCountry;
-      3 : CountryNum := 1;
+      {2 : DoCountry;
+      3 : CountryNum := 1;}
     END;
     {Print('Enter your phone number:');}
     Prt('Enter your phone number: ');
@@ -663,7 +663,7 @@ VAR
       PauseScr(FALSE);
   END;
 
-  PROCEDURE MailBox;
+  PROCEDURE Mailbox;
   BEGIN
     IF (NoMail IN User.Flags) THEN
     BEGIN
@@ -1033,7 +1033,7 @@ VAR
 {       Commands above can be toggled on or off for new user application,
         Commands below are accessible through account settings menu and user editor }
 
-        24 : MailBox;                           { Mail Forwarding }
+        24 : Mailbox;                           { Mailbox / Mail Forwarding }
         25 : Toggle_Editor;                     { Fullscreen or Line Editor }
         26 : Toggle_File_Area_LightBar;         { File Area Lightbar }
         27 : Toggle_Message_Area_LightBar;      { Message Area Lightbar }

@@ -880,7 +880,7 @@ VAR
                       END
                       ELSE
                         CASE StrToInt(Cmd1) OF
-                          1 : CStuff(3,3,User);
+                          1 : CStuff(13,3,User); { Emulation }
                           2 : ToggleStatusFlag(CLSMsg,SFlags);
                           3 : ToggleACFlag(Pause,Flags);
                           4 : ToggleACFlag(Color,Flags);
@@ -1057,7 +1057,7 @@ BEGIN
                           Cmd := #0;
                         END;
                   '*' : AutoVal(User,UNum);
-                  '+' : CStuff(15,3,User);
+                  '+' : CStuff(24,3,User); { Mailbox }
                   '1'..'5' :
                         ChangeRecords(Ord(Cmd) - 48);
                   'A' : BEGIN
@@ -1083,22 +1083,22 @@ BEGIN
                               Print('Illegal Name.');
                           END;
                         END;
-                  'B' : BEGIN
+                  'B' : BEGIN { Real Name }
                           TempStr := User.RealName;
-                          CStuff(10,3,User);
+                          CStuff(2,3,User);
                           IF (User.RealName <> TempStr) THEN
                           BEGIN
                             InsertIndex(TempStr,UNum,TRUE,TRUE);
                             InsertIndex(User.RealName,UNum,TRUE,FALSE);
                           END;
                         END;
-                  'C' : CStuff(1,3,User);
-                  'D' : CStuff(4,3,User);
-                  'E' : CStuff(14,3,User);
+                  'C' : CStuff(5,3,User); { Address }
+                  'D' : CStuff(4,3,User); { City/State }
+                  'E' : CStuff(14,3,User); { Zip Code }
                   'F' : InputWN1('^1New SysOp note:%LF^4: ',User.Note,(SizeOf(User.Note) - 1),[ColorsAllowed],Next);
-                  'G' : CStuff(5,3,User);
-                  'H' : CStuff(6,3,User);
-                  'I' : CStuff(13,3,User);
+                  'G' : CStuff(10,3,User); { SysOp Question #1 }
+                  'H' : CStuff(11,3,User); { SysOp Question #2 }
+                  'I' : CStuff(12,3,User); { SysOp Question #3 }
                   'J' : BEGIN
                           REPEAT
                             NL;
@@ -1170,7 +1170,7 @@ BEGIN
                           UNTIL (Cmd = ^M) OR (HangUp);
                           Cmd := #0;
                         END;
-                  'K' : CStuff(27,3,User);
+                  'K' : CStuff(20,3,User); { QWK }
                   'L' : BEGIN
                           TempB := User.SL;
                           InputByteWOC('Enter new SL',TempB,[NumbersOnly],0,255);
@@ -1272,10 +1272,10 @@ BEGIN
                           Cmd := #0;
                         END;
                   'P' : BEGIN
-                          CStuff(2,3,User);
-                          CStuff(12,3,User);
+                          CStuff(9,3,User); { Sex }
+                          CStuff(8,3,User); { Age }
                         END;
-                  'R' : CStuff(8,3,User);
+                  'R' : CStuff(7,3,User); { Phone Number }
                   'T' : BEGIN
                           Print('New last on date (MM/DD/YYYY).');
                           Prt(': ');

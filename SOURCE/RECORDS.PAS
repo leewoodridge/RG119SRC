@@ -372,74 +372,76 @@ TYPE
 
   GeneralRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { General }
     ForgotPWQuestion: STRING[70];      { Forgot Password Question }
-    QWKWelcome,                        { QWK welcome file name }
-    QWKNews,                           { QWK news file name }
-    QWKGoodbye,                        { QWK goodbye file name }
-    Origin: STRING[50];                { Default Origin line }
-    DataPath,                          { DATA path }
-    MiscPath,                          { MISC path }
-    LogsPath,                          { LOGS path }
-    MsgPath,                           { MSGS path }
-    NodePath,                          { NODE list path }
-    TempPath,                          { TEMP path }
-    ProtPath,                          { PROT path }
-    ArcsPath,                          { ARCS path }
-    lMultPath,                         { MULT path }
-    FileAttachPath,                    { directory for file attaches }
-    QWKLocalPath,                      { QWK path for local usage }
-    DefEchoPath,                       { default echomail path }
-    NetmailPath,                       { path to netmail }
+    QWKWelcome,                        { QWK Welcome Filename }
+    QWKNews,                           { QWK News Filename }
+    QWKGoodbye,                        { QWK Goodbye Filename }
+    Origin: STRING[50];                { Default Origin Line }
+    DataPath,                          { Data Path }
+    MiscPath,                          { Misc Path }
+    LogsPath,                          { Logs Path }
+    MsgPath,                           { Msgs Path }
+    NodePath,                          { Node List Path }
+    TempPath,                          { Temp Path }
+    ProtPath,                          { Prot Path }
+    ArcsPath,                          { Arcs Path }
+    lMultPath,                         { Mult Path }
+    FileAttachPath,                    { File Attachments Path }
+    QWKLocalPath,                      { QWK Path For Local Usage }
+    DefEchoPath,                       { Default EchoMail Path }
+    NetMailPath,                       { NetMail Path }
     BBSName: STRING[40];               { BBS name }
-    SysOpName: STRING[30];             { SysOp's name }
+    SysOpName: STRING[30];             { SysOp's Name }
     Version: STRING[20];			   { Renegade BBS Version }
-    BBSPhone: STRING[12];              { BBS phone number }
-    LastDate: STRING[10];              { last system date }
-    PacketName,                        { QWK packet name }
-    BulletPrefix: STRING[8];           { default bulletins filename }
-    SysOpPW,                           { SysOp password }
-    NewUserPW,                         { newuser password }
-    MinBaudOverride,                   { override minimum baud rate }
-    QWKNetworkACS,                     { QWK network REP ACS }
+    BBSPhone: STRING[12];              { BBS Phone Number }
+    LastDate: STRING[10];              { Last System Date }
+    PacketName,                        { QWK Packet Name }
+    BulletPrefix: STRING[8];           { Default Bulletins Filename }
+    SysOpPW,                           { SysOp Password }
+    NewUserPW,                         { New User Password }
+    MinBaudOverride,                   { Minimum Baud Override Password }
+    { ACS Requirements: Begin }
+	QWKNetworkACS,                     { QWK Network Rep }
     LastOnDatACS,					   {  }
     SOP,                               { SysOp }
     CSOP,                              { Co-SysOp }
     MSOP,                              { Message SysOp }
     FSOP,                              { File SysOp }
-    SPW,                               { SysOp PW at logon }
-    AddChoice,                         { Add voting choices acs }
-    NormPubPost,                       { make normal public posts }
-    NormPrivPost,                      { send normal e-mail }
-    AnonPubRead,                       { see who posted public anon }
-    AnonPrivRead,                      { see who sent anon e-mail }
-    AnonPubPost,                       { make anon posts }
-    AnonPrivPost,                      { send anon e-mail }
-    SeeUnval,                          { see unvalidated files }
-    DLUnval,                           { DL unvalidated files }
-    NoDLRatio,                         { no UL/DL ratio }
-    NoPostRatio,                       { no post/call ratio }
-    NoFileCredits,                     { no file credits checking }
-    ULValReq,                          { uploads require validation }
-    TeleConfMCI,                       { ACS access for MCI codes while teleconfin' }
-    OverrideChat,                      { override chat hours }
-    NetMailACS,                        { do they have access to netmail? }
-    Invisible,                         { Invisible mode? }
-    FileAttachACS,                     { ACS to attach files to messages }
-    ChangeVote,                        { ACS to change their vote }
+    SPW,                               { SysOp PW At Logon }
+    AddChoice,                         { Add Voting Choices }
+    NormPubPost,                       { Make Normal Public Posts }
+    NormPrivPost,                      { Send Normal E-Mail }
+    AnonPubRead,                       { See Who Posted Public Anonymous }
+    AnonPrivRead,                      { See Who Sent Anonymous E-Mail }
+    AnonPubPost,                       { Make Anonymous Posts }
+    AnonPrivPost,                      { Send Anonymous E-Mail }
+    SeeUnval,                          { See Unvalidated Files }
+    DLUnval,                           { Download Unvalidated Files }
+    NoDLRatio,                         { No UL/DL Ratio }
+    NoPostRatio,                       { No Post/Call Ratio }
+    NoFileCredits,                     { No File Credits Checking }
+    ULValReq,                          { Uploads Require Validation }
+    TeleConfMCI,                       { Use MCI In Teleconference }
+    OverrideChat,                      { Override Chat Hours }
+    NetMailACS,                        { NetMail }
+    Invisible,                         { Invisible Mode } { Should This Be Deleted? }
+    FileAttachACS,                     { Add File Attachments To Messages }
+    ChangeVote,                        { Change Their Vote }
     UnUsedACS1,                        { UNUSED }
     UnUsedACS2: ACString;              { UNUSED }
-    MaxPrivPost,                       { max email can send per call }
-    MaxFBack,                          { max feedback per call }
-    MaxPubPost,                        { max posts per call }
-    MaxChat,                           { max sysop pages per call }
-    MaxWaiting,                        { max mail waiting }
-    CSMaxWaiting,                      { max mail waiting for Co-SysOp + }
-    MaxMassMailList,
-    MaxLogonTries,                     { tries allowed for PW's at logon }
-    SysOpColor,                        { SysOp color in chat mode }
-    UserColor,                         { user color in chat mode }
-    SliceTimer,
-    MaxBatchDLFiles,
-    MaxBatchULFiles,
+	{ ACS Requirements: End }
+    MaxPrivPost,                       { Max E-Mail Sent Per Call }
+    MaxFBack,                          { Max Feedback Sent Per Call }
+    MaxPubPost,                        { Max Posts Per Call }
+    MaxChat,                           { Max SysOp Pages Per Call }
+    MaxWaiting,                        { Max Mail Waiting }
+    CSMaxWaiting,                      { Max Mail Waiting For Co-SysOp + }
+    MaxMassMailList,				   {}
+    MaxLogonTries,                     { Max Tries Allowed For PW's At Logon }
+    SysOpColor,                        { SysOp Color In Chat Mode }
+    UserColor,                         { User Color In Chat Mode }
+    SliceTimer, 					   {}
+    MaxBatchDLFiles,				   {}
+    MaxBatchULFiles,				   {}
     Text_Color,                        { color OF standard text }
     Quote_Color,                       { color OF quoted text }
     Tear_Color,                        { color OF tear line }
@@ -451,42 +453,42 @@ TYPE
     FileCreditComp,                    { file credit compensation ratio }
     FileCreditCompBaseSize,            { file credit area compensation size }
     ULRefund,                          { percent OF time to refund on ULs }
-    GlobalMenu,
-    AllStartMenu,
-    ShuttleLogonMenu,
-    NewUserInformationMenu,
-    FileListingMenu,
-    MessageReadMenu,
-    CurWindow,                         { type OF SysOp window in use }
-    SwapTo: Byte;                      { Swap Where?    }
+    GlobalMenu,						   {}
+    AllStartMenu,					   {}
+    ShuttleLogonMenu,				   {}
+    NewUserInformationMenu,			   {}
+    FileListingMenu,				   {}
+    MessageReadMenu,				   {}
+    CurWindow,                         { Type Of SysOp Window In Use }
+    SwapTo: Byte;                      { Swap Where? }
     UnUsedByte1,                       { UNUSED }
     UnUsedByte2: Byte;                 { UNUSED }
-    lLowTime,                          { SysOp begin minute (in minutes) }
-    HiTime,                            { SysOp END time }
-    DLLowTime,                         { normal downloading hours begin.. }
-    DLHiTime,                          { ..and END }
-    MinBaudLowTime,                    { minimum baud calling hours begin.. }
-    MinBaudHiTime,                     { ..and END }
-    MinBaudDLLowTime,                  { minimum baud downloading hours begin.. }
-    MinBaudDLHiTime,                   { ..and END }
-    NewApp,                            { send new user application to # }
-    TimeOutBell,                       { minutes before timeout beep }
-    TimeOut,                           { minutes before timeout }
-    ToSysOpDir,                        { SysOp file area }
-    CreditMinute,                      { Credits per minute }
-    CreditPost,                        { Credits per post }
-    CreditEmail,                       { Credits per Email sent }
-    CreditFreeTime,                    { Amount OF "Free" time given to user at logon }
-    NumUsers,                          { number OF users }
-    PasswordChange,                    { change password at least every x days }
-    RewardRatio,                       { % OF file points to reward back }
-    CreditInternetMail,                { cost for Internet mail }
-    BirthDateCheck,                    { check user's birthdate every xx logons }
+    lLowTime,                          { SysOp Chat Hours: Begin }
+    HiTime,                            { SysOp Chat Hours: End }
+    DLLowTime,                         { Normal Download Hours: Begin }
+    DLHiTime,                          { Normal Download Hours: End }
+    MinBaudLowTime,                    { Minimum Baud Calling Hours: Begin }
+    MinBaudHiTime,                     { Minimum Baud Calling Hours: End }
+    MinBaudDLLowTime,                  { Minimum Baud Downloading Hours: Begin }
+    MinBaudDLHiTime,                   { Minimum Baud Downloading Hours: End }
+    NewApp,                            { Send New User Application Letter To User # }
+    TimeOutBell,                       { Minutes Before TimeOut Beep }
+    TimeOut,                           { Minutes Before TimeOut }
+    ToSysOpDir,                        { "To SysOp" File Area }
+    CreditMinute,                      { Credits Per Minute }
+    CreditPost,                        { Credits Per Post }
+    CreditEmail,                       { Credits Per E-Mail Sent }
+    CreditFreeTime,                    { Amount Of "Free" Time Given To User At Logon }
+    NumUsers,                          { Number Of Users }
+    PasswordChange,                    { Password Change Required Every # Days }
+    RewardRatio,                       { % Of File Points To Reward Back }
+    CreditInternetMail,                { Credits Per Internet E-Mail }
+    BirthDateCheck,                    { Verify Users Birthdate Every # Logons }
     UnUsedInteger1,                    { UNUSED }
     UnUsedInteger2: SmallInt;          { UNUSED }
-    MaxQWKTotal,                       { max msgs in a packet, period }
-    MaxQWKBase,                        { max msgs in a area }
-    DaysOnline: SmallWord;             { days online }
+    MaxQWKTotal,                       { Max Msgs In A Packet, Period! }
+    MaxQWKBase,                        { Max Msgs In A Area }
+    DaysOnline: SmallWord;             { Days Online }
     UnUsedWord1,					   { UNUSED }
     UnUsedWord2: SmallWord;            { UNUSED }
     MinimumBaud,                       { minimum baud rate to logon }
@@ -554,7 +556,7 @@ TYPE
     TestUploads,                       { perform integrity tests on uploads? }
     UseFileAreaLightBar,		  	   { File Area LightBar }
     UseMsgAreaLightBar: Boolean;  	   { Message Area LightBar }
-    ShuttleUnvalLogin,                 { **Can unvalidated users log in from shuttle menu** was UnUsedBoolean1 } 
+    ShuttleUnvalLogin,                 { Can UnValidated Users Logon From Shuttle Menu? } { Was UnUsedBoolean1 } 
     UnUsedBoolean2: Boolean;           { UNUSED }
 	
 	ConnectionType: Array [1..2] Of Boolean; { 1 = Modem, 2 = Telnet }

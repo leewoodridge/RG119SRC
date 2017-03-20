@@ -1,9 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
-{$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
-
 UNIT NewUsers;
 
 INTERFACE
@@ -61,7 +55,7 @@ BEGIN
       (*
       Prt(FString.NewUserPassword);
       *)
-      RGMainStr(10,FALSE);
+      RGMainStr(10,FALSE); { New User Password }
       GetPassword(NewUserPassword,20);
       IF ((NewUserPassword <> '') AND (General.NewUserPW <> NewUserPassword)) THEN
       BEGIN
@@ -89,9 +83,6 @@ BEGIN
   IF (NOT HangUp) THEN
   BEGIN
     PrintF('NEWUSER');
-
-    { Fill user account fields toggled off with dummy info here? }
-
     Counter := 1;
     WHILE (Counter <= 23) AND (NOT HangUp) DO
     BEGIN

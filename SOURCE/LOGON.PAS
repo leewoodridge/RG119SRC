@@ -685,7 +685,6 @@ BEGIN
     UNTIL (CmdToExec = 0) OR (Done);
     CASE TSHuttleLogon OF
       1 : BEGIN
-
             Reset(ValidationFile);
             RecNum1 := -1;
             RecNum := 1;
@@ -693,26 +692,21 @@ BEGIN
             BEGIN
               Seek(ValidationFile,(RecNum - 1));
               Read(ValidationFile,Validation);
-              IF (Validation.Key = '!') THEN
+              IF (Validation.Key = 'B') THEN { Was B, but that returns sl25, should be 50 }
                 RecNum1 := RecNum;
               Inc(RecNum);
             END;
             Close(ValidationFile);
-
-            IF (RecNum1 <> -1) AND (ThisUser.SL > Validation.NewSL) THEN
+            IF (RecNum1 <> -1) AND (ThisUser.SL >= Validation.NewSL) Or (General.ShuttleUnvalLogin) THEN
               Loggedon := TRUE
             ELSE
             BEGIN
               PrintF('NOSHUTT');
               IF (NoFile) THEN
-                (*
-                Print('You have not been validated yet.');
-                *)
-                RGNoteStr(31,FALSE);
+                RGNoteStr(31,FALSE); (*Print('You have not been validated yet.');*)
               SL1('* Illegal Shuttle Logon attempt');
               Inc(Tries);
             END;
-
           END;
       2 : BEGIN
             IF (NOT General.ClosedSystem) AND PYNQ(RGMainStr(2,TRUE){FString.LogonAsNew},0,FALSE) THEN
@@ -879,12 +873,12 @@ BEGIN
   IEMSI;
   GotName := FALSE;
   IF ((General.ShuttleLog) AND (NOT FastLogon) AND (NOT HangUp)) THEN
-    Doshuttle;
-  Setc(7);
+    DoShuttle;
+  SetC(7);
   CLS;
   Print(Centre(VerLine(1))); { Version & Copyright Information }
   Print(Centre(VerLine(2)));
-  Print(Centre(VerLine(3)));
+{ Print(Centre(VerLine(3))); }
   PrintF('PRELOGON');
   IF (ACSUser) THEN
   BEGIN

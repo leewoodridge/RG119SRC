@@ -379,8 +379,8 @@ BEGIN
     IF (FindOnlyOnce) THEN
       PrintF('ONCEONLY');
 
-    {UpdateUserInformation;} { could be reenabled after dummy info added to new user }
-
+    {UpdateUserInformation;}
+	
     IF (General.LogonQuote) THEN
       RGQuote('LGNQUOTE');
 
