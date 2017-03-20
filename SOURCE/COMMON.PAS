@@ -3687,11 +3687,16 @@ BEGIN
 END;
 
 FUNCTION VerLine(B: Byte): STRING;
+Var
+ Year,
+ Month,
+ Day,
+ WDay: Word;
 BEGIN
+  GetDate(Year,Month,Day,WDay);
   CASE B OF
-    1 : VerLine := '|09The |14Renegade Bulletin Board System|09, Version |15'+General.Version;
-    2 : VerLine := '|09Brought to you by |10The Renegade Development Team|09.';
-    3 : VerLine := '|09Copyright (c) |151991-2009|09';
+    1 : VerLine := 'Renegade Bulletin Board System, Version '+General.Version;
+    2 : VerLine := 'Copyright (c) 1991-'+IntToStr(Year)+' The Renegade Development Team';
   END;
 END;
 
@@ -4703,6 +4708,7 @@ BEGIN
                   'M' : Add := PHours('Always allowed',General.MinBaudDLLowTime,General.MinBaudDLHiTime);
                   'N' : Add := General.BBSName;
                   'P' : Add := General.BBSPhone;
+				  'T' : Add := Liner.NodeTelnetUrl;
                 END;
           'C' : CASE UpCase(S[Index + 2]) OF
                   'A' : Add := FormatNumber(General.CallAllow[SL]);
@@ -4874,31 +4880,31 @@ BEGIN
                         END;
                 END;
           'P' : CASE UpCase(S[Index + 2]) OF
-                  '1' : Add := General.MsgPath;
+                 {'1' : Add := General.MsgPath;
                   '2' : Add := General.NodePath;
                   '3' : Add := General.LMultPath;
-                  '4' : Add := General.SysOpPW;
+                  '4' : Add := General.SysOpPW;         (*MAJOR SEC FLAW FOR MCIS TO CONTAIN PASSWORDS*)
                   '5' : Add := General.NewUserPW;
                   '6' : Add := General.MinBaudOverride;
                   '7' : Add := General.ArcsPath;
-                  'B' : Add := General.BulletPrefix;
+                  'B' : Add := General.BulletPrefix;}
                   'C' : IF (LoggedOn > 0) THEN
                           Str((MsgPost / LoggedOn) * 100:3:2,Add)
                         ELSE
                           Add := '0';
-                  'D' : Add := General.DataPath;
-                  'F' : Add := General.FileAttachPath;
+                 {'D' : Add := General.DataPath;
+                  'F' : Add := General.FileAttachPath; (* USELESS *)
                   'L' : Add := General.LogsPath;
-                  'M' : Add := General.MiscPath;
+                  'M' : Add := General.MiscPath;}
                   'N' : Add := Ph;
                   'O' : BEGIN
                           IF (PrintingFile) OR (Reading_A_Msg) THEN
                             TempPause := FALSE;
                           Add := '';
                         END;
-                  'P' : Add := General.ProtPath;
+                 {'P' : Add := General.ProtPath;}
                   'S' : Add := FormatNumber(MsgPost);
-                  'T' : Add := General.TempPath;
+                 {'T' : Add := General.TempPath;}
                 END;
           'Q' : CASE UpCase(S[Index + 2]) OF
                   'D' : Add := IntToStr(NumBatchDLFiles);

@@ -10,6 +10,7 @@ IMPLEMENTATION
 
 USES
   Dos,
+  {SysUtils,}
   Common,
   Email,
   Mail0,
@@ -46,43 +47,61 @@ BEGIN
 	UnpackTime(FileDateTime,FileDateTime2);
 	With FileDateTime2 Do
 	  Begin
-        Print(lRGLngStr(10,TRUE){FString.AutoMsgT}+TempStr+' on '+IntToStr(Month)+'/'+IntToStr(Day)+'/'+IntToStr(Year));
+        Print(lRGLngStr(10,TRUE)+TempStr+' on '+IntToStr(Month)+'/'+IntToStr(Day)+'/'+IntToStr(Year));
+		{ AutoMessage Posted By USERNAME On 01/01/2017 }
       End;
-	LenTempStr := 0;
-    REPEAT
+	  
+	If (NOT ReadBuffer('AUTOH')) Then
+	  Begin
+	    LenTempStr := 0;
+        REPEAT
+          ReadLn(AutoMsgFile,TempStr);
+          IF (LennMCI(TempStr) > LenTempStr) THEN
+            LenTempStr := LennMCI(TempStr);
+        UNTIL (EOF(AutoMsgFile));
+        IF (LenTempStr >= ThisUser.LineLen) THEN
+          LenTempStr := (ThisUser.LineLen - 1);
+        Reset(AutoMsgFile);
+        ReadLn(AutoMsgFile,TempStr);
+        TempStr := lRGLngStr(11,TRUE);
+        {UserColor(0);}
+        IF ((NOT OkANSI) AND (NOT OkAvatar) AND (Ord(TempStr[1]) > 128) OR (TempStr[1] = #32)) THEN
+          NL
+        ELSE
+          BEGIN
+            FOR Counter := 1 TO LenTempStr DO
+              OutKey(TempStr[1]);
+              NL;
+          END;
+	  End
+	Else
+	  Begin
+	    PrintF('AUTOH'); { AutoMessage Header }
+	  End;
+
+    REPEAT { Print The AutoMessage }
       ReadLn(AutoMsgFile,TempStr);
-      IF (LennMCI(TempStr) > LenTempStr) THEN
-        LenTempStr := LennMCI(TempStr);
-    UNTIL (EOF(AutoMsgFile));
-    IF (LenTempStr >= ThisUser.LineLen) THEN
-      LenTempStr := (ThisUser.LineLen - 1);
-    Reset(AutoMsgFile);
-    ReadLn(AutoMsgFile,TempStr);
-    TempStr := lRGLngStr(11,TRUE);
-    UserColor(0);
-    IF ((NOT OkANSI) AND (NOT OkAvatar) AND (Ord(TempStr[1]{FString.AutoM}) > 128) OR (TempStr[1]{FString.AutoM} = #32)) THEN
-      NL
-    ELSE
-    BEGIN
-      FOR Counter := 1 TO LenTempStr DO
-        OutKey(TempStr[1]{FString.AutoM});
-      NL;
-    END;
-    REPEAT
-      ReadLn(AutoMsgFile,TempStr);
-      PrintACR('^3'+TempStr);
+      PrintACR(TempStr);
     UNTIL EOF(AutoMsgFile) OR (Abort) OR (HangUp);
     Close(AutoMsgFile);
-    TempStr := lRGLngStr(11,TRUE);
-    UserColor(0);
-    IF ((NOT OkANSI) AND (NOT OkAvatar) AND (Ord(TempStr[1]{FString.AutoM}) > 128) OR (TempStr[1]{FString.AutoM} = #32)) THEN
-      NL
-    ELSE
-    BEGIN
-      FOR Counter := 1 TO LenTempStr DO
-        OutKey(TempStr[1]{FString.AutoM});
-      NL;
-    END;
+
+	If (NOT ReadBuffer('AUTOT')) Then
+	  Begin
+	    TempStr := lRGLngStr(11,TRUE); { AutoMessage Border Character }
+        UserColor(0);
+        IF ((NOT OkANSI) AND (NOT OkAvatar) AND (Ord(TempStr[1]) > 128) OR (TempStr[1] = #32)) THEN
+         NL
+        ELSE
+          BEGIN
+            FOR Counter := 1 TO LenTempStr DO
+            OutKey(TempStr[1]);
+            NL;
+          END;
+	  End
+	Else
+	  Begin
+		PrintF('AUTOT'); { AutoMessage Footer }
+	  End;
     PauseScr(FALSE);
   END;
   LastError := IOResult;

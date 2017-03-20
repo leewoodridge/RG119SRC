@@ -113,7 +113,6 @@ BEGIN
   Counter := 1;
   WHILE (Counter <= NumCmds) AND (NewMenuCmd = '') AND (NOT Done) AND (NOT HangUp) DO
   BEGIN
-  {Print('Here I Am!');}
     IF (MemCmd^[Counter].Ckeys = AutoCmd) then
       IF (AACS(MemCmd^[Counter].ACS)) THEN
       BEGIN
@@ -585,6 +584,10 @@ VAR
   TempStr: AStr;
   SaveMenu: Byte;
   NoCmd: Boolean;
+  
+  RecNum,			{ Added These For Checking SL, Command 'O3' }
+  RecNum1: Integer;
+  
 BEGIN
   NewMenuToLoad := FALSE;
   NewMenuCmd := '';
@@ -662,7 +665,7 @@ BEGIN
           END;
     'A' : CASE Cmd[2] OF
             'A','C','M','T' :
-                  DoArcCommand(Cmd[2]);
+                  DoArcCommand(Cmd[2]); { A=, C=, M=Comment Update, T=}
             'E' : ExtractToTemp;
             'G' : UserArchive;
             'R' : ReZipStuff;
@@ -699,7 +702,7 @@ BEGIN
     'F' : CASE Cmd[2] OF
             'A' : FileAreaChange(Done,MenuOption);
             'B' : DownloadFile(MenuOption,[lIsAddDLBatch]);
-            'C' : CheckFilesBBS;
+            'C' : CheckFilesBBS; { Import FILES.BBS }
             'D' : DownloadFile(MenuOption,[]);
             'F' : SearchFileDescriptions;
             'L' : ListFileSpec(MenuOption);
@@ -792,12 +795,15 @@ BEGIN
             NoCmd := TRUE;
           END;
     'N' : CASE Cmd[2] OF
-            'A' : ToggleChatAvailability;
+            'A' : Begin
+			        ToggleChatAvailability;
+					PauseScr(False);
+				  End;
             'D' : Dump_Node;
             'O' : BEGIN
                     LListNodes;
                     IF (Novice IN ThisUser.Flags) THEN
-                      PauseScr(FALSE);
+                      {PauseScr(FALSE);}
                   END;
             'P' : Page_User;
             'G' : MultiLine_Chat;
@@ -824,13 +830,33 @@ BEGIN
             NoCmd := TRUE;
           END;
     'O' : CASE Cmd[2] OF
-            '1' : TShuttleLogon := 1; { Login }
-			'2' : TShuttleLogon := 2; { Apply }
-	        '3' : Begin               { Check Validation Level }
-			        If ThisUser.Sl <= Validation.NewSL Then
-			          RGNoteStr(31,FALSE) { Not Validated }
-				    Else
-				      Print('Your account has been validated to level '+IntToStr(ThisUser.SL)); { Validated }
+            '1' : TShuttleLogon := 1; { Shuttle Login: Login }
+			'2' : TShuttleLogon := 2; { Shuttle Login: Apply }
+	        '3' : Begin               { Shuttle Login: Check Validation }
+				    Reset(ValidationFile);
+                    RecNum1 := -1;
+                    RecNum := 1;
+                    WHILE (RecNum <= NumValKeys) AND (RecNum1 = -1) DO
+                      BEGIN
+                        Seek(ValidationFile,(RecNum - 1));
+                        Read(ValidationFile,Validation);
+                        IF (Validation.Key = 'B') THEN
+                          RecNum1 := RecNum;
+                        Inc(RecNum);
+                      END;
+                    Close(ValidationFile);
+				    If ThisUser.Sl < Validation.NewSL Then
+				      Begin
+				        {Print(IntToStr(Validation.NewSL)+' is what we`re looking for');
+						Print(IntToStr(ThisUser.Sl)+' is what we found');}
+			            RGNoteStr(31,False); { Account Not Validated }
+				      End;
+				    If ThisUser.Sl >= Validation.NewSL Then
+					  Begin
+					    {Print(Inttostr(Validation.NewSL)+' is what we`re looking for');
+					    Print(IntToStr(ThisUser.Sl)+' is what we found');}
+				        RGNoteStr(44,False); { Account Validated }
+					  End;
 			      End;				   
             'A' : AutoValidationCmd(MenuOption);
             'B' : GetUserStats(MenuOption);
@@ -943,7 +969,7 @@ BEGIN
             NoCmd := TRUE;
           END;
     '*' : CASE Cmd[2] OF
-            '=' : ShowCmds(MenuOption);
+            {'=' : ShowCmds(MenuOption);} { What's the purpose of this? }
             'B' : IF (CheckPW) THEN
                   BEGIN
                     SysOpLog('* Message Area Editor');
@@ -973,7 +999,8 @@ BEGIN
                   END;
             'L' : IF (CheckPW) THEN
                     ShowLogs;
-            'N' : TEdit1;
+            'N' : IF (CheckPW) THEN
+			        TEdit1; { Edit Text File } { Do We Need This? }
             'P' : IF (CheckPW) THEN
                   BEGIN
                     SysOpLog('* System Configuration Editor');
@@ -1006,15 +1033,18 @@ BEGIN
                     SysOpLog('* Protocol Editor');
                     ProtocolEditor;
                   END;
-            'Z' : BEGIN
+            'Z' : IF (CheckPW) THEN
+			      BEGIN
                     SysOpLog('* History Editor');
                     HistoryEditor;
                   END;
-            '1' : BEGIN
+            '1' : IF (CheckPW) THEN
+			      BEGIN
                     SysOpLog('* Edited Files');
                     EditFiles;
                   END;
-            '2' : BEGIN
+            '2' : IF (CheckPW) THEN
+			      BEGIN
                     SysOpLog('* Sorted Files');
                     Sort;
                   END;
@@ -1023,19 +1053,22 @@ BEGIN
                     SysOpLog('* Read Private Messages');
                     ReadAllMessages('');
                   END;
-            '4' : IF (MenuOption = '') THEN
-                    Do_Unlisted_Download
-                  ELSE
-                    UnlistedDownload(MenuOption);
+            '4' : IF (CheckPW) THEN
+			        IF (MenuOption = '') THEN
+                      Do_Unlisted_Download
+                    ELSE
+                      UnlistedDownload(MenuOption);
             '5' : BEGIN
                     SysOpLog('* Rechecked files');
                     ReCheck;
                   END;
             '6' : IF (CheckPW) THEN
                     UploadAll;
-            '7' : ValidateFiles;
+            '7' : IF (CheckPW) THEN
+			        ValidateFiles;
             '8' : AddGIFSpecs;
-            '9' : PackMessageAreas;
+            '9' : IF (CheckPW) THEN
+			        PackMessageAreas;
             '#' : IF (CheckPW) THEN
                   BEGIN
                     SysOpLog('* Menu Editor');
@@ -1044,8 +1077,10 @@ BEGIN
                     CurMenu := SaveMenu;
                     LoadMenu;
                   END;
-            '$' : DirF(TRUE);
-            '%' : DirF(FALSE);
+            '$' : IF (CheckPW) THEN
+			        DirF(TRUE); { Long Directory Listing Of Current File Area }
+            '%' : IF (CheckPW) THEN
+			        DirF(FALSE); { Condensed Directory Listing Of Current File Area }
           ELSE
             NoCmd := TRUE;
           END;

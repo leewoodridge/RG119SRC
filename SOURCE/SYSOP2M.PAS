@@ -54,7 +54,7 @@ BEGIN
       PrintACR('|07(|15I|07) Question #1     : |15'+ShowYesNo(NewUserToggles[10]){+' |07(|15^5'+lRGLngStr(38,True)+'|07)'}+
 	   '  |08³  |07(|15Z|07) New User PW     : |15'+NewUserPW);
       PrintACR('|07(|15J|07) Question #2     : |15'+ShowYesNo(NewUserToggles[11]){+' |07(|15^5'+lRGLngStr(39,True)+'|07)'}+
-	   '(1) Can Unval''d Users Log In From Shuttle: '+ShowOnOff(ShuttleUnvalLogin));
+	   '  |08³  |07(|151|07) Can Unval''d Users Log In From Shuttle: |15'+ShowOnOff(ShuttleUnvalLogin));
       PrintACR('|07(|15K|07) Question #3     : |15'+ShowYesNo(NewUserToggles[12]){+' |07(|15^5'+lRGLngStr(40,True)+'|07)'});
       PrintACR('|07(|15L|07) Term Emulation  : |15'+ShowYesNo(NewUserToggles[13]));
       PrintACR('|07(|15M|07) ANSI Colors     : |15'+ShowYesNo(NewUserToggles[14]));

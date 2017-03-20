@@ -98,16 +98,16 @@ BEGIN
           PrintACR('|07(|15M|07) MultiNode Support : |15'+PadLeftStr(ShowOnOff(MultiNode),14)+
 			      ' |07(|15N|07) Network Mode      : |15%NM');
           Nl;
-          PrintACR('|07(|150|07) Data Files          : |15%PD');
-          PrintACR('|07(|151|07) Miscellaneous Files : |15%PM');
-          PrintACR('|07(|152|07) Message Storage     : |15%P1');
-          PrintACR('|07(|153|07) Nodelist (V7)       : |15%P2');
-          PrintACR('|07(|154|07) Log/Trap Files      : |15%PL');
-          PrintACR('|07(|155|07) Temporary Files     : |15%PT');
-          PrintACR('|07(|156|07) Protocols           : |15%PP');
-          PrintACR('|07(|157|07) Archivers           : |15%P7');
-          PrintACR('|07(|158|07) File Attachments    : |15%PF');
-         {PrintACR('|07(|159|07) Strings             : |15%P3');} { Strings & data files are combined now }
+          PrintACR('|07(|150|07) Data Files          : |15'+DataPath);
+          PrintACR('|07(|151|07) Miscellaneous Files : |15'+MiscPath);
+          PrintACR('|07(|152|07) Message Storage     : |15'+MsgPath);
+          PrintACR('|07(|153|07) Nodelist (V7)       : |15'+NodePath);
+          PrintACR('|07(|154|07) Log/Trap Files      : |15'+LogsPath);
+          PrintACR('|07(|155|07) Temporary Files     : |15'+TempPath);
+          PrintACR('|07(|156|07) Protocols           : |15'+ProtPath);
+          PrintACR('|07(|157|07) Archivers           : |15'+ArcsPath);
+          PrintACR('|07(|158|07) File Attachments    : |15'+FileAttachPath);
+         {PrintACR('|07(|159|07) Strings             : |15'+DataPath);} { Strings & data files are combined now }
           Nl;
           Prt('|07Enter Selection Or (|15Q|07)uit: |15');
 
@@ -171,9 +171,9 @@ BEGIN
                 REPEAT
 					ClrScr;
 					PrintACR(PadLeftStr('|17|15 þ Renegade BBS Configuration : System Passwords',80));
-					PrintACR('|07(|15A|07) SysOp Password         : |15%P4');
-					{PrintACR('|07(|15B|07) New User Password      : |15%P5');}
-					PrintACR('|07(|15C|07) Baud Override Password : |15%P6');
+					PrintACR('|07(|15A|07) SysOp Password         : |15'+SysOpPW);
+				   {PrintACR('|07(|15B|07) New User Password      : |15'+NewUserPW);}
+					PrintACR('|07(|15C|07) Baud Override Password : |15'+MinBaudOverride);
 					Nl;
 					Prt('|07Enter Selection Or (|15Q|07) to Quit: |15');				  
                   OneK(Cmd,'QABC',TRUE,TRUE);

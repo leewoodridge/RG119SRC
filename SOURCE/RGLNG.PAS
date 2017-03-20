@@ -498,7 +498,15 @@ BEGIN
       ELSE IF (S = 'NEW_USER_APPLICATION_LETTER') THEN
         RGStrNum := 42
       ELSE IF (S = 'NEW_USER_IN_RESPONSE_TO_SUBJ') THEN
-        RGStrNum := 43;
+        RGStrNum := 43
+	  Else If (S = 'SHUTTLE_LOGON_VALIDATED') Then			{* NEW FROM HERE *}
+		RgStrNum := 44;
+		
+		
+(*		
+	  Else If (S = '') Then
+		RgStrNum := 
+*)		
       IF (RGStrNum = -1) THEN
       BEGIN
         WriteLn('Error!');
