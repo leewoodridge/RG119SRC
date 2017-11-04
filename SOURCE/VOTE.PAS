@@ -1,8 +1,14 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
+
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+
+  VOTING
+  
+  [ISSUES]
+	- results ugly
+}
 
 UNIT Vote;
 
@@ -101,11 +107,11 @@ BEGIN
   BEGIN
     Seek(VotingFile,(AvailableTopics[TopicNum] - 1));
     Read(VotingFile,Topic);
-    PrintACR(' '+'|17|15'+PadRightInt(TopicNum,4)+'XX'+
-             '|18|15'+PadRightInt(Topic.NumVotedQuestion,4)+'XX'+
-             '|19|15'+Topic.Question1);
+    PrintACR('  ^0'+PadLeftInt(TopicNum,4)+
+             '  ^1'+PadLeftStr(Topic.Question1,64)+
+			 '  ^0'+PadLeftInt(Topic.NumVotedQuestion,4));
     IF (Topic.Question2 <> '') THEN
-      PrintACR(PadRightStr('',12)+'|14  '+Topic.Question2);
+      PrintACR(PadRightStr('',6)+'  ^1'+Topic.Question2+'^0');
     WKey;
     Inc(TopicNum);
   END;
@@ -142,13 +148,13 @@ BEGIN
   ChoiceNum := 1;
   WHILE (ChoiceNum <= Topic.ChoiceNumber) AND (NOT Abort) AND (NOT HangUp) DO
   BEGIN
-    PrintACR('^3'+PadRightInt(Topic.Answers[ChoiceNum].NumVotedAnswer,4)+
-             CTP(Topic.Answers[ChoiceNum].NumVotedAnswer,Topic.NumVotedQuestion)+
-             AOnOff(User.Vote[TopicNum] = ChoiceNum,' |12',' |10')+
-             PadRightInt(ChoiceNum,2)+
-             '.'+Topic.Answers[ChoiceNum].Answer1);
+    PrintACR('  ^0'+PadLeftInt(ChoiceNum,3)+
+			 AOnOff(User.Vote[TopicNum] = ChoiceNum,'^9','^1')+
+			 '  '+PadLeftStr(Topic.Answers[ChoiceNum].Answer1,59)+
+			 '  '+PadLeftInt(Topic.Answers[ChoiceNum].NumVotedAnswer,4)+
+             '  '+PadLeftStr(CTP(Topic.Answers[ChoiceNum].NumVotedAnswer,Topic.NumVotedQuestion),4));
     IF (Topic.Answers[ChoiceNum].Answer2 <> '') THEN
-      PrintACR(PadLeftStr('',14)+Topic.Answers[ChoiceNum].Answer2);
+      PrintACR(PadLeftStr('',7)+Topic.Answers[ChoiceNum].Answer2);
 
     IF (ListVoters) AND (Topic.Answers[ChoiceNum].NumVotedAnswer > 0) THEN
     BEGIN
@@ -188,25 +194,25 @@ BEGIN
   CLS;
   Print('^5Renegade Voting:');
   NL;
-  PrintACR('^5Topic: ^3'+Topic.Question1);
+  PrintACR('^0Topic : ^1'+Topic.Question1);
   IF (Topic.Question2 <> '') THEN
-    PrintACR('^5     : ^3'+Topic.Question2);
+    PrintACR('^0      : ^1'+Topic.Question2);
   NL;
-  PrintACR('^5Created by: ^3'+Topic.CreatedBy);
+  PrintACR('^0Created By : ^1'+Topic.CreatedBy);
   NL;
   ChoiceNum := 1;
   WHILE (ChoiceNum <= Topic.ChoiceNumber) AND (NOT Abort) AND (NOT HangUp) DO
   BEGIN
-    PrintACR('^3'+PadRightInt(ChoiceNum,3)+'.^9 '+Topic.Answers[ChoiceNum].Answer1);
+    PrintACR('^0'+PadRightInt(ChoiceNum,3)+'.^1 '+Topic.Answers[ChoiceNum].Answer1);
     IF (Topic.Answers[ChoiceNum].Answer2 <> '') THEN
-      PrintACR('     ^9'+Topic.Answers[ChoiceNum].Answer2);
+      PrintACR('     ^1'+Topic.Answers[ChoiceNum].Answer2);
     Inc(ChoiceNum);
   END;
   Dec(ChoiceNum);
   IF (AACS(Topic.AddAnswersACS)) AND (ChoiceNum < 25) THEN
   BEGIN
     Inc(ChoiceNum);
-    Print('^3'+PadRightInt(ChoiceNum,3)+'.^9 <Pick this one to add your own choice>');
+    Print('^0'+PadRightInt(ChoiceNum,3)+'.^9 <Add Your Own Choice!>'); { LeeW: Should be in strings file }
   END;
   IF (ThisUser.Vote[TopicNum] >= 1) AND (ThisUser.Vote[TopicNum] <= Topic.ChoiceNumber) THEN
   BEGIN

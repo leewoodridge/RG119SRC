@@ -4,6 +4,13 @@
 
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
 
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+
+  EVENT EDITOR
+}
+
 UNIT SysOp6;
 
 INTERFACE
@@ -915,14 +922,18 @@ VAR
   PROCEDURE ListEvents(VAR RecNumToList1: Integer);
   VAR
     NumDone: Integer;
+	Sched: String;
   BEGIN
     IF (RecNumToList1 < 1) OR (RecNumToList1 > NumFileAreas) THEN
       RecNumToList1 := 1;
     Abort := FALSE;
     Next := FALSE;
     CLS;
-    PrintACR('^0 ##^4:^3Description                   ^4:^3Typ^4:^3Bsy^4:^3Time ^4:^3Len^4:^3Days   ^4:^3Execinfo');
-    PrintACR('^4 ==:==============================:===:===:=====:===:=======:============');
+	
+	PrintACR('^4+---+----+-------------------------------------------+----------+-------+-----+');
+	PrintACR('^4| ^3A ^4| ^3## ^4| ^3Description                               ^4| ^3Schedule ^4| ^3Time  ^4| ^3Wrn ^4|');
+	PrintACR('^4+---+----+-------------------------------------------+----------+-------+-----+');
+	
     Reset(EventFile);
     NumDone := 0;
     WHILE (NumDone < (PageLength - 5)) AND (RecNumToList1 >= 1) AND (RecNumToList1 <= NumEvents)
@@ -930,22 +941,22 @@ VAR
     BEGIN
       Seek(EventFile,(RecNumToList1 - 1));
       Read(EventFile,Event);
+				
       WITH Event DO
-        PrintACR(AOnOff(EventIsActive IN EFlags,'^5+','^1-')+
-                 '^0'+PadRightInt(RecNumToList1,2)+
-                 ' ^3'+PadLeftStr(EventDescription,30)+
-                 (*
-                 ' '+SchedT(FALSE,EType)+
-                 *)
-                 ' ^5'+PadLeftInt(EventPreTime,3)+
-                 ' '+Copy(CTim(EventStartTime),4,5));
-                 (*
-                 ' '+PadLeftInt(DurationOrLastDay,3)+
-                 ' '+DActiv(FALSE,ExecDays,Monthly)+
-                 ' ^3'+PadLeftStr(lExecData,9));
-                 *)
+	   BEGIN
+	   
+   		IF EventDayOfMonth <> 0 THEN Sched := IntToStr(EventDayOfMonth)
+		ELSE Sched := +DaysEventActive(EventDays,'3','1');
+	   
+        PrintACR('  ^0'+PadLeftStr(AOnOff(EventIsActive IN EFlags,'^9'+#251,'^4-'),2)+
+                 '  ^0'+PadLeftInt(RecNumToList1,3)+
+                 '  ^1'+PadLeftStr(EventDescription,42)+               
+				 '  ^0'+PadLeftStr(Sched,9)+
+				 '  ^0'+PadLeftStr(Copy(CTim(EventStartTime),4,5),6)+
+                 '  ^0'+PadLeftInt(EventPreTime,3));
       Inc(RecNumToList1);
       Inc(NumDone);
+	 END
     END;
     Close(EventFile);
     LastError := IOResult;
@@ -966,7 +977,7 @@ BEGIN
   REPEAT
     IF (Cmd <> '?') THEN
       ListEvents(RecNumToList);
-    LOneK('%LFEvent editor [^5?^4=^5Help^4]: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
+    LOneK('^0%LFEvent Editor: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
     CASE Cmd OF
       ^M  : IF (RecNumToList < 1) OR (RecNumToList > NumEvents) THEN
               RecNumToList := 1;
@@ -975,11 +986,11 @@ BEGIN
       'M' : ModifyEvent(TempEvent,Cmd,RecNumToList);
       'P' : PositionEvent(TempEvent,RecNumToList);
       '?' : BEGIN
-              Print('%LF^1<^3CR^1>Next screen or redisplay current screen');
-              Print('^1(^3?^1)Help/First event');
-              LCmds(13,3,'Delete event','Insert event');
-              LCmds(13,3,'Modify event','Position event');
-              LCmds(13,3,'Quit','');
+              Print('^0%LF^0<^1CR^0> Next Page / Refresh');
+              {Print('^1(^3?^1)Help/First event');} {LeeW: useless }
+              LCmds(15,1,'D Delete Event','I Insert Event');
+              LCmds(15,1,'M Modify Event','P Position Event');
+              LCmds(15,1,'Q Quit','');
             END;
     END;
     IF (Cmd <> ^M) THEN

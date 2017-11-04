@@ -75,63 +75,67 @@ TYPE
   Str74 = STRING[74];
   Str78 = STRING[78];
   Str160 = STRING[160];
-  UnixTime = LongInt;             { Seconds Since 1-1-70 }
+  
+  UnixTime = LongInt;             { Seconds Since 01-01-70 }
   ACString = STRING[20];          { AC String }
+  
   ARFlagType = '@'..'Z';          { AR Flags }
+  ARFlagSet = SET OF ARFlagType;  { Set Of AR Flags }
 
-  ARFlagSet = SET OF ARFlagType;  {SET OF AR flags}
   FlagType =
-   (RLogon,                       { L - Limited to one call a day }
-    RChat,                        { C - No SysOp paging }
-    RValidate,                    { V - Posts are unvalidated }
-    RUserList,                    { U - Can't list users }
-    RAMsg,                        { A - Can't leave automsg }
-    RPostAn,                      { * - Can't post anonymously }
-    RPost,                        { P - Can't post }
-    REmail,                       { E - Can't send email }
-    RVoting,                      { K - Can't use voting booth }
-    RMsg,                         { M - Force email deletion }
-    VT100,                        { Supports VT00 }
-    HotKey,                       { hotkey input mode }
-    Avatar,                       { Supports Avatar }
-    Pause,                        { screen pausing }
-    Novice,                       { user requires novice help }
-    ANSI,                         { Supports ANSI }
-    Color,                        { Supports color }
-    Alert,                        { Alert SysOp upon login }
-    SMW,                          { Short Message(s) Waiting }
-    NoMail,                       { Mailbox Is Closed }
-    FNoDLRatio,                   { 1 - No UL/DL Ratio }
-    FNoPostRatio,                 { 2 - No Post/Call Ratio }
-    FNoCredits,                   { 3 - No Credits Checking }
-    FNoDeletion);                 { 4 - Protected From Deletion }
+	{ Restrictions }
+   (RLogon,			{ L - Limited To One Call Daily }
+    RChat,			{ C - No SysOp Paging }
+    RValidate,		{ V - Posts Are Unvalidated }
+    RUserList,		{ U - Can't List Users }
+    RAMsg,			{ A - Can't Leave Auto Message (Or Add To BBS List???) }
+    RPostAn,		{ * - Can't Post Anonymously }
+    RPost,			{ P - Can't Post }
+    REmail,			{ E - Can't Send E-Mail }
+    RVoting,		{ K - Can't Vote }
+    RMsg,			{ M - Mandatory E-Mail Deletion }
+	{ Privileges }
+    FNoDLRatio,		{ 1 - No UL/DL Ratio }
+    FNoPostRatio,	{ 2 - No Post/Call Ratio }
+    FNoCredits,		{ 3 - No Credits Checking }
+    FNoDeletion,	{ 4 - Protected From Deletion }
+	{ Other / Preferenes }
+	VT100,			{ Supports VT00 Emulation }
+    HotKey,			{ Hotkey Input Mode }
+    Avatar,			{ Supports Avatar Emulation }
+    Pause,			{ Screen Pausing }
+    Novice,			{ Novice/Expert Mode }
+    ANSI,			{ Supports ANSI Emulation }
+    Color,			{ Supports Color }
+    SMW,			{ Short Message(s) Waiting }
+    NoMail,			{ Mailbox Is Closed }
+    CLSMsg,			{ If Screen Clearing }
+    RIP,			{ If RIP Graphics Can Be Used }
+    FSEditor,		{ If Full Screen Editor }
+    AutoDetect,		{ If Emulation Is Auto Detected }
+    UseLightBars);	{ If LightBars Are Enabled }
 
+	
   FlagSet = SET OF FlagType;
 
   StatusFlagType =
-   (LockedOut,                    { If Locked Out }
-    Deleted,                      { If Deleted }
-    TrapActivity,	              { If Trapping Users Activity }
-    TrapSeparate,                 { If Trap To Seperate File }
-    ChatAuto,                     { If Auto Chat Trapping }
-    ChatSeparate,                 { If Separate Chat File To Trap To }
-    SLogSeparate,                 { If Separate SysOp Log }
-    CLSMsg,                       { If Screen Clearing }
-    RIP,                          { If RIP Graphics Can Be Used }
-    FSEditor,                     { If Full Screen Editor }
-    AutoDetect,                   { Use Auto-Detected Emulation }
-    FileAreaLightBar,
-    MsgAreaLightBar,
-    UnUsedStatusFlag1,
-    UnUsedStatusFlag2,
-    UnUsedStatusFlag3
-  );
-
+   (LockedOut,			{ If Locked Out }
+    Deleted,			{ If Deleted }
+    TrapActivity,		{ If Trapping Users Activity }
+    TrapSeparate,		{ If Trap To Seperate File }
+    ChatAuto,			{ If Auto Chat Trapping }
+    ChatSeparate,		{ If Separate Chat File To Trap To }
+    SLogSeparate,		{ If Separate SysOp Log }
+	Alert,				{ Alert SysOp Upon Login }
+    UnUsedStatusFlag0,	{  }
+    UnUsedStatusFlag1,	{  }
+    UnUsedStatusFlag2,	{  }
+    UnUsedStatusFlag3);	{  }
   StatusFlagSet = SET OF StatusFlagType;
 
   ANonTyp =
    (ATNo,		{ Anonymous Posts Not Allowed }
-    ATYes,		{ Anonymous Posts Are Allowed }
+    ATYes,		{ Anonymous Posts Allowed }
     ATForced,	{ Force Anonymous }
     ATDearAbby,	{ "Dear Abby"  }
     ATAnyName);	{ Post Under Any Name }
@@ -205,7 +209,8 @@ TYPE
     LastQWK,                                { Last QWK Packet }
     Expiration: UnixTime;                   { Expiration Date }
     UnUsedUnixTime1,
-    UnUsedUnixTime2: UnixTime; 
+    UnUsedUnixTime2: UnixTime;
+	
     UserID,                                 { Permanent User ID }
     TLToday,                                { # Min Left Today }
     ForUsr,                                 { Forward Mail To }
@@ -215,33 +220,36 @@ TYPE
     UnUsedInteger2: SmallInt; 
     PasswordChanged: SmallWord;             { Numeric Date PW Changed (Was UnixTime) }
     UnUsedWord1,
-    UnUsedWord2: SmallWord; 
+    UnUsedWord2: SmallWord;
+	
     lCredit,                                { Amount Of Credit }
     Debit,                                  { Amount Of Debit }
     PW,                                     { Password }
     Uploads,                                { # Of Uploads }
-    Downloads,                              { # OF Downloads }
+    Downloads,                              { # Of Downloads }
     UK,                                     { Uploaded Kb }
     DK,                                     { Downloaded Kb }
     LoggedOn,                               { # Times On }
     MsgPost,                                { # Message Posts }
-    EmailSent,                              { # E-mail Sent }
+    EmailSent,                              { # E-Mail Sent }
     FeedBack,                               { # Feedback Sent }
     TimeBank,                               { # Mins In Bank }
     TimeBankAdd,                            { # Mins Deposited Today }
 	TimeBankWith,                           { Time Withdrawn }
-    DLKToday,                               { # KBytes Downloaded Today }
+    DLKToday,                               { kB Downloaded Today }
     DLToday,                                { # Files Downloaded Today }
-    FilePoints: LongInt;
+    FilePoints: LongInt;					{ File Points }
     UnUsedLongInt1,
-    UnUsedLongInt2: LongInt; 
+    UnUsedLongInt2: LongInt;
+	
     TeleConfEcho,                           { Teleconf Echo? }
     TeleConfInt,                            { Teleconf Interrupt }
-    GetOwnQWK,                              { Get Own Messages }
-    ScanFilesQWK,                           { New Files In QWK }
-    PrivateQWK: Boolean;                    { Private Mail QWK }
-    UnUsedBoolean1,
-    UnUsedBoolean2: Boolean; 
+    GetOwnQWK,                              { QWK: Get Own Messages? }
+    ScanFilesQWK,                           { QWK: Get New Files List? }
+    PrivateQWK: Boolean;                    { QWK: Get Own Private Mail? }
+    UnUsedBoolean1,							{  }
+    UnUsedBoolean2: Boolean;				{  }
+	
     AR: ARFlagSet;                          { AR Flags }
     Flags: FlagSet;                         { Flags }
     SFlags: StatusFlagSet;                  { Status Flags }
@@ -258,12 +266,12 @@ TYPE
      Junked);
 
   FromToInfo = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { From/To Information For MHeaderRec }
-    Anon: Byte;
+    Anon: Byte;			{  }
     UserNum: SmallWord;	{ User Number }
     A1S: STRING[36];	{ Posted As }
     Real: STRING[36];	{ Real Name }
     Name: STRING[36];	{ System Name }
-    Zone,
+    Zone,				{  }
     Net,
     Node,
     Point: SmallWord;
@@ -288,8 +296,8 @@ TYPE
 
   HistoryRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { HISTORY.DAT : Summary Logs }
     Date: UniXTime;             { The Date }
-    Active,                     {  }
-    Callers,                    { Callers }
+    Active,                     { Activity }
+    Callers,                    { Callers (connections) daily?}
     NewUsers,                   { New Users }
     Posts,                      { Message Posts }
     Email,                      { Private Mail Sent }
@@ -303,14 +311,14 @@ TYPE
   END;
 
   FileArcInfoRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { Archive Configuration Records }
-    Active: Boolean;		{ Active Or Not }
+    Active: Boolean;		{ Active? }
     Ext: STRING[3];			{ File Extension }
     ListLine,				{ /X For Internal; X: 1=ZIP, 2=ARC/PAK, 3=ZOO, 4=LZH }
     ArcLine,				{ Compression CmdLine }
     UnArcLine,				{ De-Compression CmdLine }
     TestLine,				{ Integrity Test CmdLine }
     CmtLine: STRING[25];	{ Comment CmdLine }
-    SuccLevel: SmallInt;	{ Success Errorlevel, -1=Ignore Results }
+    SuccLevel: SmallInt;	{ Success Errorlevel, -1 = Ignore Results }
   END;
 
   ModemFlagType =	{ MODEM.DAT Status Flags }
@@ -329,15 +337,15 @@ TYPE
     Hangup,							{ Hangup String }
     Offhook: STRING[30];			{ Off-Hook String }
     DoorPath,						{ Path For Drop Files }
-    TeleConfNormal,                 { Teleconferencing Strings }
-    TeleConfAnon,					
-    TeleConfGlobal,
-    TeleConfPrivate: STRING[40];
-    Ok,
-    Ring,
-    Reliable,
-    CallerID,
-    NoCarrier: STRING[20];
+    TeleConfNormal,                 { TeleConferencing: Normal Prefix }
+    TeleConfAnon,					{ TeleConferencing: Anonymous Prefix }
+    TeleConfGlobal,					{ TeleConferencing: Global Prefix }
+    TeleConfPrivate: STRING[40];	{ TeleConferencing: Private Prefix }
+    Ok,								{  }
+    Ring,							{  }
+    Reliable,						{  }
+    CallerID,						{  }
+    NoCarrier: STRING[20];			{  }
     Connect: ARRAY [1..22] OF STRING[20];
 	
     { 300, 600, 1200, 2400, 4800, 7200, 9600, 12000, 14400, 16800, 19200,
@@ -345,12 +353,13 @@ TYPE
     
 	UseCallerID: Boolean;			{ Add Caller ID To SysOp Note }
     LogonACS: ACString;				{ ACS Required For This Node }
-    IRQ,
-    Address: STRING[10];			{ Used Only For Functional MCI Codes
-									  %C = Comport Address, %E = IRQ }
+    IRQ,							{  }
+    Address: STRING[10];			{ Used Only For Functional MCI Codes: %C = Comport Address, %E = IRQ }
     AnswerOnRing: Byte;				{ Answer After How Many Rings }
     MultiRing: Boolean;				{ Answer Ringmaster Or Other Multiple-Ring System Only }
     NodeTelnetUrl: STRING[65];		{ Telnet URL }
+(*	TeleConfX: Integer;				{ TeleConferencing X Pos }
+	TeleConfY: Integer;				{ TeleConferencing Y Pos } *)
   END;
 
   ValidationRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { Validation }
@@ -370,7 +379,7 @@ TYPE
     NewAC: FlagSet;				{ New AC }
   END;
 
-  GeneralRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { General }
+  GeneralRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { RENEGADE.DAT }
     ForgotPWQuestion: STRING[70];      { Forgot Password Question }
     QWKWelcome,                        { QWK Welcome Filename }
     QWKNews,                           { QWK News Filename }
@@ -384,7 +393,7 @@ TYPE
     TempPath,                          { Temp Path }
     ProtPath,                          { Prot Path }
     ArcsPath,                          { Arcs Path }
-    lMultPath,                         { Mult Path }
+    lMultPath,                         { Mult Path } { LeeW: Was for strings, is used still?? }
     FileAttachPath,                    { File Attachments Path }
     QWKLocalPath,                      { QWK Path For Local Usage }
     DefEchoPath,                       { Default EchoMail Path }
@@ -420,10 +429,10 @@ TYPE
     NoPostRatio,                       { No Post/Call Ratio }
     NoFileCredits,                     { No File Credits Checking }
     ULValReq,                          { Uploads Require Validation }
-    TeleConfMCI,                       { Use MCI In Teleconference }
+    TeleConfMCI,                       { Use MCI In TeleConference }
     OverrideChat,                      { Override Chat Hours }
     NetMailACS,                        { NetMail }
-    Invisible,                         { Invisible Mode } { Should This Be Deleted? }
+    Invisible,                         { Invisible Mode } { LeeW: Should This Be Deleted? }
     FileAttachACS,                     { Add File Attachments To Messages }
     ChangeVote,                        { Change Their Vote }
     UnUsedACS1,                        { UNUSED }
@@ -435,30 +444,30 @@ TYPE
     MaxChat,                           { Max SysOp Pages Per Call }
     MaxWaiting,                        { Max Mail Waiting }
     CSMaxWaiting,                      { Max Mail Waiting For Co-SysOp + }
-    MaxMassMailList,				   {}
+    MaxMassMailList,				   { Max Length Of Mass-Mail List }
     MaxLogonTries,                     { Max Tries Allowed For PW's At Logon }
     SysOpColor,                        { SysOp Color In Chat Mode }
     UserColor,                         { User Color In Chat Mode }
-    SliceTimer, 					   {}
-    MaxBatchDLFiles,				   {}
-    MaxBatchULFiles,				   {}
-    Text_Color,                        { color OF standard text }
-    Quote_Color,                       { color OF quoted text }
-    Tear_Color,                        { color OF tear line }
-    Origin_Color,                      { color OF origin line }
+    SliceTimer, 					   {  }
+    MaxBatchDLFiles,				   { Max Files In Batch DL Queue }
+    MaxBatchULFiles,				   { Max Files In Batch UL Queue }
+	Text_Color,                        { Color Of Standard Text }
+    Quote_Color,                       { Color Of Quoted Text }
+    Tear_Color,                        { Color Of Tear Line }
+    Origin_Color,                      { Color Of Origin Line }
     BackSysOpLogs,                     { Days To Keep SYSOP##.LOG }
-    EventWarningTime,                  { minutes before event to warn user }
-    WFCBlankTime,                      { minutes before blanking WFC menu }
-    AlertBeep,                         { time between alert beeps - Was Integer }
-    FileCreditComp,                    { file credit compensation ratio }
-    FileCreditCompBaseSize,            { file credit area compensation size }
-    ULRefund,                          { percent OF time to refund on ULs }
-    GlobalMenu,						   {}
-    AllStartMenu,					   {}
-    ShuttleLogonMenu,				   {}
-    NewUserInformationMenu,			   {}
-    FileListingMenu,				   {}
-    MessageReadMenu,				   {}
+    EventWarningTime,                  { Minutes Before Event To Warn User }
+    WFCBlankTime,                      { Minutes Before Blanking WFC Menu }
+    AlertBeep,                         { Time Between Alert Beeps (Was Integer) }
+    FileCreditComp,                    { File Credit Compensation Ratio }
+    FileCreditCompBaseSize,            { File Credit Area Compensation Size }
+    ULRefund,                          { Percent Of Time To Refund For ULs }
+    GlobalMenu,						   { Global Menu # }
+    AllStartMenu,					   { Start Menu # }
+    ShuttleLogonMenu,				   { Shuttle Logon Menu # }
+    NewUserInformationMenu,			   { New User Info Menu # }
+    FileListingMenu,				   { File Listing Menu # }
+    MessageReadMenu,				   { Message Reading Menu # }
     CurWindow,                         { Type Of SysOp Window In Use }
     SwapTo: Byte;                      { Swap Where? }
     UnUsedByte1,                       { UNUSED }
@@ -491,76 +500,74 @@ TYPE
     DaysOnline: SmallWord;             { Days Online }
     UnUsedWord1,					   { UNUSED }
     UnUsedWord2: SmallWord;            { UNUSED }
-    MinimumBaud,                       { minimum baud rate to logon }
-    MinimumDLBaud,                     { minimum baud rate to download }
+    MinimumBaud,                       { Minimum Baud Rate To Logon }
+    MinimumDLBaud,                     { Minimum Baud Rate To Download }
     MaxDepositEver,					   { Maximum Amount Of Time Allowed In TimeBank }
     MaxDepositPerDay,				   { Maximum Daily TimeBank Deposit }
     MaxWithdrawalPerDay,			   { Maximum Daily TimeBank Withdrawl }
-    CallerNum,                         { system caller number }
-    RegNumber,                         { registration number }
-    TotalCalls,                        { incase different from callernum }
-    TotalUsage,                        { total usage in minutes }
-    TotalPosts,                        { total number OF posts }
-    TotalDloads,                       { total number OF dloads }
-    TotalUloads,                       { total number OF uloads }
-    MinResume,                         { min K to allow resume-later }
-    MaxInTemp,                         { max K allowed in TEMP }
-    MinSpaceForPost,                   { minimum drive space left to post }
-    MinSpaceForUpload: LongInt;        { minimum drive space left to upload }
+    CallerNum,                         { System Caller Number }
+    RegNumber,                         { Registration Number }
+    TotalCalls,                        { incase different from callernum ??? }
+    TotalUsage,                        { Total Usage In Minutes }
+    TotalPosts,                        { Total number Of Posts }
+    TotalDloads,                       { Total number Of DLs }
+    TotalUloads,                       { Total number Of ULs }
+    MinResume,                         { Minimum K Allowed For Resume Later }
+    MaxInTemp,                         { Maximum K Allowed In Temp }
+    MinSpaceForPost,                   { Minimum Drive Space Left To Post }
+    MinSpaceForUpload,		           { Minimum Drive Space Left To Upload }
     UnUsedLongInt1,                    { UNUSED }
     UnUsedLongInt2: LongInt;           { UNUSED }
-    AllowAlias,                        { allow handles? }
-    PhonePW,                           { phone number password in logon? }
-    LocalSec,                          { use local security? }
-    GlobalTrap,                        { trap everyone's activity? }
-    AutoChatOpen,                      { automatically open chat buffer? }
-    AutoMInLogon,                      { Auto-Message at logon? }
-    BullInLogon,                       { bulletins at logon? }
-    YourInfoInLogon,                   { "Your Info" at logon? }
-    OffHookLocalLogon,                 { phone off-hook for local logons? }
-    ForceVoting,                       { manditory voting? }
-    CompressBases,                     { "compress" file/msg area numbers? }
-    SearchDup,                         { search for dupes files when UL? }
-    ForceBatchDL,                      {  }
-    ForceBatchUL,                      {  }
-    LogonQuote,				           { Quotes In Logon? }
-    UserAddQuote,                      { Ask User To Add Quote In Logon? }
-    StripCLog,                         { strip colors from SysOp log? }
-    SKludge,                           { show kludge lines? }
-    SSeenby,                           { show SEEN-BY lines? }
-    SOrigin,                           { show origin line? }
-    AddTear,                           { show tear line? }
+    AllowAlias,                        { Allow Aliases (Handles)? }
+    PhonePW,                           { Ask For Phone Number During Logon? }
+    LocalSec,                          { Use Local Security? }
+    GlobalTrap,                        { Trap Everyone's Activity? }
+    AutoChatOpen,                      { Automatically Open Chat Buffer? }
+    AutoMInLogon,                      { Display Auto-Message During Logon? }
+    BullInLogon,                       { Display Bulletins During Logon? }
+    YourInfoInLogon,                   { Display "Your Info" During Logon? }
+    OffHookLocalLogon,                 { Take The Phone Off-Hook During Local Logons? }
+    ForceVoting,                       { Mandatory Voting? }
+    CompressBases,                     { "Compress" File/Message Area Numbers? }
+    SearchDup,                         { Search For Duplicate Files On Uploads? }
+    ForceBatchDL,                      { Force Batch DL? }
+    ForceBatchUL,                      { Force Batch UL? }
+    LogonQuote,				           { Display Quotes During Logon? }
+    UserAddQuote,                      { Ask User To Add Quote During Logon? }
+    StripCLog,                         { Strip Colors From SysOp Log? }
+    SKludge,                           { Show Kludge Lines? }
+    SSeenby,                           { Show Seen-By Lines? }
+    SOrigin,                           { Show Origin Lines? }
+    AddTear,                           { Show Tear Line? }
     ShuttleLog,                        { Use Shuttle Logon? }
-    ClosedSystem,                      { Allow new users? }
-    SwapShell,                         { Swap on shell? }
-    UseEMS,                            { use EMS for overlay }
-    UseBios,                           { use BIOS for video output }
-    UseIEMSI,                          { use IEMSI }
-    ULDLRatio,                         { use UL/DL ratios? }
-    FileCreditRatio,                   { use auto file-credit compensation? }
-    ValidateAllFiles,                  { validate files automatically? }
-    FileDiz,                           { Search/Import file_id.diz }
-    SysOpPword,                        { check for sysop password? }
-    TrapTeleConf,                      { Trap teleconferencing to ROOMx.TRP? }
-    IsTopWindow,                       { is window at top OF screen? }
-    ReCompress,                        { recompress like archives? }
-    RewardSystem,                      { use file rewarding system? }
-    TrapGroup,                         { record group chats? }
-    QWKTimeIgnore,                     { ignore time remaining for qwk download? }
-    NetworkMode,                       { Network mode ? }
-    WindowOn,                          { is the sysop window on? }
-    ChatCall,                          { Whether system keeps beeping after chat}
-    DailyLimits,                       { Daily file limits on/off }
-    MultiNode,                         { enable multinode support }
-    PerCall,                           { time limits are per call or per day?}
-    TestUploads,                       { perform integrity tests on uploads? }
-    UseFileAreaLightBar,		  	   { File Area LightBar }
-    UseMsgAreaLightBar: Boolean;  	   { Message Area LightBar }
-    ShuttleUnvalLogin,                 { Can UnValidated Users Logon From Shuttle Menu? } { Was UnUsedBoolean1 } 
+    ClosedSystem,                      { Allow New Users? }
+    SwapShell,                         { Swap On Shell? }
+    UseEMS,                            { Use EMS For Overlay? }
+    UseBios,                           { Use BIOS For Video Output? }
+    UseIEMSI,                          { Use IEMSI? }
+    ULDLRatio,                         { Use UL/DL Ratios? }
+    FileCreditRatio,                   { Use Automatic File-Credit Compensation? }
+    ValidateAllFiles,                  { Validate Uploads Automatically? }
+    FileDiz,                           { Search/Import FILE_ID.DIZ }
+    SysOpPword,                        { Check For SysOp Password? }
+    TrapTeleConf,                      { Trap TeleConferencing To ROOM#.TRP? }
+    IsTopWindow,                       { Is Window At Top Of Screen? }
+    ReCompress,                        { ReCompress Like Archives? }
+    RewardSystem,                      { Use File Rewarding System? }
+    TrapGroup,                         { Trap Group Chats? }
+    QWKTimeIgnore,                     { Ignore Time Remaining For QWK Download? }
+    NetworkMode,                       { Network Mode? }
+    WindowOn,                          { Is The SysOp Window On? }
+    ChatCall,                          { Keep Beeping After Chat Call? }
+    DailyLimits,                       { Daily File Limits On/Off }
+    MultiNode,                         { Enable Multi-Node Support? }
+    PerCall,                           { Are Time Limits Per-Call Or Per-Day? }
+    TestUploads,                       { Perform Integrity Tests On Uploads? }
+    UseLightBars,				  	   { Use LightBars? }
+    ShuttleUnvalLogin,                 { Allow UnValidated Users To Logon From Shuttle Menu? } { LeeW: Added }
+	UnUsedBoolean1,					   { UNUSED }
     UnUsedBoolean2: Boolean;           { UNUSED }
-	
-	ConnectionType: Array [1..2] Of Boolean; { 1 = Modem, 2 = Telnet }
-	  
+
     FileArcInfo: ARRAY [1..MaxArcs] OF FileArcInfoRecordType; { Archive Specs }
 
     FileArcComment: ARRAY [1..3] OF STRING[40]; { BBS Comment Files For Archives }
@@ -572,22 +579,24 @@ TYPE
       Point: SmallWord;
     END;
 
-    NewUserToggles: ARRAY [1..27] OF Boolean; { New User Application Toggles }
-
+    NewUserToggles: ARRAY [1..27] OF Boolean; { LeeW: New User Application Toggles }
+	
     Macro: ARRAY [0..9] OF STRING[100]; { SysOp Macros }
 
     NetAttribute: NetAttribs;         { Default NetMail Attributes }
     TimeAllow,                        { Time Allowance }
     CallAllow,                        { Call Allowance }
-    DLRatio,                          { # ULs/# DLs Ratios }
-    DLKRatio,                         { DLk/ULk ratios }
-    PostRatio,                        { Posts/Call Ratio }
-    DLOneday,                         { Max Downloads In One Day }
-    DLKOneDay: SecurityRangeType;     { Max K Downloaded In One Day }
+    DLRatio,                          { Download/Upload Ratio (#) }
+    DLKRatio,                         { Download/Upload Ratio (K) }
+    PostRatio,                        { Post/Call Ratio }
+    DLOneday,                         { Max Download In One Day (#) }
+    DLKOneDay: SecurityRangeType;     { Max Download In One Day (K) }
+	
+	ConnectionType: Array [1..2] Of Boolean; { 1 = Modem, 2 = Telnet } { LeeW: cant just add things like this}
   END;
 
   ShortMessageRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { SHORTMSG.DAT : One-Line Messages }
-    Msg: AStr;
+    Msg: STRING[160];
     Destin: SmallInt;
   END;
 
@@ -601,62 +610,62 @@ TYPE
     AddAnswersACS: ACString;	 { ACS Required To Add Answer }
       Answers: ARRAY [1..25] OF {$IFDEF WIN32} PACKED {$ENDIF} RECORD
 	  Answer1,				     { Answer, Line 1 }
-	  Answer2: STRING[65];	     { Answer, Line 2 }
+	  Answer2: STRING[59];	     { Answer, Line 2 } {65}
 	  NumVotedAnswer: SmallInt;  { Number Of Votes }
 	  END;
   END;
 
   MessageAreaFlagType =
-   (MARealName,                   { whether real names are forced }
-    MAUnHidden,                   { whether *VISIBLE* to users w/o access }
-    MAFilter,                     { whether to filter ANSI/8-bit ASCII }
-    MAPrivate,                    { allow private messages }
-    MAForceRead,                  { force the reading of this area }
-    MAQuote,                      { Allow Quote/Tagline to messages posted in this area }
-    MASKludge,                    { strip IFNA kludge lines }
-    MASSeenBy,                    { strip SEEN-BY lines }
-    MASOrigin,                    { strip origin lines }
-    MAAddTear,                    { add tear/origin lines }
-    MAInternet,                   { if internet message area }
-    MAScanOut);                   { Needs to be scanned out by renemail }
+   (MARealName,                   { Whether Real Names Are Forced }
+    MAUnHidden,                   { Whether Visible To Users Without Access }
+    MAFilter,                     { Whether To Filter ANSI/8-Bit ASCII }
+    MAPrivate,                    { Allow Private Messages }
+    MAForceRead,                  { Force The Reading Of This Area }
+    MAQuote,                      { Allow Quote/Tagline To Messages Posted In This Area }
+    MASKludge,                    { Strip IFNA Kludge Lines }
+    MASSeenBy,                    { Strip Seen-By Lines }
+    MASOrigin,                    { Strip Origin Lines }
+    MAAddTear,                    { Add Tear/Origin Lines }
+    MAInternet,                   { If Internet Message Area }
+    MAScanOut);                   { Needs To Be Scanned Out By ReneMail }
 
   MAFlagSet = SET OF MessageAreaFlagType;
 
   MessageAreaRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { MBASES.DAT : Message Area Records }
-    Name: STRING[40];             { message area description }
-    FileName: STRING[8];          { HDR/DAT data filename }
-    MsgPath: STRING[40];          { Not Used } { Messages Pathname }
-    ACS,                          { access requirement }
-    PostACS,                      { post access requirement }
-    MCIACS,                       { MCI usage requirement }
-    SysOpACS: ACString;           { Message area sysop requirement }
-    MaxMsgs: SmallWord;           { max message count }
-    Anonymous: AnonTyp;           { anonymous type }
-    Password: STRING[20];         { area password }
-    MAFlags: MAFlagSet;           { message area status vars }
-    MAType: SmallInt;             { Area type (0=Local,1=Echo, 3=Qwk) }
-    Origin: STRING[50];           { origin line }
-    Text_Color,                   { color OF standard text }
-    Quote_Color,                  { color OF quoted text }
-    Tear_Color,                   { color OF tear line }
-    Origin_Color,                 { color OF origin line }
-    MessageReadMenu: Byte;
-    QuoteStart,
-    QuoteEnd: STRING[70];
-    PrePostFile: STRING[8];
-    AKA: Byte;                    { alternate address }
-    QWKIndex: SmallWord;          { QWK indexing number }
+    Name: STRING[40];             { Message Area Description }
+    FileName: STRING[8];          { HDR/DAT Data Filename }
+    MsgPath: STRING[40];          { NOT USED } { Messages Pathname }
+    ACS,                          { ACS To Access }
+    PostACS,                      { ACS To Post }
+    MCIACS,                       { ACS To Use MCIs }
+    SysOpACS: ACString;           { ACS To Be Message Area SysOp }
+    MaxMsgs: SmallWord;           { Max Message Count }
+    Anonymous: AnonTyp;           { Anonymous Type }
+    Password: STRING[20];         { Password }
+    MAFlags: MAFlagSet;           { Message Area Status Vars }
+    MAType: SmallInt;             { Area Type: 0=Local 1=Echo 3=QWK }
+    Origin: STRING[50];           { Origin Line }
+    Text_Color,                   { Color Of Standard Text }
+    Quote_Color,                  { Color Of Quoted Text }
+    Tear_Color,                   { Color Of Tear Line }
+    Origin_Color,                 { Color Of Origin Line }
+    MessageReadMenu: Byte;		  {  }
+    QuoteStart,					  {  }
+    QuoteEnd: STRING[70];		  {  }
+    PrePostFile: STRING[8];		  {  }
+    AKA: Byte;                    { Alternate Address }
+    QWKIndex: SmallWord;          { QWK Indexing Number }
   END;
 
   FileAreaFlagType =
-   (FANoRatio,                    { if <No Ratio> active }
-    FAUnHidden,                   { whether *VISIBLE* to users w/o access }
-    FADirDLPath,                  { if *.DIR file stored in DLPATH }
-    FAShowName,                   { show uploaders in listings }
-    FAUseGIFSpecs,                { whether to use GifSpecs }
-    FACDROM,                      { Area is read only, no sorting or ul scanning }
-    FAShowDate,                   { show date uploaded in listings }
-    FANoDupeCheck);               { No dupe check on this area }
+   (FANoRatio,                    { If No Ratio Active }
+    FAUnHidden,                   { Whether Visible To Users Without Access }
+    FADirDLPath,                  { If .DIR File Stored In DLPATH }
+    FAShowName,                   { Show Uploaders In Listings }
+    FAUseGIFSpecs,                { Use GIFSpecs }
+    FACDROM,                      { Area Is Read Only, No Sorting Or UL Scanning }
+    FAShowDate,                   { Show Date Uploaded In Listings }
+    FANoDupeCheck);               { No Dupe Check }
 
   FAFlagSet = SET OF FileAreaFlagType;
 
@@ -666,59 +675,60 @@ TYPE
     DLPath,                       { download path     }
     ULPath: STRING[40];           { upload path       }
     MaxFiles: SmallInt;           { max files allowed - VerbRec Limit would allow up to LongInt Value or Maximum 433835}
-    Password: STRING[20];         { password required }
-    ArcType,                      { wanted archive type (1..max,0=inactive) }
-    CmtType: Byte;                { wanted comment type (1..3,0=inactive) }
+    Password: STRING[20];         { Password Required }
+    ArcType,                      { Wanted Archive Type (1-Max, 0=Inactive) }
+    CmtType: Byte;                { Wanted Comment Type (1-3, 0=Inactive) }
     ACS,                          { access requirements }
     ULACS,                        { upload requirements }
     DLACS: ACString;              { download requirements }
-    FAFlags: FAFlagSet;           { file area status vars }
+    FAFlags: FAFlagSet;           { file area Flags }
   END;
 
   FileInfoFlagType =
-   (FINotVal,                     { If file is not validated }
-    FIIsRequest,                  { If file is REQUEST }
-    FIResumeLater,                { If file is RESUME-LATER }
-    FIHatched,                    { Has file been hatched? }
-    FIOwnerCredited,
-    FIUnusedFlag1,
-    FIUnusedFlag2,
-    FIUnusedFlag3);
+   (FINotVal,                     { If File Is Not Validated }
+    FIIsRequest,                  { If File Is REQUEST }
+    FIResumeLater,                { If File Is RESUME-LATER }
+    FIHatched,                    { Has File Been Hatched? }
+    FIOwnerCredited,			  {  }
+    FIUnusedFlag1,				  {  }
+    FIUnusedFlag2,				  {  }
+    FIUnusedFlag3);				  {  }
 
   FIFlagSet = SET OF FileInfoFlagType;
 
   FileInfoRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { *.DIR : File records }
     FileName: STRING[12];          { Filename }
-    Description: STRING[50];       { File description }
-    FilePoints: SmallInt;          { File points }
-    Downloaded: LongInt;           { Number DLs }
-    FileSize: LongInt;             { File size in Bytes }
-    OwnerNum: SmallInt;            { ULer OF file }
-    OwnerName: STRING[36];         { ULer's name }
-    FileDate: UnixTime;            { Date ULed }
+    Description: STRING[50];       { File Description }
+    FilePoints: SmallInt;          { File Points }
+    Downloaded: LongInt;           { Number Of Times Downloaded }
+    FileSize: LongInt;             { File Size (Bytes) }
+    OwnerNum: SmallInt;            { Uploaders User Number }
+    OwnerName: STRING[36];         { Uploaders User Name }
+    FileDate: UnixTime;            { Date Uploaded }
     VPointer: LongInt;             { Pointer to verbose descr, -1 if none }
     VTextSize: SmallInt;           { Verbose descr textsize - 50 Bytes x 99 Lines = 4950 max }
-    FIFlags: FIFlagSet;            { File status }
+    FIFlags: FIFlagSet;            { File Status }
   END;
 
   LastCallerRec = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { LASTON.DAT : Last few callers records }
-    Node: Byte;                      { Node number }
-    UserName: STRING[36];            { User name OF caller }
-    Location: STRING[30];            { Location OF caller }
-    Caller,                          { system caller number }
+    Node: Byte;                      { Node Number }
+    UserName: STRING[36];            { User Name }
+    Location: STRING[30];            { Location }
+    Caller,                          { Caller number } { LeeW: What does this do? it's just set in sys cfg}
     UserID,                          { User ID # }
-    Speed: LongInt;                  { Speed OF caller 0=Local }
-    LogonTime,                       { time user logged on }
-    LogoffTime: UnixTime;            { time user logged off }
-    NewUser,                         { was it a new user? }
-    Invisible: Boolean;              { Invisible user? }
-    Uploads,                         { Uploads during call }
-    Downloads,                       { Downloads during call }
+    Speed: LongInt;                  { Speed, 0=Local }
+    LogonTime,                       { Time Logged On }
+    LogoffTime: UnixTime;            { Time Logged Off }
+    NewUser,                         { Are They A New User? }
+    Invisible: Boolean;              { Invisible User? } { LeeW: Remove? }
+    Uploads,                         { Uploads During Call }
+    Downloads,                       { Downloads During Call }
     MsgRead,                         { Messages Read }
     MsgPost,                         { Messages Posted }
-    EmailSent,                       { Email sent }
-    FeedbackSent: SmallWord;         { Feedback sent }
-    UK,                              { Upload/Download kbytes during call }
+    EmailSent,                       { Email Sent }
+    FeedbackSent: SmallWord;         { Feedback Sent }
+    UK,                              { Upload/Download Kbytes During Call }
+									 { LeeW: Are we to assume all these stats are 'during call'? ^^^ }
     DK: LongInt;
     Reserved: ARRAY [1..17] OF Byte; { Reserved }
   END;
@@ -804,9 +814,9 @@ TYPE
   END;
 
   ConferenceRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { CONFRENC.DAT : Conference data }
-    Key: Char;            { key '@' to 'Z' }
-    Name: STRING[30];     { name of conference }
-    ACS: ACString;        { access requirement }
+    Key: Char;            { Key: '@' To 'Z' }
+    Name: STRING[30];     { Name Of Conference }
+    ACS: ACString;        { Access Requirement }
   END;
 
   NodeFlagType =
@@ -850,7 +860,7 @@ TYPE
   END;
 
   SchemeRec = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { Scheme.dat }
-    Description: STRING[30];        { Description OF the color scheme }
+    Description: STRING[30];        { Description Of The Color Scheme }
     Color: ARRAY [1..200] OF Byte;  { Colors in scheme }
   END;
 
@@ -863,7 +873,7 @@ TYPE
    080 - 099 : Who's Online Colors
    100 - 114 : Last On Colors
    115 - 134 : QWK Colors
-   135 - ??? : E-Mail Colors }
+   135 - ??? : E-Mail Colors } { LeeW: All that is irrelevant now }
 
   BBSListRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { *.BBS file records }
     RecordNum,                    { Number Of The Record For Edit }
@@ -898,18 +908,18 @@ TYPE
   END;
 
   MenuFlagType =
-    (ClrScrBefore,                 { C: clear screen before menu display }
-     DontCenter,                   { D: don't center the menu titles }
-     NoMenuTitle,                  { T: no menu title displayed }
-     NoMenuPrompt,                 { N: no menu prompt whatsoever? }
-     ForcePause,                   { P: force a pause before menu display? }
-     AutoTime,                     { A: is time displayed automatically? }
-     ForceLine,                    { F: Force full line input }
-     NoGenericAnsi,                { 1: DO NOT generate generic prompt if ANSI }
-     NoGenericAvatar,              { 2: DO NOT generate generic prompt if AVT }
-     NoGenericRIP,                 { 3: DO NOT generate generic prompt if RIP }
-     NoGlobalDisplayed,            { 4: DO NOT display the global commands }
-     NoGlobalUsed);                { 5: DO NOT use global commands }
+    (ClrScrBefore,                 { C: Clear Screen Before Menu Is Displayed }
+     DontCenter,                   { D: Don't Center Menu Titles }
+     NoMenuTitle,                  { T: No Menu Titles Displayed }
+     NoMenuPrompt,                 { N: No Menu Prompt }
+     ForcePause,                   { P: Pause Before Menu Is Displayed }
+     AutoTime,                     { A: Display Time Automatically }
+     ForceLine,                    { F: Force Full Line Input }
+     NoGenericAnsi,                { 1: No ANSI Prompt }
+     NoGenericAvatar,              { 2: No AVT Prompt }
+     NoGenericRIP,                 { 3: No RIP Prompt }
+     NoGlobalDisplayed,            { 4: Do Not Display Global Commands }
+     NoGlobalUsed);                { 5: Do Not Use Global Commands }
 
   MenuFlagSet = SET OF MenuFlagType;
 

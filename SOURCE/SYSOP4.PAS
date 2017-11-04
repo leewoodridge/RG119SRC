@@ -1,8 +1,11 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D-,E-,F+,I-,L-,N-,O+,R-,S-,V-}
+
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+
+  Text Editor???
+}
 
 UNIT SysOp4;
 
@@ -271,7 +274,7 @@ BEGIN
     BEGIN
       Abort := NOT NewPtr(Nex);
       Top := Nex;
-      Print('^1Loading...');
+      Print('^0Loading...');
       WHILE ((NOT EOF(Fil)) AND (NOT Abort)) DO
       BEGIN
         Inc(TotalLines);
@@ -293,7 +296,7 @@ BEGIN
       IF (Abort) THEN
       BEGIN
         NL;
-        Print(^G^G'|12WARNING: |10Not all of file read.^3');
+        Print(^G^G'^8WARNING: Not all of file read.^0');
         NL;
         AllRead := FALSE;
       END;

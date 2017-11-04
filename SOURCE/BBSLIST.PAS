@@ -1,5 +1,8 @@
-{$A+,B-,D-,E-,F+,I-,L-,N-,O+,R-,S+,V-}
+{$IFDEF WIN32}
+{$I DEFINES.INC}
+{$ENDIF}
 
+{$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
 
 UNIT BBSList;
 
@@ -247,7 +250,7 @@ BEGIN
          BBSList.Port := 23;
         MPL(SizeOf(BBSList.Port) - 1);
 
-        InputWordWoc(Question,BBSList.Port,[NumbersOnly,InterActiveEdit],1,65535);
+        {InputWordWoc(Question,BBSList.Port,[NumbersOnly,InterActiveEdit],1,65535);} {LeeW}
        END
        ELSE IF WhichOne = 'LOCATION' THEN
         BEGIN
@@ -311,7 +314,7 @@ BEGIN
       BEGIN
 
        MPL(SizeOf(BBSList.SDG) - 1);
-       InputWordWoc(Question,BBSList.SDG,[NumbersOnly,InterActiveEdit],1,65535);
+       {InputWordWoc(Question,BBSList.SDG,[NumbersOnly,InterActiveEdit],1,65535);}
        {Abort := (BBSList.xE = '');}
       END
      ELSE IF WhichOne = 'SDH' THEN

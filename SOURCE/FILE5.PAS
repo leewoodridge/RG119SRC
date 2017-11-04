@@ -45,6 +45,7 @@ VAR
   junk3,
   Found: Boolean;
   TransferTime: LongInt;
+  {Counter: Integer;}
 
   PROCEDURE Parse(CONST s: AStr);
   VAR
@@ -71,14 +72,6 @@ VAR
         Inc(k);
       END;
     END;
-  END;
-
-  PROCEDURE VersionInfo;
-  BEGIN
-    NL;
-    Print('Renegade''s internal DOS emulator.  Supported commands are limited.');
-    NL;
-    NL;
   END;
 
   FUNCTION DOSErrorMsg(ErrorNum: Byte): AStr;
@@ -115,7 +108,18 @@ VAR
     NoCmd := FALSE;
     s := XWord[1];
     IF (s = '?') OR (s = 'HELP') THEN
-      PrintF('DOSHELP')
+
+	  If (Not ReadBuffer('DOSHELP')) Then
+	    Begin
+		  Nl;
+	      Print('^0The following commands are supported;');
+		  Nl;
+		  Print('^0 HELP EDIT DEL TYPE REN DIE CD CHDIR MD MKDIR RD RMDIR COPY MOVE CLS VIEW SEND');
+		  Print('^0 RECEIVE DIRSIZE DISKFREE EXT CONVERT CVT UNARC UNZIP ARC ZIP EXIT');
+		  Nl;
+	    End
+	  Else
+	    PrintF('DOSHELP')
     ELSE IF (s = 'EDIT') THEN
     BEGIN
       IF ((Exist(XWord[2])) AND (XWord[2] <> '')) THEN
@@ -323,7 +327,7 @@ VAR
         ELSE
         BEGIN
           IF (XWord[3] = '') THEN
-            XWord[3] := CurDir;
+          XWord[3] := CurDir;
           XWord[2] := BSlash(FExpand(XWord[2]),FALSE);
           XWord[3] := FExpand(XWord[3]);
           FindFirst(XWord[3],AnyFile,DirInfo);
@@ -409,8 +413,6 @@ VAR
       IF (Junk) THEN
         SysOpLog('DOS emulator upload of: '+s);
     END
-    ELSE IF (s = 'VER') THEN
-      VersionInfo
     ELSE IF (s = 'DIRSIZE') THEN
     BEGIN
       NL;
@@ -588,10 +590,11 @@ VAR
 
 BEGIN
   Done := FALSE;
-  NL;
-  Print('Type "EXIT" to return to Renegade');
-  NL;
-  VersionInfo;
+  Nl;
+  Print('|07Pseudo-DOS: Renegade''s internal DOS emulator.');
+  Nl;
+  Print('|07Type "|15HELP|07" for a list of supported commands, or "|15EXIT|07" to return to Renegade.');
+  Nl;
   REPEAT
     GetDir(0,CurDir);
     Prompt('^1'+CurDir+'>');
@@ -801,4 +804,3 @@ BEGIN
 END;
 
 END.
-

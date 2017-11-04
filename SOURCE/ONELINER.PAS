@@ -5,8 +5,9 @@ INTERFACE
 
 Uses
     Common,
-    Timefunc,
-    Mail1;
+    TimeFunc,
+    Mail1,
+	CRT;
 
 Type
     OneLinerRecordType = {$IFDEF WIN32} Packed {$ENDIF} Record
@@ -88,7 +89,7 @@ BEGIN
                     IF (OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := 'Anon';
                     IF (OneLinerListPtr^.Anonymous) AND (SysOp) THEN
-                     OneLinerListMCI := Caps(User.Name) + ' ^4(^5A^4)';
+                     OneLinerListMCI := Caps(User.Name) + ' ^1(^3A^1)';
                     IF (NOT OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := Caps(User.Name);
                   END;
@@ -97,7 +98,7 @@ BEGIN
                     IF (OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := 'anon';
                     IF (OneLinerListPtr^.Anonymous) AND (SysOp) THEN
-                     OneLinerListMCI := ToLower(User.Name) + ' ^4(^5a^4)';
+                     OneLinerListMCI := ToLower(User.Name) + ' ^1(^3a^1)';
                     IF (NOT OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := ToLower(User.Name);
                   END;
@@ -106,7 +107,7 @@ BEGIN
                     IF (OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := 'Anon';
                     IF (OneLinerListPtr^.Anonymous) AND (SysOp) THEN
-                     OneLinerListMCI := Copy(User.Name,1,2) + ' ^4(^5A^4)';
+                     OneLinerListMCI := Copy(User.Name,1,2) + ' ^1(^3A^1)';
                     IF (NOT OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := Copy(User.Name,1,2);
                   END;
@@ -115,7 +116,7 @@ BEGIN
                     IF (OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := 'anon';
                     IF (OneLinerListPtr^.Anonymous) AND (SysOp) THEN
-                     OneLinerListMCI := ToLower(Copy(User.Name,1,2)) + ' ^4(^5a^4)';
+                     OneLinerListMCI := ToLower(Copy(User.Name,1,2)) + ' ^1(^3a^1)';
                     IF (NOT OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := ToLower(Copy(User.Name,1,2));
                   END;
@@ -144,7 +145,7 @@ BEGIN
     PrintF('ONELH');
     IF (NoFile) THEN
       BEGIN
-        CLS; NL;
+        ClrScr; NL;
         Print(Centre('^4' + General.BBSName + ' One Liners'));
         Print(Centre('^5ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ'));
       END;
@@ -162,8 +163,8 @@ END;
 PROCEDURE DisplayError(FName: ASTR; VAR FExists: Boolean);
 BEGIN
   NL;
-  PrintACR('|12ú |09The '+FName+'.*  File is missing.');
-  PrintACR('|12ú |09Please, inform the Sysop!');
+  PrintACR('|12?|09The '+FName+'.*  File is missing.');
+  PrintACR('|12?|09Please, inform the Sysop!');
   SysOpLog('The '+FName+'.* file is missing.');
   FExists := FALSE;
 END;
@@ -193,16 +194,16 @@ Begin
  WHILE (NOT Abort) AND (NOT Hangup) DO
   Begin
    NL;
-   Print('^4 Enter your one liner');
-   Prt(' ^5:');
-   MPL(76);
+   Print('^0 Enter Your One-Liner ...');
+   Prt(' ');
+   MPL(55);
    InputMain(OneLinerList.OneLiner,(SizeOf(OneLinerList.OneLiner) - 1),[InterActiveEdit,ColorsAllowed]);
    NL;
    Abort := (OneLinerList.OneLiner = '');
    IF (Abort) THEN
    Exit
    ELSE
-     OneLinerList.Anonymous := PYNQ('^4 Post Anonymous? ^5',0,FALSE);
+     OneLinerList.Anonymous := PYNQ('^0 Post Anonymously? ',0,FALSE);
      Exit;
   End;
 End;
@@ -216,7 +217,8 @@ BEGIN
   BEGIN
     NL;
     OneLiner_View;
-    IF PYNQ('^4 Add a one liner? ^5',0, FALSE) THEN
+	NL; { LeeW }
+    IF PYNQ('^0 Add A One-Liner? ',0, FALSE) THEN
     BEGIN
       FillChar(OneLinerList,SizeOf(OneLinerList),0);
       AskOneLinerQuestions(OneLinerList);
@@ -225,16 +227,17 @@ BEGIN
         PrintF('ONELH');
 		IF (NoFile) THEN
 		  BEGIN
-			CLS; NL;
-			Print(Centre('^4' + General.BBSName + ' One Liners'));
-			Print(Centre('^5ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ'));
+			ClrScr;
+			NL;
+			Print(Centre('^0' + General.BBSName + ' One-Liners'));
+			Print(Centre('^4ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ'));
 		  END;
-        Print(' ^4'+OneLinerList.OneLiner);
+        Print(' ^1'+OneLinerList.OneLiner); { LeeW: Add name tag }
         PrintF('ONELE');
         IF (NoFile) THEN
-			Print(Centre('^5ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ'));
+			Print(Centre('^4ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ'));
         NL;
-        IF (PYNQ('^4 Add this oneliner? ^5',0,TRUE)) THEN
+        IF (PYNQ('^0 Add This One-Liner? ^5',0,TRUE)) THEN
         BEGIN
           Assign(OneLinerListFile,General.DataPath+'ONELINER.DAT');
           IF (Exist(General.DataPath+'ONELINER.DAT')) THEN
@@ -250,7 +253,7 @@ BEGIN
           Close(OneLinerListFile);
           LastError := IOResult;
 
-          SysOpLog('Added Oneliner : '+OneLinerList.OneLiner+'.');
+          SysOpLog('Added One-Liner : '+OneLinerList.OneLiner{+'.'});
         END;
       END;
     END;
@@ -275,9 +278,9 @@ BEGIN
     PrintF('ONELH');
     IF (NoFile) THEN
       BEGIN
-        CLS; NL;
-        Print(Centre('^4' + General.BBSName + ' One Liners'));
-        Print(Centre('^5ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ'));
+        ClrScr; NL;
+        Print(Centre('^0' + General.BBSName + ' One-Liners'));
+        Print(Centre('^4ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ'));
         NL;
       END;
     OnRec := 1;
@@ -300,10 +303,10 @@ BEGIN
     IF (NOT Abort) THEN
       PrintF('ONELE');
       IF (NoFile) THEN
-        Print(Centre('^5ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ'));
+        Print(Centre('^4ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ'));
 
     AllowContinue := FALSE;
-    SysOpLog('^5* ^4'+ ThisUser.Name + '^5 Viewed the OneLiners.');
+    SysOpLog(ThisUser.Name+' Viewed The One-Liners.');
   END;
 END;
 

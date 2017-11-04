@@ -3,6 +3,14 @@
 {$ENDIF}
 
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
+
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+
+  CONFERENCE EDITOR
+}
+
 UNIT SysOp12;
 
 INTERFACE
@@ -78,8 +86,10 @@ BEGIN
   CLS;
   IF (DisplayListNum) THEN
   BEGIN
-    PrintACR('^0##^4:^3C^4:^3Name                            ^0##^4:^3C^4:^3Name');
-    PrintACR('^4==:=:==============================  ==:=:==============================');
+    PrintACR('^4+----+---+-----------------------------+----+---+-----------------------------+');
+	PrintACR('^4| ^3## ^4| ^3K | ^3Description                 '+
+			 '^4| ^3## ^4| ^3K | ^3Description                 ^4|');
+	PrintACR('^4+----+---+-----------------------------+----+---+-----------------------------+');
   END
   ELSE
   BEGIN
@@ -95,12 +105,12 @@ BEGIN
     Seek(ConferenceFile,(RecNumToList - 1));
     Read(ConferenceFile,Conference);
     IF (DisplayListNum) THEN
-      TempStr := TempStr + PadLeftStr('^0'+PadRightInt(RecNumToList,2)+
-                           ' ^3'+Conference.Key+
-                           ' ^5'+Conference.Name,37)
+      TempStr := TempStr + PadLeftStr('  ^0'+PadLeftInt(RecNumToList,3)+
+									  '  ^0'+PadLeftStr(Conference.Key,2)+
+									  '  ^1'+Conference.Name,39)
     ELSE
-      TempStr := TempStr + PadLeftStr(' ^3'+Conference.Key+
-                           ' ^5'+Conference.Name,34);
+      TempStr := TempStr + PadLeftStr(' ^0'+Conference.Key+
+                           ' ^1'+Conference.Name,34);
     Inc(NumOnline);
     IF (NumOnline = 2) THEN
     BEGIN
@@ -116,7 +126,7 @@ BEGIN
   IF (NumOnline = 1) AND (NOT Abort) AND (NOT HangUp) THEN
     PrintaCR(TempStr);
   IF (NumConfKeys = 0) AND (NOT Abort) AND (NOT HangUp) THEN
-    Print('^7No conference records.');
+    Print('^9[ No Conference Records ]');
 END;
 
 PROCEDURE ChangeConference(MenuOption: Str50);
@@ -543,18 +553,18 @@ BEGIN
   REPEAT
     IF (Cmd <> '?') THEN
       DisplayConferenceRecords(RecNumToList,TRUE);
-    LOneK('%LFConference editor [^5?^4=^5Help^4]: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
+    LOneK('%LF^0Conference Editor: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
     CASE Cmd OF
       'D' : DeleteConference(TempConference,RecNumToList);
       'I' : InsertConference(TempConference,Cmd,RecNumToList);
       'M' : ModifyConference(TempConference,Cmd,RecNumToList);
       'P' : PositionConference(TempConference,RecNumToList);
       '?' : BEGIN
-              Print('%LF^1<^3CR^1>Next Screen or redisplay screen');
-              Print('^1(^3?^1)Help/First conference');
-              LCmds(18,3,'Delete conference','Insert conference');
-              LCmds(18,3,'Modify conference','Position conference');
-              LCmds(18,3,'Quit','');
+              Print('%LF^0<^1CR^0> Next Page / Refresh');
+              {Print('^1(^3?^1)Help/First conference');}
+              LCmds(20,1,'D Delete Conference','I Insert Conference');
+              LCmds(20,1,'M Modify Conference','P Position Conference');
+              LCmds(20,1,'Q Quit','');
             END;
     END;
     IF (Cmd <> ^M) THEN

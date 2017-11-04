@@ -1,8 +1,13 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
+
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+
+  PROTOCOL EDITOR
+  
+}
+
 
 UNIT SysOp1;
 
@@ -573,7 +578,7 @@ VAR
                   Cmd1 := #0;
                 END;
           'J' : BEGIN
-                  InputIntegerWOC('%LFJump to entry?',RecNumToEdit,[NumbersOnly],1,NumProtocols);
+                  InputIntegerWOC('^0%LFJump To Which Entry?',RecNumToEdit,[NumbersOnly],1,NumProtocols);
                   IF (RecNumToEdit < 1) OR (RecNumToEdit > NumProtocols) THEN
                     Cmd1 := #0;
                 END;
@@ -585,15 +590,15 @@ VAR
                   Cmd1 := #0;
                 END;
           '?' : BEGIN
-                  Print('%LF^1<^3CR^1>Redisplay current screen');
-                  Print('^31^1-^38^1:Modify item');
+                  {Print('%LF^1<^3CR^1>Redisplay current screen');} { LeeW: useless }
+                  {Print('^31^1-^38^1:Modify item');}
                   IF (NOT Editing) THEN
-                    LCmds(20,3,'Quit and save','')
+                    LCmds(20,3,'Q Quit','')
                   ELSE
                   BEGIN
-                    LCmds(20,3,'[Back entry',']Forward entry');
-                    LCmds(20,3,'First entry in list','Jump to entry');
-                    LCmds(20,3,'Last entry in list','Quit and save');
+                    LCmds(20,3,'[ Previous Entry','] Next Entry');
+                    LCmds(20,3,'F First Entry','J Jump To Entry');
+                    LCmds(20,3,'L Last Entry','Q Quit');
                   END;
                 END;
         END;
@@ -613,7 +618,7 @@ VAR
     ELSE
     BEGIN
       RecNumToInsertBefore := -1;
-      InputIntegerWOC('%LFProtocol to insert before?',RecNumToInsertBefore,[NumbersOnly],1,(NumProtocols + 1));
+      InputIntegerWOC('^0%LFInsert Before Which Protocol?',RecNumToInsertBefore,[NumbersOnly],1,(NumProtocols + 1));
       IF (RecNumToInsertBefore >= 1) AND (RecNumToInsertBefore <= (NumProtocols + 1)) THEN
       BEGIN
         Reset(ProtocolFile);
@@ -629,12 +634,12 @@ VAR
           EditProtocol(TempProtocol1,TempProtocol1,Cmd1,RecNumToEdit,Changed,FALSE);
           CheckProtocol(TempProtocol1,1,14,Ok);
           IF (NOT OK) THEN
-            IF (NOT PYNQ('%LFContinue inserting protocol? ',0,TRUE)) THEN
+            IF (NOT PYNQ('^0%LFContinue Inserting Protocol? ',0,TRUE)) THEN
               Abort := TRUE;
         UNTIL (OK) OR (Abort) OR (HangUp);
-        IF (NOT Abort) AND (PYNQ('%LFIs this what you want? ',0,FALSE)) THEN
+        IF (NOT Abort) AND (PYNQ('^0%LFIs This Correct? ',0,FALSE)) THEN
         BEGIN
-          Print('%LF[> Inserting protocol record ...');
+          Print('^9%LF[> Inserting Protocol ...');
           Seek(ProtocolFile,FileSize(ProtocolFile));
           Write(ProtocolFile,Protocol);
           Dec(RecNumToInsertBefore);
@@ -650,7 +655,7 @@ VAR
             Seek(ProtocolFile,RecNum);
             Write(ProtocolFile,TempProtocol1);
             Inc(NumProtocols);
-            SysOpLog('* Inserted protocol: ^5'+TempProtocol1.Description);
+            SysOpLog('* Inserted Protocol: '+TempProtocol1.Description);
           END;
           Close(ProtocolFile);
           LastError := IOResult;
@@ -670,7 +675,7 @@ VAR
     ELSE
     BEGIN
       RecNumToEdit := -1;
-      InputIntegerWOC('%LFProtocol to modify?',RecNumToEdit,[NumbersOnly],1,NumProtocols);
+      InputIntegerWOC('^0%LFModify Which Protocol?',RecNumToEdit,[NumbersOnly],1,NumProtocols);
       IF (RecNumToEdit >= 1) AND (RecNumToEdit <= NumProtocols) THEN
       BEGIN
         SaveRecNumToEdit := -1;
@@ -701,7 +706,7 @@ VAR
             Seek(ProtocolFile,(SaveRecNumToEdit - 1));
             Write(ProtocolFile,Protocol);
             Changed := FALSE;
-            SysOpLog('* Modified protocol: ^5'+Protocol.Description);
+            SysOpLog('* Modified Protocol: '+Protocol.Description);
           END;
         END;
         Close(ProtocolFile);
@@ -723,16 +728,15 @@ VAR
     ELSE
     BEGIN
       RecNumToPosition := -1;
-      InputIntegerWOC('%LFPosition which protocol?',RecNumToPosition,[NumbersOnly],1,NumProtocols);
+      InputIntegerWOC('^0%LFPosition Which Protocol?',RecNumToPosition,[NumbersOnly],1,NumProtocols);
       IF (RecNumToPosition >= 1) AND (RecNumToPosition <= NumProtocols) THEN
       BEGIN
         RecNumToPositionBefore := -1;
-        Print('%LFAccording to the current numbering system.');
-        InputIntegerWOC('%LFPosition before which protocol?',RecNumToPositionBefore,[NumbersOnly],1,(NumProtocols + 1));
+        InputIntegerWOC('^0%LFPosition Before Which Protocol?',RecNumToPositionBefore,[NumbersOnly],1,(NumProtocols + 1));
         IF (RecNumToPositionBefore >= 1) AND (RecNumToPositionBefore <= (NumProtocols + 1)) AND
            (RecNumToPositionBefore <> RecNumToPosition) AND (RecNumToPositionBefore <> (RecNumToPosition + 1)) THEN
         BEGIN
-          Print('%LF[> Positioning protocol records ...');
+          Print('^9%LF[> Positioning ...');
           IF (RecNumToPositionBefore > RecNumToPosition) THEN
             Dec(RecNumToPositionBefore);
           Dec(RecNumToPosition);
@@ -774,8 +778,11 @@ VAR
     Abort := FALSE;
     Next := FALSE;
     CLS;
-    PrintACR('^0 ###^4:^3ACS       ^4:^3Description');
-    PrintACR('^4 ===:==========:=============================================================');
+
+	PrintACR('^4+---+----+------------+-------------------------------------------------------+');
+	PrintACR('^4| ^3A ^4| ^3## ^4| ^3ACS        ^4| ^3Description                                           ^4|');
+	PrintACR('^4+---+----+------------+-------------------------------------------------------+');
+
     Reset(ProtocolFile);
     NumDone := 0;
     WHILE (NumDone < (PageLength - 5)) AND (RecNumToList1 >= 1) AND (RecNumToList1 <= NumProtocols)
@@ -784,17 +791,17 @@ VAR
       Seek(ProtocolFile,(RecNumToList1 - 1));
       Read(ProtocolFile,Protocol);
       WITH Protocol DO
-        PrintACR(AOnOff((ProtActive IN PRFlags),'^5+','^1-')+
-                 '^0'+PadRightInt(RecNumToList1,3)+
-                 ' ^9'+PadLeftStr(ACS,10)+
-                 ' ^1'+Description);
+        PrintACR('  '+AOnOff((ProtActive IN PRFlags),'^9'+#251,'^4-')+
+                 '   ^0'+PadLeftInt(RecNumToList1,2)+
+                 '   ^0'+PadLeftStr(ACS,10)+
+                 '   ^1'+Description);
       Inc(RecNumToList1);
       Inc(Numdone);
     END;
     Close(ProtocolFile);
     LastError := IOResult;
     IF (NumProtocols = 0) THEN
-      Print('*** No protocols defined ***');
+      Print('^8 [ NO PROTOCOLS CONFIGURED ]');
   END;
 
 BEGIN
@@ -805,7 +812,7 @@ BEGIN
   REPEAT
     IF (Cmd <> '?') THEN
       ListProtocols(RecNumToList);
-    LOneK('%LFProtocol editor [^5?^4=^5Help^4]: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
+    LOneK('^0%LFProtocol Editor: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
     CASE Cmd OF
       ^M  : IF (RecNumToList < 1) OR (RecNumToList > NumProtocols) THEN
               RecNumToList := 1;
@@ -814,11 +821,11 @@ BEGIN
       'M' : ModifyProtocol(TempProtocol,Cmd,RecNumToList);
       'P' : PositionProtocol(TempProtocol,RecNumToList);
       '?' : BEGIN
-              Print('%LF^1<^3CR^1>Next screen or redisplay current screen');
-              Print('^1(^3?^1)Help/First protocol');
-              LCmds(16,3,'Delete protocol','Insert protocol');
-              LCmds(16,3,'Modify protocol','Position protocol');
-              LCmds(16,3,'Quit','');
+              Print('^0%LF<^1CR^0> Next Page / Refresh');
+              {Print('^1(^3?^1)Help/First protocol');} { LeeW: useless }
+              LCmds(18,1,'D Delete Protocol','I Insert Protocol');
+              LCmds(18,1,'M Modify Protocol','P Position Protocol');
+              LCmds(18,1,'Q Quit','');
             END;
     END;
     IF (Cmd <> ^M) THEN

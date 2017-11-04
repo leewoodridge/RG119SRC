@@ -1,7 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
 
 UNIT EMail;
@@ -87,8 +83,7 @@ VAR
     IF (User.Waiting >= General.MaxWaiting) OR (NoMail IN User.Flags) AND (NOT CoSysOp) THEN
     BEGIN
       UNum1 := 0;
-      { Print(FString.CantEmail); }
-      lRGLngStr(46,FALSE);
+      lRGLngStr(46,FALSE); { Print(FString.CantEmail); }
       Exit;
     END;
     ForUsrUNum := User.ForUsr;
@@ -165,9 +160,8 @@ VAR
       Exit;
     CASE Cmd1 OF
       '1' : BEGIN
-              { Print(FString.MassEmail); }
-              lRGLngStr(48,FALSE);
-              SysOpLog('Mass-private message sent to: (by ACS "'+MassACS+'")');
+              lRGLngStr(48,FALSE); { Print(FString.MassEmail); }
+              SysOpLog('Mass-Private Messages Sent To: (By ACS "'+MassACS+'")');
               FOR UNum1 := 1 TO (MaxUsers - 1) DO
               BEGIN
                 LoadURec(User,UNum1);
@@ -181,9 +175,8 @@ VAR
               END;
             END;
       '2' : BEGIN
-              { Print(FString.MassEmailAll); }
-              lRGLngStr(49,FALSE);
-              SysOpLog('Mass-private message sent to ALL USERS.');
+              lRGLngStr(49,FALSE); { Print(FString.MassEmailAll); }
+              SysOpLog('Mass-Private Messages Sent To All Users');
               FOR UNum1 := 1 TO (MaxUsers - 1) DO
               BEGIN
                 LoadURec(User,UNum1);
@@ -193,14 +186,13 @@ VAR
               END;
             END;
       '3' : BEGIN
-              { Print(FString.MassEmail); }
-              lRGLngStr(48,FALSE);
-              SysOpLog('Mass-private message sent to:');
+              lRGLngStr(48,FALSE); { Print(FString.MassEmail); }
+              SysOpLog('Mass-Private Messages Sent To:');
               FOR UNum1 := 1 TO NumMassMailList DO
               BEGIN
                 SendIt(MaxMailListArray[UNum1]);
                 SysOpLog('   '+Caps(User.Name));
-                Print('   '+Caps(User.Name));
+                Print('   ^1'+Caps(User.Name)+'^0'); { LeeW: Why's this here? }
               END;
             END;
     END;
@@ -260,23 +252,22 @@ BEGIN
 
       IF (ThisUser.EmailSent > SaveEmailSent) THEN
         Inc(ThisUser.Debit,Fee);
-
     END
     ELSE
     BEGIN
-
-      { Print(FString.SendEMail); }
-      lRGLngStr(47,FALSE);
-      NL;
-      Print('Enter User Number, Name, or Partial Search String.');
-      Prt(': ');
+	  lRGLngStr(47,FALSE); { RGLNG: $Send_Email }
+      {NL;}
+      Print('^0Enter User Number [^11^0-^1'+IntToStr(MaxUsers - 1)+'^0], Name, Or Partial Search String.');
+	  NL;
+      Prt('^0To: ');
       lFindUserWS(UNum);
-      IF (UNum < 1) THEN
+      {IF (UNum < 1) THEN
       BEGIN
         NL;
         PauseScr(FALSE);
       END
-      ELSE
+      ELSE}
+	  { LeeW: ^ fix this in lFindUserWS command }
       BEGIN
         MHeader.Status := [];
         SEMail(UNum,MHeader);
@@ -289,29 +280,29 @@ BEGIN
     NumMassMailList := 0;
     FillChar(MaxMailListArray,SizeOf(MaxMailListArray),0);
     NL;
-    Print('Mass private message: Send message to multiple users.');
+    Print('Mass-Private Messaging: Send A Message To Multiple Users'); { LeeW: Description of mass-mailing }
     IF (NOT CoSysOp) THEN
       Cmd := '3'
     ELSE
     BEGIN
       NL;
-      Print('(1) Send to users with a certain ACS.');
-      Print('(2) Send to all system users.');
-      Print('(3) Send private messages to a list of users.');
+      Print('^0(^11^0) Send To All Users With A Certain ACS');
+      Print('^0(^12^0) Send To All Users');
+      Print('^0(^13^0) Send To A List Of Users');
       NL;
-      Prt('Your choice [^51^4-^53^4,^5Q^4=^5Quit^4]: ');
+      Prt('^0Select Method [^11^0-^13^0,(^1Q^0)uit]: ');
       OneK(Cmd,'Q123',TRUE,TRUE);
     END;
     CASE Cmd OF
       '1' : BEGIN
               NL;
-              Prt('Enter ACS: ');
+              Prt('^0Enter ACS: ');
               MPL((SizeOf(ACString) - 1));
               InputL(MassACS,(SizeOf(ACString) - 1));
               IF (MassACS <> '') THEN
               BEGIN
                 NL;
-                Print('Users marked by ACS "'+MassACS+'":');
+                Print('^0Users Marked By ACS "'+MassACS+'":');
                 Abort := FALSE;
                 Next := FALSE;
                 Reset(UserFile);
@@ -322,7 +313,7 @@ BEGIN
                   IF (AACS1(User,UNum,MassACS)) AND (UNum <> UserNum) AND (NOT (Deleted IN User.SFlags))
                      AND (NOT (LockedOut IN User.SFlags)) THEN
                   BEGIN
-                    PrintACR('   '+Caps(User.Name));
+                    PrintACR('^1   '+Caps(User.Name)+'^0');
                     Inc(NumMassMailList);
                   END;
                   Inc(UNum);
@@ -333,7 +324,7 @@ BEGIN
             END;
       '2' : BEGIN
               NL;
-              Print('All users marked for mass-private messages.');
+              Print('^0All Users Marked For Mass-Messaging');
               Abort := FALSE;
               Next := FALSE;
               Reset(UserFile);
@@ -343,7 +334,7 @@ BEGIN
                 LoadURec(User,UNum);
                 IF (UNum <> UserNum) AND (NOT (Deleted IN User.SFlags)) AND (NOT (LockedOut IN User.SFlags)) THEN
                 BEGIN
-                  PrintACR('   '+Caps(User.Name));
+                  PrintACR('^1   '+Caps(User.Name)+'^0');
                   Inc(NumMassMailList);
                 END;
                 Inc(UNum);
@@ -353,16 +344,17 @@ BEGIN
             END;
       '3' : BEGIN
               NL;
-              Print('You can send mass private messages to '
-                    +AOnOff(CoSysOp,'255',IntToStr(General.MaxMassMailList))+' user''s');
-              Print('Enter a blank line to stop entering names.');
+              Print('You can send mass private messages to up to '
+                    +AOnOff(CoSysOp,'255',IntToStr(General.MaxMassMailList))+' users');
+              Print('Enter a blank line to stop entering names');
               UNum := 1;
               WHILE (UNum <> 0) AND (NumMassMailList < General.MaxMassMailList) OR (UNum <> 0) AND (NumMassMailList < 255)
                 AND (CoSysOp) DO
               BEGIN
                 NL;
-                Print('Enter User Number, Name, or Partial Search String.');
-                Prt(': ');
+				Print('^0Enter User Number [^11^0-^1'+IntToStr(MaxUsers - 1)+'^0], Name, Or Partial Search String.');
+				NL;
+				Prt('^0To: ');
                 lFindUserWS(UNum);
                 FOR Counter := 1 TO NumMassMailList DO
                   IF (MaxMailListArray[Counter] = UNum) THEN
@@ -384,7 +376,7 @@ BEGIN
               IF (NumMassMailList > 0) THEN
               BEGIN
                 NL;
-                Print('Users marked:');
+                Print('^0Users Marked:');
                 Abort := FALSE;
                 Next := FALSE;
                 Reset(UserFile);
@@ -392,7 +384,7 @@ BEGIN
                 WHILE (UNum <= NumMassMailList) AND (NOT Abort) AND (NOT HangUp) DO
                 BEGIN
                   LoadURec(User,MaxMailListArray[UNum]);
-                  PrintACR('   '+Caps(User.Name));
+                  PrintACR('   ^1'+Caps(User.Name)+'^0');
                   Inc(UNum);
                   WKey;
                 END;
@@ -403,11 +395,11 @@ BEGIN
     IF (Cmd <> 'Q') THEN
     BEGIN
       NL;
-      Print('Total users listed: '+IntToStr(NumMassMailList));
+      Print('^0Total Users Marked: ^1'+IntToStr(NumMassMailList));
       IF (NumMassMailList > 0) THEN
       BEGIN
         NL;
-        IF PYNQ('Send mass-private messages to the above list? ',0,FALSE) THEN
+        IF PYNQ('^0Send Mass-Private Messages To The Above List? ',0,FALSE) THEN
           DoIt(Cmd);
       END;
     END;
@@ -485,13 +477,13 @@ BEGIN
       User.ForUsr := 0;
 
     IF (User.ForUsr > 0) THEN
-    BEGIN
+    BEGIN 
       UNum := User.ForUsr;
       LoadURec(User,UNum);
       IF (CoSysOp) THEN
       BEGIN
         NL;
-        IF (NOT PYNQ('Send private message to '+Caps(User.Name)+'? ',0,FALSE)) THEN
+        IF (NOT PYNQ('HSDFJKFK Send private message to '+Caps(User.Name)+'? ',0,FALSE)) THEN
           Exit;
       END;
     END;
@@ -501,8 +493,7 @@ BEGIN
 
     IF (NOT AACS(General.NetMailACS)) THEN
     BEGIN
-      { Print(FString.NoNetMail); }
-      lRGLngStr(50,FALSE);
+      lRGLngStr(50,FALSE); { Print(FString.NoNetMail); }
       PauseScr(FALSE);
       Exit;
     END;
@@ -728,20 +719,14 @@ VAR
       SNum1 := 1;
     Abort := FALSE;
     Next := FALSE;
-    (*
-    CLS;
-    PrintACR('á⁄ƒƒƒƒƒ¬ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¬ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¬ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒø');
-    PrintACR('á≥à Num á≥â Date/Time         á≥ä Sender                 á≥ã Subject                  á≥');
-    PrintACR('á¿ƒƒƒƒƒ¡ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¡ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¡ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ');
-    *)
     lRGLngStr(60,FALSE);
     NumDone := 1;
     WHILE (NumDone < (PageLength - 5)) AND (SNum1 >= 1) AND (SNum1 <= MNum) AND (NOT Abort) AND (NOT HangUp) DO
     BEGIN
       LoadHeader(MessageArray1[SNum1],MHeader);
-      TempStr := 'å'+PadRightInt(SNum1,5);
+      TempStr := '  ^0'+PadLeftInt(SNum1,3)+'  ';
       IF (MHeader.From.Anon IN [1,2]) THEN
-        TempStr := TempStr + '  ç[Unknown]          '
+        TempStr := TempStr + PadLeftStr('Unknown',20)
       ELSE
       BEGIN
         PackToDate(DT,MHeader.Date);
@@ -750,18 +735,18 @@ VAR
           Dec(j,12);
         IF (j = 0) THEN
           j := 12;
-        TempStr := TempStr + '  ç'+ZeroPad(IntToStr(DT.Day))+
+        TempStr := TempStr + PadLeftStr(ZeroPad(IntToStr(DT.Day))+
                              ' '+Copy(MonthString[DT.Month],1,3)+
                              ' '+IntToStr(DT.Year)+
-                             '  '+ZeroPad(IntToStr(j))+
+                             ' '+{ZeroPad(}IntToStr(j){)}+ { LeeW: No need to zero pad the hour }
                              ':'+ZeroPad(IntToStr(DT.Min))+
-                             AOnOff((DT.Hour >= 12),'p','a');
+                             ' '+AOnOff((DT.Hour >= 12),'PM','AM'),20);
       END;
-      TempStr := TempStr + ' é'+PadLeftStr(UseName(MHeader.From.Anon,MHeader.From.A1S),23);
+      TempStr := TempStr + '  ^0'+PadLeftStr(UseName(MHeader.From.Anon,MHeader.From.A1S),22);
       IF (MHeader.FileAttached = 0) THEN
-        TempStr := TempStr + '  è'+Copy(MHeader.Subject,1,25)
+        TempStr := TempStr + '  ^1'+Copy(MHeader.Subject,1,25)
       ELSE
-        TempStr := TempStr + '  è'+StripName(Copy(MHeader.Subject,1,25));
+        TempStr := TempStr + '  ^1'+StripName(Copy(MHeader.Subject,1,25));
       PrintACR(TempStr);
       WKey;
       Inc(SNum1);
@@ -788,7 +773,7 @@ BEGIN
         IF (Cmd = 'L') THEN
           ListYourEmail(SNum,MNum,MessageArray);
         NL;
-        Prt('Select message (^51^4-^5'+IntToStr(MNum)+'^4) [^5?^4=^5First^4,^5<CR>^4=^5Next^4,^5Q^4=^5Quit^4)]: ');
+        Prt('^0Select Message [^11^0-^1'+IntToStr(MNum)+'^0] [?=First,<CR>=Next,Q=Quit)]: ');
         MPL(Length(IntToStr(MNum)));
         ScanInput(InputStr,'Q?'^M);
         Cmd := InputStr[1];
@@ -811,7 +796,7 @@ BEGIN
             ELSE
             BEGIN
               NL;
-              Print('^7The range must be from 1 to '+IntToStr(MNum)+'^1');
+              Print('^7The range must be from 1 to '+IntToStr(MNum)+'^0'); { LeeW: Should be messages cmd }
               PauseScr(FALSE);
               SNum := 1;
               Cmd := 'L';
@@ -831,13 +816,17 @@ BEGIN
             ReadMsg(MessageArray[SNum],SNum,MNum);
           END;
           { Prt(FString.ReadingEmail); }
-          LOneK(lRGLngStr(13,TRUE),Cmd,'Q-ADFGLNRSUVXZM?'^M,TRUE,TRUE);
+          LOneK(lRGLngStr(13,TRUE),Cmd,'[]DFGMRUVXZ?LQ'^M,TRUE,TRUE);
           CASE Cmd OF
-            '-' : IF (SNum > 1) THEN
+            '[' : IF (SNum > 1) THEN
                     Dec(SNum)
                   ELSE
                     SNum := MNum;
-            'A' : ;
+			']' : IF (SNum < MNum) THEN
+                    Inc(SNum)
+                  ELSE
+                    SNum := 1;
+           {'A' : ;}
             'D' : BEGIN
                     DeleteOk := TRUE;
                     IF (MHeader.FileAttached > 0) THEN
@@ -913,7 +902,7 @@ BEGIN
                       END;
                     END;
                   END;
-            'S' : IF (NOT CoSysOp) THEN
+          (*'S' : IF (NOT CoSysOp) THEN
                     Print('%LF^7You do not have the required access level for this option!^1%LF%PA')
                   ELSE IF (LastAuthor < 1) OR (LastAuthor > (MaxUsers - 1)) THEN
                     Print('%LF^7The sender of this message does not have an account on this BBS!^1%LF%PA')
@@ -923,28 +912,28 @@ BEGIN
                     ShowUserInfo(1,LastAuthor,User);
                     NL;
                     PauseScr(FALSE);
-                  END;
+                  END; *)
             'U' : IF (NOT CoSysOp) THEN
-                    Print('%LF^7You do not have the required access level for this option!^1%LF%PA')
+                    Print('%LF^8You do not have the required access level for this option!^0%LF%PA')
                   ELSE IF (LastAuthor < 1) OR (LastAuthor > (MaxUsers - 1)) THEN
-                    Print('%LF^7The sender of this message does not have an account on this BBS!^1%LF%PA')
+                    Print('%LF^8The sender of this message does not have an account on this BBS!^1%LF%PA')
                   ELSE IF (CheckPW) THEN
                     UserEditor(LastAuthor);
             'V' : IF (NOT CoSysOp) THEN
-                    Print('%LF^7You do not have the required access level for this option!^1%LF%PA')
+                    Print('%LF^8You do not have the required access level for this option!^0%LF%PA')
                   ELSE IF (LastAuthor < 1) OR (LastAuthor > (MaxUsers - 1)) THEN
-                    Print('%LF^7The sender of this message does not have an account on this BBS!^1%LF%PA')
+                    Print('%LF^8The sender of this message does not have an account on this BBS!^1%LF%PA')
                   ELSE
                   BEGIN
                     LoadURec(User,LastAuthor);
                     AutoVal(User,LastAuthor);
                   END;
             'X' : IF (NOT CoSysOp) THEN
-                    Print('%LF^7You do not have the required access level for this option!^1%LF%PA')
+                    Print('%LF^8You do not have the required access level for this option!^0%LF%PA')
                   ELSE
                     ExtractMsgToFile(MessageArray[SNum],MHeader);
             'Z' : IF (NOT MsgSysOp) THEN
-                    Print('%LF^7You do not have the required access level for this option!^1%LF%PA')
+                    Print('%LF^8You do not have the required access level for this option!^0%LF%PA')
                   ELSE
                   BEGIN
                     DeleteOk := TRUE;
@@ -969,20 +958,16 @@ BEGIN
                   END;
             '?' : BEGIN
                     NL;
-                    LCmds(17,3,'-Read previous','Again');
-                    LCmds(17,3,'Delete message','Forward messages');
-                    LCmds(17,3,'Goto message','List messages');
-                    LCmds(17,3,'Move message','Next message');
-                    LCmds(17,3,'Reply to message','Show user');
-                    LCmds(17,3,'User editor','Validate user');
-                    LCmds(17,3,'Xtract to file','Zap (Delete w/o reciept)');
-                    LCmds(17,3,'Quit','');
+                    LCmds(19,1,'[ Previous Message','] Next Message');
+                    LCmds(19,1,'D Delete Message','F Forward Message');
+                    LCmds(19,1,'G Go To Message','L List Messages');
+                    LCmds(19,1,'M Move Message','R Reply To Message'{'A Again'});
+                    (*LCmds(19,1,'','S Show User'); { LeeW: Kind of redundant, with editor also being option }*)
+                    IF CoSysOp THEN LCmds(19,1,'U User Editor','V Validate User'); { LeeW: Added check for sop }
+                    LCmds(19,1,'X Save To File','Z Zap (Delete Without Reciept)');
+                    LCmds(19,1,'Q Quit','');
                   END;
-          ELSE
-            IF (SNum < MNum) THEN
-              Inc(SNum)
-            ELSE
-              SNum := 1;
+          {ELSE}
           END;
           IF (MNum = 0) THEN
             Cmd := 'Q';
@@ -991,8 +976,7 @@ BEGIN
       IF (Cmd = 'Q') THEN
         IF (RMsg IN ThisUser.Flags) AND (NOT CoSysOp) AND (MNum > 0) AND (NOT InWFCMenu) THEN
         BEGIN
-          { Print(FString.SorryReply); }
-          lRGLngStr(53,FALSE);
+          lRGLngStr(53,FALSE); { Print(FString.SorryReply); }
           SNum := 1;
           Cmd := 'L';
         END;
@@ -1084,13 +1068,14 @@ BEGIN
               ELSE
                 ExtractMsgToFile(MsgNum,MHeader);
         '?' : BEGIN
-                Print('%LF<^3CR^1>Next message');
-                LCmds(20,3,'Again','Edit message');
-                LCmds(20,3,'Delete message','-Previous message');
+				NL;
+                Print('<CR> Next Message');
+                LCmds(22,1,'A Again','E Edit Message');
+                LCmds(22,1,'D Delete Message','- Previous Message');
                 IF (CoSysOp) THEN
-                  LCmds(20,3,'Xtract to file','Quit')
+                  LCmds(22,1,'X Extract To File','Q Quit')
                 ELSE
-                  LCmds(20,3,'Quit','');
+                  LCmds(22,1,'Q Quit','');
               END;
       ELSE
         Inc(MsgNum);

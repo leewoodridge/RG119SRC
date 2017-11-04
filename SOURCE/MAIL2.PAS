@@ -1,9 +1,8 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
-
+{
+ListMessages
+	- add key for chars
+}
 UNIT Mail2;
 
 INTERFACE
@@ -154,9 +153,9 @@ BEGIN
   Abort := FALSE;
   Next := FALSE;
   CLS;
-  PrintACR('ÚÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄ¿');
-  PrintACR('³ Msg# ³ Sender            ³ Receiver           ³  '+'Subject           ³! Posted ³');
-  PrintACR('ÀÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÙ');
+  PrintACR('^4++------+-------------------+-------------------+-------------------+---------+');
+  PrintACR('^4|| ^3#### ^4| ^3Sender            ^4| ^3Receiver          ^4| ^3Subject           ^4| ^3Posted  ^4|');
+  PrintACR('^4++------+-------------------+-------------------+-------------------+---------+');
   Dec(Msg_On);
   NumDone := 0;
   WHILE ((NumDone < (PageLength - 7)) AND (Msg_On >= 0) AND (Msg_On < TempHiMsg) AND (NOT Abort) AND (NOT HangUp)) DO
@@ -169,40 +168,40 @@ BEGIN
     BEGIN
 
       IF (MDeleted IN MHeader.Status) THEN
-        S := '''D'
+        S := '^0D'
       ELSE IF (UnValidated IN MHeader.Status) THEN
-        S := '''U'
+        S := '^0U'
       ELSE IF ToYou(MHeader) OR FromYou(MHeader) THEN
-        S := '''>'
+        S := '^0Y'
       ELSE IF (Pub) AND (TempLastRead < MHeader.Date) THEN
-        S := '''*'
+        S := '^0*'
       ELSE
-        S := ' ';
+        S := '^0 ';
 
-      S := S + ' "'+PadLeftInt(Msg_On,5)+'  #';
+      S := S +'  '+PadLeftInt(Msg_On,5); {#}
 
       IF (MARealName IN MemMsgArea.MAFlags) THEN
         S1 := UseName(MHeader.From.Anon,MHeader.From.Real)
       ELSE
         S1 := UseName(MHeader.From.Anon,MHeader.From.A1S);
 
-      S := S + PadLeftStr(S1,18)+'  $';
+      S := S +'  '+PadLeftStr(S1,18); {Sender}
 
       IF ((MARealName IN MemMsgArea.MAFlags) AND (MHeader.MTo.Real <> '')) THEN
         S1 := UseName(MHeader.MTo.Anon,MHeader.MTo.Real)
       ELSE
         S1 := UseName(MHeader.MTo.Anon,MHeader.MTo.A1S);
 
-      S := S + PadLeftStr(S1,19)+' % ';
+      S := S +'  '+PadLeftStr(S1,18); {Receiver}
 
       IF (MHeader.FileAttached = 0) THEN
-        S := S + PadLeftStr(MHeader.Subject,18)
+        S := S +'  '+PadLeftStr(MHeader.Subject,18)
       ELSE
-        S := S + PadLeftStr(Stripname(MHeader.Subject),18);
+        S := S +'  '+PadLeftStr(Stripname(MHeader.Subject),18);
 
       PackToDate(ADate,MHeader.Date);
 
-      S := S + ' &'+ZeroPad(IntToStr(ADate.Month))+'/'+ ZeroPad(IntToStr(ADate.Day))+'/'+ZeroPad(IntToStr(ADate.Year));
+      S := S +'  '+ZeroPad(IntToStr(ADate.Month))+'/'+ ZeroPad(IntToStr(ADate.Day))+'/'+ZeroPad(IntToStr(ADate.Year));
 
       IF (AllowMCI IN MHeader.Status) THEN
         PrintACR(S)
@@ -316,7 +315,7 @@ BEGIN
       END
       ELSE
       BEGIN
-        IF ((CLSMsg IN ThisUser.SFlags) AND (NOT Contlist)) THEN
+        IF ((CLSMsg IN ThisUser.Flags) AND (NOT Contlist)) THEN
           Cls
         ELSE
           NL;
@@ -973,7 +972,7 @@ BEGIN
         ListMessages(MsgArea <> -1);
       NL;
       { Prompt(FString.ReadQ); }
-      Prt('Select message (^51^4-^5'+IntToStr(HiMsg)+'^4) [^5?^4=^5First^4,^5<CR>^4=^5Next^4,^5Q^4=^5Quit^4)]: ');
+      Prt('^0Select Message [^11^0-^1'+IntToStr(HiMsg)+'^0] [<^1?^0>First,<^1CR^0>Next,(^1Q^0)uit]: ');
       (*
       lRGLngStr(32,FALSE);
       *)
@@ -1003,7 +1002,7 @@ BEGIN
           ELSE
           BEGIN
             NL;
-            Print('^7The range must be from 1 to '+IntToStr(HiMsg)+'^1');
+            Print('^8The range must be from 1 to '+IntToStr(HiMsg)+'^1');
             PauseScr(FALSE);
             Msg_On := 1;
             InputStr := '?';

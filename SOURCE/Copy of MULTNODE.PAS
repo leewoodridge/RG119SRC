@@ -137,7 +137,7 @@ BEGIN
       BEGIN
         BlockRead(f,s[0],1);
         BlockRead(f,s[1],Ord(s[0]));
-        Prt(s);
+        Print(s);
       END;
       Close(f);
       LastError := IOResult;
@@ -254,14 +254,13 @@ VAR
         IF (i <> ThisNode) AND ((NOT ((ThisNode MOD 8) IN Forget[ThisNode DIV 8])) AND
            ((NOT ChannelOnly) AND (MultiNodeChat) AND (Room = RoomNumber)) OR
            ((NodeR.Channel = ChatChannel) AND (ChatChannel > 0) AND ChannelOnly)) THEN
-          LowLevelSend(s,i); { Other Users }
+          LowLevelSend('[u[B[25D'+s+'258'+'[24;1H',i); { Other Users }
       END;
     IF (ShowHere) THEN
     BEGIN
       IF (MultiNodeChat) AND NOT AACS(General.TeleConfMCI) THEN
         MCIAllowed := FALSE;
-      Print('[u'+s); { Local Echo }
-	  Print('[s'+'[23;1H');
+      Print('[u[25D'+s+'265'+'[24;1H'); { Local Echo }
       MCIAllowed := TRUE;
     END;
   END;
@@ -497,7 +496,7 @@ VAR
             BEGIN
               Dec(cp);
               WasColor := TRUE;
-              Set_Color;
+              set_color;
             END
             ELSE
             BEGIN
@@ -510,7 +509,7 @@ VAR
               BEGIN
                  WasColor := TRUE;
                  Dec(cp,j);
-                 Set_Color;
+                 set_color;
               END;
             END;
           END;
@@ -529,7 +528,7 @@ VAR
     os := s;
     s:='';
     ml := (253 - Length(MCI(Liner.TeleConfNormal)));
-    CheckHangUp;
+    checkhangup;
     IF (HangUp) THEN
       Exit;
     cp := 1;
@@ -682,18 +681,17 @@ BEGIN
   AddToRoom(RoomNumber);
   NL;
   Done := FALSE;
-  Print('[s'); { save position, first msg goes here }
-  Print('[23;1H'); { go to input prompt }
+Prt('[s'); { save position }
+Prt('[24;1H'); { go to input position }
 WHILE (NOT Done) AND (NOT HangUp) DO
   BEGIN
     TLeft;
     MultiNodeChat := TRUE;
     LoadNode(ThisNode);
-    UserColor(3);
-    Check_Status;
-	Prompt('[K'+'^1<^3'+ThisUser.Name+'^1> ^3'); {LeeW}
+    Usercolor(3);
+    check_status;
+	Prt('^1<^3'+ThisUser.Name+'^1> ^3'); {LeeW}
 	InputMain(s); 	
-	
 	ChannelOnly := FALSE;
     MultiNodeChat := FALSE;
 	
@@ -1166,8 +1164,9 @@ WHILE (NOT Done) AND (NOT HangUp) DO
   Else
     Prt('['+IntToStr(Y)+';'+IntToStr(X)+'H'); { return to original position };
 	*)	
-  SendMessage(s,ThisUser.TeleConfEcho); {LeeW}
+  SendMessage(s+'[s',ThisUser.TeleConfEcho); {LeeW}
   
+	 
     END;
   END;
   MultiNodeChat := FALSE;
@@ -1250,24 +1249,17 @@ BEGIN
     END;
   IF (Forced OR AACS(General.TeleConfMCI)) THEN
     s := MCI(s);
-  
-  { Good }
-  
   IF (s <> '') THEN
     BEGIN
       IF (NOT Forced) THEN
         BEGIN
           LoadNode(NodeNum);
           IF (NOT ((ThisNode MOD 8) IN NodeR.Forget[ThisNode DIV 8])) THEN
-		    BEGIN
-				LowLevelSend(^M^J'^5Message from '+Caps(ThisUser.Name)+' on node '+IntToStr(ThisNode)+':^1'^M^J,NodeNum);
-				LowLevelSend(s+'1264',NodeNum);
-			END
-		  ELSE
+            LowLevelSend(^M^J'^5Message from '+Caps(ThisUser.Name)+' on node '+IntToStr(ThisNode)+':^1'^M^J,NodeNum)
+          ELSE
             Print(^M^J'That node has forgotten you.');
         END;
-    
-	  IF (NodeNum = 0) THEN
+      IF (NodeNum = 0) THEN
         FOR NodeNum := 1 TO MaxNodes DO
           IF (NodeNum <> ThisNode) THEN
             BEGIN
@@ -1275,9 +1267,9 @@ BEGIN
               IF (NodeR.User > 0) THEN
                 LowLevelSend(s,NodeNum)
             END
-      ELSE      { match up ELSE statements }
-      ELSE
-		{LowLevelSend(s,NodeNum);}
+        ELSE      (* Match up ELSE Statements ??? *)
+        ELSE
+          LowLevelSend(s,NodeNum);
     END;
 END;
 

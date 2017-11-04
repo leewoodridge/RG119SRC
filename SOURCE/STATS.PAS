@@ -1,8 +1,17 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
+
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+
+  TOP USERS STATS
+  
+  [ISSUES]
+	- needs better styling, customizable styling-- custo header mid and tail
+	- top 20 files: needs more info than just filename? users wont be able to tell
+	what they ara
+}
+
 UNIT STATS;
 
 INTERFACE
@@ -237,9 +246,11 @@ BEGIN
   Abort := FALSE;
   Next := FALSE;
   CLS;
-  PrintACR('^5'+Center('-=[ Top 10 '+Title+' ]=-',78,TRUE));
+  PrintACR('^1'+Center('Top 10 '+Title,78,TRUE));
   NL;
-  PrintACR('^5##   User Name         '+Center(Header,55,TRUE));
+  PrintACR('^4+----+------------------------------------+-----------------------------------+');
+  PrintACR('^4| ^3## ^4| ^3User Name                          ^4| ^3'+PadLeftStr(Header,33)+' ^4|');
+  PrintACR('^4+----+------------------------------------+-----------------------------------+');
   NL;
   Counter := 1;
   WHILE (Counter <= 10) AND (NOT Abort) AND (NOT HangUp) DO
@@ -247,14 +258,13 @@ BEGIN
     User.Name := '';
     IF (Top10User[Counter].UNum >= 1) THEN
       LoadURec(User,Top10User[Counter].UNum);
-    TempStr :=  '^5'+PadRightInt(Counter,2)+
-                '   '+
-                AOnOff(User.Name = ThisUser.Name,'^7','^0')+
-                User.Name+' ^1';
-    FOR Counter1 := (Length(User.Name) + 1) TO 35 DO
-      TempStr := TempStr + '.';
-    TempStr := TempStr + '  '+AOnOff((Top10User[Counter].Info > 0.0),'^4'
-                         +PadRightStr(RealToStr(Top10User[Counter].Info,0,Decimal),Width),'');
+    TempStr :=  '  ^0'+PadLeftInt(Counter,3)+
+                '  ^0'+AOnOff(User.Name = ThisUser.Name,'^9','^1')+
+					   PadLeftStr(User.Name,34)+' ^0';
+  { FOR Counter1 := (Length(User.Name) + 1) TO 34 DO
+      TempStr := TempStr + '-'; } { LeeW: That was ugly }
+    TempStr := TempStr + '  '+AOnOff((Top10User[Counter].Info > 0.0),'^0'
+							 +PadLeftStr(RealToStr(Top10User[Counter].Info,0,Decimal),Width),'');
     PrintACR(TempStr);
     WKey;
     Inc(Counter);
@@ -275,9 +285,11 @@ BEGIN
   Abort := FALSE;
   Next := FALSE;
   CLS;
-  PrintACR('^5'+Center('-=[ Top 20 Files Downloaded ]=-',78,TRUE));
+  PrintACR('^1'+Center('Top 20 Files Downloaded',79,TRUE));
   NL;
-  PrintACR('^5##   Filename.Ext  Number Downloads         ##   Filename.Ext  Number Downloads');
+  PrintACR('^4+----+--------------+------------------+----+---------------------------------+');
+  PrintACR('^4| ^3## ^4| ^3FILENAME.EXT ^4| ^3Downloads        ^4| ^3## ^4| ^3FILENAME.EXT ^4| ^3Downloads        ^4|');
+  PrintACR('^4+----+--------------+------------------+----+---------------------------------+');
   NL;
   FOR Counter := 1 to 10 DO
   BEGIN
@@ -294,14 +306,14 @@ BEGIN
         Close(FileInfoFile);
         Close(ExtInfoFile);
       END;
-      TempStr := '^5'+PadRightInt(Counter,2);
-      TempStr := TempStr + '^0'+PadRightStr(F.FileName,15);
-      IF (Top20File[Counter].Downloaded > 0) THEN
-        TempStr := TempStr + '^4'+PadRightInt(Top20File[Counter].Downloaded,12)
-      ELSE
-        TempStr := TempStr + '            ';
+      TempStr := '  ^0'+PadLeftInt(Counter,3);
+      TempStr := TempStr + '  ^1'+PadLeftStr(F.FileName,13);
+      {IF (Top20File[Counter].Downloaded > 0) THEN}
+        TempStr := TempStr + '  ^0'+PadLeftInt(Top20File[Counter].Downloaded,17)
+      (*ELSE
+        TempStr := TempStr + '{            }';*)
     END;
-    TempStr := TempStr + '               ';
+    (*TempStr := TempStr + '{               }';*)
     F.FileName := '';
     IF ((Counter + 10) > 10) THEN
     BEGIN
@@ -315,10 +327,10 @@ BEGIN
         Close(FileInfoFile);
         Close(ExtInfoFile);
       END;
-      TempStr := TempStr + '^5'+PadRightInt(Counter + 10,2);
-      TempStr := TempStr + '^0'+PadRightStr(F.FileName,15);
-      IF (Top20File[Counter + 10].Downloaded > 0) THEN
-        TempStr := TempStr + '^4'+PadRightInt(Top20File[Counter + 10].Downloaded,12)
+      TempStr := TempStr + '  ^0'+PadLeftInt(Counter + 10,3);
+      TempStr := TempStr + '  ^0'+PadLeftStr(F.FileName,13);
+      {IF (Top20File[Counter + 10].Downloaded > 0) THEN}
+        TempStr := TempStr + '  ^0'+PadLeftInt(Top20File[Counter + 10].Downloaded,17)
     END;
     PrintACR(TempStr);
   END;

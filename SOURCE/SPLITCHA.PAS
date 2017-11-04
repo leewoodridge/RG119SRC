@@ -505,7 +505,7 @@ BEGIN
   ELSE IF (ChatAuto IN ThisUser.SFlags) THEN
     ChatFileLog(TRUE);
   NL;
-  Exclude(ThisUser.Flags,Alert);
+  Exclude(ThisUser.SFlags,Alert);
   {
   PrintF('CHATINIT');
   IF (NoFile) THEN
@@ -1230,7 +1230,7 @@ BEGIN
   ELSE IF (ChatAuto IN ThisUser.SFlags) THEN
     ChatFileLog(TRUE);
   NL;
-  Exclude(ThisUser.Flags,Alert);
+  Exclude(ThisUser.SFlags,Alert);
   {
   PrintF('CHATINIT');
   IF (NoFile) THEN

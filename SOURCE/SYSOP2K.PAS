@@ -1,7 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
 
 UNIT SysOp2K;
@@ -24,18 +20,19 @@ VAR
 BEGIN
   Abort := FALSE;
   Next := FALSE;
-  PrintACR('^0 ##^4:^3Ext^4:^3Compression cmdline      ^4:^3Decompression cmdline    ^4:^3Success Code');
-  PrintACR('^4 ==:===:=========================:=========================:============');
+  PrintACR('^4+---+----+-----+----------------------------+----------------------------+----+');
+  PrintACR('^4| ^3A ^4| ^3## ^4| ^3Ext ^4| ^3Compression CmdLine        ^4| ^3Decompression CmdLine      ^4| ^3SC ^4|');
+  PrintACR('^4+---+----+-----+----------------------------+----------------------------+----+');
   RecNumToList := 1;
   WHILE (RecNumToList <= NumArcs) AND (NOT Abort) AND (NOT HangUp) DO
   BEGIN
     WITH General.FileArcInfo[RecNumToList] DO
-      PrintACR(AOnOff(Active,'^5+','^1-')+
-               '^0'+PadRightInt(RecNumToList,2)+
-               ' ^3'+PadLeftStr(Ext,3)+
-               ' ^5'+PadLeftStr(ArcLine,25)+
-               ' '+PadLeftStr(UnArcLine,25)+
-               ' '+AOnOff(SuccLevel <> - 1,IntToStr(SuccLevel),'-1 (ignores)'));
+      PrintACR('  ^0'+PadLeftStr(AOnOff(Active,'^9'+#251,'^4-'),2)+
+               '  ^0'+PadLeftInt(RecNumToList,3)+
+               '  ^1'+PadLeftStr(Ext,4)+
+               '  ^0'+PadLeftStr(ArcLine,27)+
+               '  ^0'+PadLeftStr(UnArcLine,27)+
+               '  ^0'+PadLeftStr(AOnOff(SuccLevel <> - 1,IntToStr(SuccLevel),'-1 (Ignores)'),3));
     Inc(RecNumToList);
   END;
 END;
@@ -45,7 +42,7 @@ VAR
   RecNumToList: Byte;
 BEGIN
   FOR RecNumToList := 1 TO 3 DO
-    PrintACR('^1'+IntToStr(RecNumToList)+'. Archive comment file: ^5'+
+    PrintACR('^0<^1'+IntToStr(RecNumToList)+'^0> Archive Comment File #'+IntToStr(RecNumToList)+': ^1'+
              AOnOff(General.FileArcComment[RecNumToList] <> '',
                     General.FileArcComment[RecNumToList],'*None*'));
 END;
@@ -337,7 +334,7 @@ BEGIN
       NL;
       DisplayCmt;
     END;
-    LOneK('%LFArchive editor [^5?^4=^5Help^4]: ',Cmd,'QDIM123?'^M,TRUE,TRUE);
+    LOneK('^0%LFArchive Editor: ',Cmd,'QDIM123?'^M,TRUE,TRUE);
     CASE Cmd OF
       'D' : DeleteArchive(TempArchive,RecNumToList);
       'I' : InsertArchive(TempArchive,Cmd,RecNumToList);
@@ -345,16 +342,17 @@ BEGIN
       '1'..'3' :
             BEGIN
               Changed := FALSE;
-              InputWNWC('%LFNew comment file #'+IntToStr(Ord(Cmd) - 48)+': ',General.FileArcComment[Ord(Cmd) - 48],40,Changed);
+              InputWNWC('^0%LFNew Comment File #'+
+			  IntToStr(Ord(Cmd) - 48)+': ',General.FileArcComment[Ord(Cmd) - 48],40,Changed);
               IF (Changed) THEN
-                SysOpLog('* Modified comment: ^5'+IntToStr(Ord(Cmd) - 48)+'.');
+                SysOpLog('* Modified comment: '+IntToStr(Ord(Cmd) - 48)+'.');
             END;
       '?' : BEGIN
-              Print('%LF^1<^3CR^1>Next screen or redisplay current screen');
-              Print('^1(^3?^1)Help/First archive');
-              Print('^31^1-^33^1:Modify Item');
-              LCmds(16,3,'Delete archive','Insert archive');
-              LCmds(16,3,'Modify archive','Quit');
+              Print('^0%LF<^1CR^0> Next Page / Refresh');
+              {Print('^1(^3?^1)Help/First archive'); }{ LeeW: useless }
+              {Print('1^1-^33^1:Modify Item');}
+              LCmds(18,1,'D Delete Archiver','I Insert Archiver');
+              LCmds(18,1,'M Modify Archiver','Q Quit');
             END;
     END;
   UNTIL (Cmd = 'Q') OR (HangUp);

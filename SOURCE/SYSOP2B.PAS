@@ -1,10 +1,12 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,L+,I-,L+,N-,O+,R-,S+,V-}
 
-UNIT SysOp2B;
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+
+}
+
+UNIT SysOp2B; { Modem / Node Configuration }
 
 INTERFACE
 
@@ -48,11 +50,11 @@ VAR
   VAR
     Changed: Boolean;
   BEGIN
-    Print('%LF^1Current modem '+DisplayStr+' string: "^5'+InputStr+'^1"');
+    Print('%LF^0Current modem '+DisplayStr+' string: "^0'+InputStr+'^0"');
     Print('%LFUse: "|" for a carriage return');
     Print('     "~" for a half-second delay');
     Print('     "^" to toggle DTR off for 1/4 second');
-    InputWN1('%LF^1Enter new modem '+DisplayStr+' string:%LF^4: ',InputStr,Len,[InterActiveEdit],Changed);
+    InputWN1('%LF^0Enter new modem '+DisplayStr+' string:%LF^0: ',InputStr,Len,[InterActiveEdit],Changed);
   END;
 
   FUNCTION WhichBaud(B: Byte): AStr;
@@ -90,29 +92,29 @@ BEGIN
     BEGIN
       Abort := FALSE;
       Next := FALSE;
-      Print('%CL^5Modem/Node Configuration:');
+      Print('%CL^0Modem/Node Configuration:');
       NL;
-      PrintACR('^11. Maximum baud rate: ^5'+PadLeftInt(InitBaud,20)+
-               '^12. Port number      : ^5'+IntToStr(ComPort));
-      PrintACR('^13. Modem init       : ^5'+PadLeftStr(Init,20)+
-               '^14. Modem answer     : ^5'+Answer);
-      PrintACR('^15. Modem HangUp     : ^5'+PadLeftStr(HangUp,20)+
-               '^16. Modem offhook    : ^5'+Offhook);
-      PrintACR('^17. COM port locking : ^5'+PadLeftStr(ShowOnOff(LockedPort IN MFlags),20)+
-               '^18. XON/XOFF flow    : ^5'+ShowOnOff(XONXOFF IN MFlags));
-      PrintACR('^19. CTS/RTS flow     : ^5'+PadLeftStr(ShowOnOff(CTSRTS IN MFlags),20)+
-               '^1A. ACS for this node: ^5'+LogonACS);
-      PrintACR('^1B. Drop file path   : ^5'+PadLeftStr(DoorPath,20)+
-               '^1C. Answer on ring   : ^5'+IntToStr(AnswerOnRing));
-      PrintACR('^1D. TeleConf Normal  : ^5'+PadLeftStr(TeleConfNormal,20)+
-               '^1E. MultiRing only   : ^5'+ShowOnOff(MultiRing));
-      PrintACR('^1F. TeleConf Anon    : ^5'+PadLeftStr(TeleConfAnon,20));
-      PrintACR('^1G. TeleConf Global  : ^5'+TeleConfGlobal);
-      PrintACR('^1H. TeleConf Private : ^5'+TeleConfPrivate);
-      PrintACR('^1I. IRQ string       : ^5'+IRQ);
-      PrintACR('^1J. Address string   : ^5'+Address);
-      PrintACR('^1R. Modem result codes');
-      Prt('%LFEnter selection [^51^4-^59^4,^5A^4-^5J^4,^5R^4,^5Q^4=^5Quit^4]: ');
+      PrintACR('^11^0> Maximum Baud Rate : ^1'+PadLeftInt(InitBaud,20)+
+               '^12^0> Port Number       : ^1'+IntToStr(ComPort));
+      PrintACR('^13^0> Modem Init        : ^1'+PadLeftStr(Init,20)+
+               '^14^0> Modem Answer      : ^1'+Answer);
+      PrintACR('^15^0> Modem Hang Up     : ^1'+PadLeftStr(HangUp,20)+
+               '^16^0> Modem Off Hook    : ^1'+Offhook);
+      PrintACR('^17^0> COM Port Locking  : ^1'+PadLeftStr(ShowOnOff(LockedPort IN MFlags),20)+
+               '^18^0> XON/XOFF Flow     : ^1'+ShowOnOff(XONXOFF IN MFlags));
+      PrintACR('^19^0> CTS/RTS Flow      : ^1'+PadLeftStr(ShowOnOff(CTSRTS IN MFlags),20)+
+               '^1A^0> ACS For This Node : ^1'+LogonACS);
+      PrintACR('^1B^0> Drop File Path    : ^1'+PadLeftStr(DoorPath,20)+
+               '^1C^0> Answer On Ring    : ^1'+IntToStr(AnswerOnRing));
+      PrintACR('^1D^0> TeleConf Normal   : ^1'+PadLeftStr(TeleConfNormal,20)+
+               '^1E^0> MultiRing Only    : ^1'+ShowOnOff(MultiRing));
+      PrintACR('^1F^0> TeleConf Anon     : ^1'+PadLeftStr(TeleConfAnon,20));
+      PrintACR('^1G^0> TeleConf Global   : ^1'+TeleConfGlobal);
+      PrintACR('^1H^0> TeleConf Private  : ^1'+TeleConfPrivate);
+      PrintACR('^1I^0> IRQ String        : ^1'+IRQ);
+      PrintACR('^1J^0> Address String    : ^1'+Address);
+      PrintACR('^1R^0> Modem Result Codes');
+      Prt('^0%LFModem/Node Configuration: ');
       OneK(Cmd,'Q123456789ABCDEFGHIJR'^M,TRUE,TRUE);
       CASE Cmd OF
         '1' : IF (InCom) THEN

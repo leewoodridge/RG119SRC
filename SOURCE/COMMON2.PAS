@@ -380,7 +380,7 @@ BEGIN
           GoToXY(55,SecondRow);
           Write(ToDate8(PD2Date(Laston)));
           GoToXY(71,SecondRow);
-          IF (FSEditor IN SFlags) THEN
+          IF (FSEditor IN Flags) THEN
             Write('FullScrn')
           ELSE
             Write('Regular');
@@ -735,7 +735,7 @@ BEGIN
       16 : BEGIN                                             { ALT-Q         }
              ChatCall := FALSE;
              ChatReason := '';
-             Exclude(ThisUser.Flags,Alert);
+             Exclude(ThisUser.SFlags,Alert);
              Update_Screen;
            END;
       35 : HangUp := TRUE;                                     { ALT-H         }

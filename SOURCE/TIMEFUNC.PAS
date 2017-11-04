@@ -20,9 +20,10 @@ TYPE
   Str5 = STRING[5];
   Str8 = STRING[8];
   Str10 = STRING[10];
+  Str11 = STRING[11];
   Str160 = STRING[160];
 
-PROCEDURE ConvertAmPm(VAR Hour: Word; VAR AmPm: Str2);
+PROCEDURE ConvertAMPM(VAR Hour: Word; VAR AMPM: Str2);
 FUNCTION ZeroPad(S: Str8): Str2;
 PROCEDURE PackToDate(VAR DT: DateTime; L: LongInt);
 FUNCTION DateToPack(VAR DT: DateTime): LongInt;
@@ -33,7 +34,7 @@ FUNCTION GetPackDateTime: LongInt;
 FUNCTION DoorToDate8(CONST SDate: Str10): Str8;
 FUNCTION PD2Time24(CONST PD: LongInt): Str5;
 FUNCTION ToDate8(CONST SDate: Str10): Str8;
-FUNCTION PDT2Dat(VAR PDT: LongInt; CONST DOW: Byte): STRING;
+FUNCTION PDToDateTime(VAR PDT: LongInt; CONST DOW: Byte): STRING;
 FUNCTION PD2Date(CONST PD: LongInt): STR10;
 FUNCTION Date2PD(CONST SDate: Str10): LongInt;
 FUNCTION TimeStr: Str8;
@@ -41,7 +42,8 @@ FUNCTION DateStr: Str10;
 FUNCTION CTim(L: LongInt): Str8;
 FUNCTION Days(VAR Month,Year: Word): Word;
 FUNCTION DayNum(DateStr: Str10): Word;
-FUNCTION Dat: Str160;
+FUNCTION Dat: Str160; { LeeW: Returns current date & time "Thu Oct 26 2017 10:00 PM" }
+FUNCTION PDToTime(VAR PDT: LongInt): STRING; { LeeW: Converts packed date to time "1:00 PM" }
 
 IMPLEMENTATION
 
@@ -55,9 +57,6 @@ CONST
   M28 = (86400 * 28);
 
   SecondsPerMonth: ARRAY [1..12] OF LongInt = (M31,M28,M31,M30,M31,M30,M31,M31,M30,M31,M30,M31);
-
-TYPE
-  Str11 = STRING[11];
 
 (* Done - Lee Palmer 11/23/07 *)
 FUNCTION IntToStr(L: LongInt): Str11;
@@ -97,13 +96,13 @@ BEGIN
 END;
 
 (* Done - 10/25/07 - Lee Palmer *)
-PROCEDURE ConvertAmPm(VAR Hour: Word; VAR AmPm: Str2);
+PROCEDURE ConvertAMPM(VAR Hour: Word; VAR AMPM: Str2);
 BEGIN
   IF (Hour < 12) THEN
-    AmPm := 'am'
+    AMPM := 'AM'
   ELSE
   BEGIN
-    AmPm := 'pm';
+    AMPM := 'PM';
     IF (Hour > 12) THEN
       Dec(Hour,12);
   END;
@@ -233,7 +232,7 @@ VAR
   DT: DateTime;
 BEGIN
   PackToDate(DT,PD);
-  PD2Date := ZeroPad(IntToStr(DT.Month))+'-'+ZeroPad(IntToStr(DT.Day))+'-'+IntToStr(DT.Year);
+  PD2Date := ZeroPad(IntToStr(DT.Month))+'/'+ZeroPad(IntToStr(DT.Day))+'/'+IntToStr(DT.Year); { date formatting }
 END;
 
 FUNCTION Date2PD(CONST SDate: Str10): LongInt;
@@ -263,34 +262,33 @@ BEGIN
 END;
 
 (* Done - Lee Palmer 11/23/07 *)
-FUNCTION PDT2Dat(VAR PDT: LongInt; CONST DOW: Byte): STRING;
-(* Example Output: 12:00 am  Fri Nov 23, 2007 *)
+FUNCTION PDToDateTime(VAR PDT: LongInt; CONST DOW: Byte): STRING;
 VAR
   DT: DateTime;
-  AmPm: Str2;
+  AMPM: Str2;
 BEGIN
   PackToDate(DT,PDT);
-  ConvertAmPm(DT.Hour,AmPm);
-  PDT2Dat := IntToStr(DT.Hour)+
-            ':'+ZeroPad(IntToStr(DT.Min))+
-            ' '+AmPm+
-            '  '+Copy(DayString[DOW],1,3)+
-            ' '+Copy(MonthString[DT.Month],1,3)+
-            ' '+IntToStr(DT.Day)+
-            ', '+IntToStr(DT.Year);
+  ConvertAMPM(DT.Hour,AMPM);
+  PDToDateTime := Copy(DayString[DOW],1,3)+
+             ' '+Copy(MonthString[DT.Month],1,3)+
+             ' '+IntToStr(DT.Day)+
+             ' '+IntToStr(DT.Year)+
+			 ' '+IntToStr(DT.Hour)+
+             ':'+ZeroPad(IntToStr(DT.Min))+
+             ' '+AMPM;
 END;
 
 FUNCTION TimeStr: Str8;
 VAR
-  AmPm: Str2;
+  AMPM: Str2;
   Hour,
   Minute,
   Second,
   Sec100: Word;
 BEGIN
   GetTime(Hour,Minute,Second,Sec100);
-  ConvertAmPm(Hour,AmPm);
-  TimeStr := IntToStr(Hour)+':'+ZeroPad(IntToStr(Minute))+' '+AmPm;
+  ConvertAMPM(Hour,AMPM);
+  TimeStr := IntToStr(Hour)+':'+ZeroPad(IntToStr(Minute))+' '+AMPM;
 END;
 
 FUNCTION DateStr: Str10;
@@ -373,21 +371,31 @@ END;
 FUNCTION Dat: Str160;
 VAR
   DT: DateTime;
-  AmPm: Str2;
+  AMPM: Str2;
   DayOfWeek,
   Sec100: Word;
 BEGIN
   GetDate(DT.Year,DT.Month,DT.Day,DayOfWeek);
   GetTime(DT.Hour,DT.Min,DT.Sec,Sec100);
-  ConvertAmPm(DT.Hour,AmPm);
-  Dat := IntToStr(DT.Hour)+
-         ':'+ZeroPad(IntToStr(DT.Min))+
-         ' '+AmPm+
-         '  '+Copy(DayString[DayOfWeek],1,3)+
+  ConvertAMPM(DT.Hour,AMPM);
+  Dat := Copy(DayString[DayOfWeek],1,3)+
          ' '+Copy(MonthString[DT.Month],1,3)+
          ' '+IntToStr(DT.Day)+
-         ', '+IntToStr(DT.Year);
+         ' '+IntToStr(DT.Year)+
+		 ' '+IntToStr(DT.Hour)+':'+ZeroPad(IntToStr(DT.Min))+' '+AMPM;
 END;
 
+FUNCTION PDToTime(VAR PDT: LongInt): STRING; { LeeW: Added }
+(* Example Output: 1:00 PM *)
+VAR
+  DT: DateTime;
+  AMPM: STRING[2];
+BEGIN
+  PackToDate(DT,PDT);
+  ConvertAMPM(DT.Hour,AMPM);
+  PDToTime := IntToStr(DT.Hour)+
+              ':'+ZeroPad(IntToStr(DT.Min))+
+              ' '+AMPM;
+END;
 
 END.

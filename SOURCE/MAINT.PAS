@@ -28,7 +28,8 @@ USES
   Mail4,
   ShortMsg,
   TimeFunc,
-  Vote;
+  Vote,
+  CRT;
 
 PROCEDURE LogonMaint;
 VAR
@@ -162,7 +163,7 @@ VAR
       BEGIN
         Print(^G);
         NL;
-        Print('^8Note: ^5System event approaching.');
+        Print('^8Note: System event approaching.');
         Print('System will be shut down in '+FormattedTime(NSL));
         NL;
         Print(^G);
@@ -204,13 +205,13 @@ BEGIN
   IF (General.MultiNode) THEN
   BEGIN
     LoadNode(ThisNode);
-    IF AACS(General.Invisible) AND PYNQ(lRGLngStr(45,TRUE){FString.AskInvisibleLoginStr},0,FALSE) THEN
+    (*IF AACS(General.Invisible) AND PYNQ(lRGLngStr(45,TRUE){FString.AskInvisibleLoginStr},0,FALSE) THEN
     BEGIN
       IsInvisible := TRUE;
       Include(NodeR.Status,NInvisible);
       SysOpLog('Selected invisible mode.');
     END
-    ELSE
+    ELSE*)
       IsInvisible := FALSE;
     FillChar(NodeR.Invited,SizeOf(NodeR.Invited),0);
     FillChar(NodeR.Booted,SizeOf(NodeR.Booted),0);
@@ -280,7 +281,7 @@ BEGIN
     END;
     WriteLn(SysOpLogFile1);
 
-    TempStr := '^3Logon ^5['+Dat+']^4 (';
+    TempStr := 'Logon ['+Dat+'] (';
 
     IF (ComPortSpeed > 0) THEN
     BEGIN
@@ -316,20 +317,18 @@ BEGIN
   SL1(TempStr);
   SaveGeneral(FALSE);
   LastError := IOResult;
-
   IF ((CoSysOp) AND (NOT FastLogon) AND (ComPortSpeed > 0)) THEN
   BEGIN
     IF PYNQ(lRGLngStr(57,TRUE){FString.QuickLogon},0,FALSE) THEN
       FastLogon := TRUE;
     NL;
   END;
-
   Assign(LastCallerFile,General.DataPath+'LASTON.DAT');
   IF Exist(General.DataPath+'LASTON.DAT') THEN
     Reset(LastCallerFile)
   ELSE
     ReWrite(LastCallerFile);
-  FillChar(LastCaller,SizeOf(LastCaller),#0);
+  FillChar(LastCaller,SizeOf(LastCaller),0);
   WITH LastCaller DO
   BEGIN
     Node := ThisNode;
@@ -407,12 +406,13 @@ BEGIN
       PauseScr(FALSE);
       CLS;
     END;
-
-    NL;
+    
     IF (General.AutoMInLogon) THEN
-      ReadAutoMsg;
-    NL;
-
+	  BEGIN
+	    NL;
+        ReadAutoMsg;
+	    NL;
+	  END;
     IF (General.YourInfoInLogon) THEN
     BEGIN
       PrintF('YOURINFO');
@@ -425,9 +425,8 @@ BEGIN
     BEGIN
       NL;
       IF PYNQ(lRGLngStr(56,TRUE){FString.ShowBulletins},0,FALSE) THEN
-        Bulletins('')
-      ELSE
-        NL;
+        Bulletins('');
+	  NL;    
     END;
 
     IF (NOT (RVoting IN ThisUser.Flags)) THEN
@@ -436,11 +435,13 @@ BEGIN
       IF (Counter > 0) THEN
       BEGIN
         NL;
-        Prompt('^5You have not voted on ^9'+IntToStr(Counter)+'^5 voting '+Plural('question',Counter));
+        Prompt('^0You have not voted on ^1'+IntToStr(Counter)+'^0 voting '+Plural('question',Counter));
         NL;
       END;
     END;
 
+	{ LeeW: Some kind of delay/pause here -- investigate }
+	
     IF Exist(General.DataPath+'BATCHDL.DAT') THEN
     BEGIN
       Assign(BatchDLFile,General.DataPath+'BATCHDL.DAT');
@@ -483,9 +484,9 @@ BEGIN
     IF (NumBatchDLFiles > 0) AND (General.ForceBatchDL) THEN
       REPEAT
         NL;
-        Print('^4You must (^5D^4)ownload, (^5R^4)emove or (^5C^4)lear your batch queued files.');
+        Print('^0You must (^1D^0)ownload, (^1R^0)emove, or (^1C^0)lear your batch queued files.');
         NL;
-        Prt('Select option: ');
+        Prt('^0Select Option: ');
         OneK(Cmd,'DRC',TRUE,TRUE);
         CASE Cmd OF
           'D' : BatchDownload;
@@ -497,9 +498,9 @@ BEGIN
     IF (NumBatchULFiles > 0) AND (General.ForceBatchUL) THEN
       REPEAT
         NL;
-        Print('^4You must (^5U^4)pload, (^5R^4)emove or (^5C^4)lear your batch queued files.');
+        Print('^0You must (^1U^0)pload, (^1R^0)emove, or (^1C^0)lear your batch queued files.');
         NL;
-        Prt('Select option: ');
+        Prt('^0Select Option: ');
         OneK(Cmd,'URC',TRUE,TRUE);
         CASE Cmd OF
           'U' : BatchUpload(FALSE,0);
@@ -513,12 +514,10 @@ BEGIN
     IF (LIL <> 0) THEN
       PauseScr(FALSE);
 
-    NL;
     Update_Screen;
   END;
 
   FindChopTime;
-
 
   IF (SMW IN ThisUser.Flags) THEN
   BEGIN
@@ -527,7 +526,7 @@ BEGIN
     PauseScr(FALSE);
   END;
 
-  IF ((Alert IN ThisUser.Flags) AND (SysOpAvailable)) THEN
+  IF ((Alert IN ThisUser.SFlags) AND (SysOpAvailable)) THEN
     ChatCall := TRUE;
 
   IF (ThisUser.Waiting > 0) THEN
@@ -535,7 +534,7 @@ BEGIN
       ReadMail
     ELSE
     BEGIN
-      IF PYNQ('Read your private messages? ',0,TRUE) THEN
+      IF PYNQ('^0Read Your Private Messages? ',0,TRUE) THEN
         ReadMail;
     END;
 
@@ -546,13 +545,14 @@ BEGIN
       IF (NoFile) THEN
       BEGIN
         NL;
-        Print('You must select a new password every '+IntToStr(General.PasswordChange)+' days.');
+        Print('^0You must select a new password every ^1'+IntToStr(General.PasswordChange)+'^0 days.');
         NL;
       END;
       CStuff(22,3,ThisUser);
     END;
 
   FastLogon := FALSE;
+  {PauseScr(False);}
 END;
 
 PROCEDURE LogoffMaint;

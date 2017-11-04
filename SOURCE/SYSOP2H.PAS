@@ -1,8 +1,11 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
+
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+
+  Network Configuration
+}
 
 UNIT SysOp2H;
 
@@ -27,26 +30,26 @@ BEGIN
     BEGIN
       Abort := FALSE;
       Next := FALSE;
-      Print('%CL^5Network Configuration:');
+      Print('%CL^0Network Configuration:');
       NL;
-      PrintACR('^1A. Net addresses');
-      PrintACR('^1B. Origin line     : ^5'+Origin);
+      PrintACR('^1A^0> Net Addresses');
+      PrintACR('^1B^0> Origin Line     : ^1'+Origin);
       NL;
-      PrintACR('^1C. Strip IFNA kludge lines : ^5'+ShowYesNo(SKludge)+
-               '^1     1. Color of standard text : ^'+IntToStr(Text_Color)+IntToStr(Text_Color));
-      PrintACR('^1D. Strip SEEN-BY lines     : ^5'+ShowYesNo(SSeenBy)+
-               '^1     2. Color of quoted text   : ^'+IntToStr(Quote_Color)+IntToStr(Quote_Color));
-      PrintACR('^1E. Strip origin lines      : ^5'+ShowYesNo(SOrigin)+
-               '^1     3. Color of tear line     : ^'+IntToStr(Tear_Color)+IntToStr(Tear_Color));
-      PrintACR('^1F. Add tear/origin line    : ^5'+ShowYesNo(AddTear)+
-               '^1     4. Color of origin line   : ^'+IntToStr(Origin_Color)+IntToStr(Origin_Color));
+      PrintACR('^1C^0> Strip IFNA Kludge Lines : ^1'+ShowYesNo(SKludge)+
+               '          ^11^0> Color Of Standard Text : ^'+IntToStr(Text_Color)+IntToStr(Text_Color));
+      PrintACR('^1D^0> Strip SEEN-BY Lines     : ^1'+ShowYesNo(SSeenBy)+
+               '          ^12^0> Color Of Quoted Text   : ^'+IntToStr(Quote_Color)+IntToStr(Quote_Color));
+      PrintACR('^1E^0> Strip Origin Lines      : ^1'+ShowYesNo(SOrigin)+
+               '          ^13^0> Color Of Tear Line     : ^'+IntToStr(Tear_Color)+IntToStr(Tear_Color));
+      PrintACR('^1F^0> Add Tear/Origin Line    : ^1'+ShowYesNo(AddTear)+
+               '          ^14^0> Color Of Origin Line   : ^'+IntToStr(Origin_Color)+IntToStr(Origin_Color));
       NL;
-      PrintACR('^1G. Default Echomail path   : ^5'+DefEchoPath);
-      PrintACR('^1H. Netmail path            : ^5'+NetMailPath);
-      PrintACR('^1I. Netmail attributes      : ^5'+NetMail_Attr(NetAttribute));
-      PrintACR('^1J. UUCP gate address       : ^5'+PadLeftStr('^5'+IntToStr(AKA[20].Zone)+':'+IntToStr(AKA[20].Net)+
-                                                       '/'+IntToStr(AKA[20].Node)+'.'+IntToStr(AKA[20].Point),20));
-      Prt('%LFEnter selection [^5A^4-^5J^4,^51^4-^54^4,^5Q^4=^5Quit^4]: ');
+      PrintACR('^1G^0> Default EchoMail Path   : ^1'+DefEchoPath);
+      PrintACR('^1H^0> NetMail Path            : ^1'+NetMailPath);
+      PrintACR('^1I^0> NetMail Attributes      : ^1'+NetMail_Attr(NetAttribute));
+      PrintACR('^1J^0> UUCP Gate Address       : ^1'+PadLeftStr('^1'+IntToStr(AKA[20].Zone)+'^0:^1'+IntToStr(AKA[20].Net)+
+                                                       '^0/^1'+IntToStr(AKA[20].Node)+'^0.^1'+IntToStr(AKA[20].Point),20));
+      Prt('^0%LFNetwork Configuration: ');
       OneK(Cmd,'QABCDEFGHIJ1234'^M,TRUE,TRUE);
       CASE Cmd OF
         'A' : BEGIN

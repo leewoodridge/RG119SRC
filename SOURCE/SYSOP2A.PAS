@@ -57,14 +57,14 @@ PROCEDURE GetTimeRange(CONST RGStrNum: LongInt; VAR LoTime,HiTime: SmallInt);
 Function ConnType : String;
 Begin      
 	If (General.ConnectionType[1] = True) And (General.ConnectionType[2] = False) Then
-		ConnType := '|07M: |15'+General.BBSPhone; { Modem }
+		ConnType := '^0M: ^1'+General.BBSPhone; { Modem }
 	If (General.ConnectionType[1] = False) And (General.ConnectionType[2] = True) Then
-		ConnType := '|07T: |15'+Liner.NodeTelnetURL; { Telnet }
+		ConnType := '^0T: ^1'+Liner.NodeTelnetURL; { Telnet }
 	If (General.ConnectionType[1] = False) And (General.ConnectionType[2] = False) Then
 		ConnType := 'None'; { None }
-	If General.ConnectionType[1] And General.ConnectionType[2] Then
-		ConnType := '|07M: |15'+General.BBSPhone+'|07 T: |15'+Liner.NodeTelnetURL; { Both }
-End; 
+	If (General.ConnectionType[1] = True) And (General.ConnectionType[2] = True) Then
+		ConnType := '^0M: ^1'+General.BBSPhone+'^0 T: ^1'+Liner.NodeTelnetURL; { Both }
+End;
   
 PROCEDURE MainBBSConfiguration;
 VAR
@@ -82,34 +82,33 @@ BEGIN
       Abort := FALSE;
       Next := FALSE;
           Cls;
-          Print(PadLeftStr('|17|15 þ Renegade BBS Configuration : Main BBS Configuration',80));	
-		  PrintACR('|07(|15A|07) BBS Name          : |15'+BBSName);
-          PrintACR('|07(|15B|07) Connection Type   : |15'+ConnType);
-          PrintACR('|07(|15C|07) SysOp`s Name      : |15'+PadLeftStr(SysOpName,14)+
-			      ' |07(|15D|07) Renegade Version  : |15'+Version);
-          PrintACR('|07(|15E|07) SysOp`s Chat Hrs  : |15'+PadLeftStr(PHours('Any',lLowTime,HiTime),14)+
-			      ' |07(|15F|07) Minimum Baud Hrs  : |15'+PadLeftStr(PHours('Any',MinBaudLowTime,MinBaudHiTime),14));
-          PrintACR('|07(|15G|07) Regular DL Hrs    : |15'+PadLeftStr(PHours('Any',DLLowTime,DLHiTime),14)+
-			      ' |07(|15H|07) Min Baud DL Hrs   : |15'+PHours('Any',MinBaudDLLowTime,MinBaudDLHiTime));
-          PrintACR('|07(|15I|07) System Passwords                   '+
-			       '|07(|15J|07) Pre-Event Warning : |15'+IntToStr(EventWarningTime)+' |07Second(s)');
-          PrintACR('|07(|15K|07) System Menus                       '+
-		           '|07(|15L|07) Bulletin Prefix   : |15'+BulletPrefix+'');
-          PrintACR('|07(|15M|07) MultiNode Support : |15'+PadLeftStr(ShowOnOff(MultiNode),14)+
-			      ' |07(|15N|07) Network Mode      : |15%NM');
+          Print(PadLeftStr('^2 þ Renegade BBS Configuration : Main BBS Configuration',80));	
+		  PrintACR('^0(^1A^0) BBS Name          : ^1'+BBSName);
+          PrintACR('^0(^1B^0) Connection Type   : ^1'+ConnType);
+          PrintACR('^0(^1C^0) SysOp`s Name      : ^1'+PadLeftStr(SysOpName,14)+
+			      ' ^0(^1D^0) Renegade Version  : ^1'+Version);
+          PrintACR('^0(^1E^0) SysOp`s Chat Hrs  : ^1'+PadLeftStr(PHours('Any',lLowTime,HiTime),14)+
+			      ' ^0(^1F^0) Minimum Baud Hrs  : ^1'+PadLeftStr(PHours('Any',MinBaudLowTime,MinBaudHiTime),14));
+          PrintACR('^0(^1G^0) Regular DL Hrs    : ^1'+PadLeftStr(PHours('Any',DLLowTime,DLHiTime),14)+
+			      ' ^0(^1H^0) Min Baud DL Hrs   : ^1'+PHours('Any',MinBaudDLLowTime,MinBaudDLHiTime));
+          PrintACR('^0(^1I^0) System Passwords                   '+
+			       '^0(^1J^0) Pre-Event Warning : ^1'+IntToStr(EventWarningTime)+' ^0Second(s)');
+          PrintACR('^0(^1K^0) System Menus                       '+
+		           '^0(^1L^0) Bulletin Prefix   : ^1'+BulletPrefix+'');
+          PrintACR('^0(^1M^0) MultiNode Support : ^1'+PadLeftStr(ShowOnOff(MultiNode),14)+
+			      ' ^0(^1N^0) Network Mode      : ^1%NM'); { LeeW: Why is this a MCI? }
           Nl;
-          PrintACR('|07(|150|07) Data Files          : |15'+DataPath);
-          PrintACR('|07(|151|07) Miscellaneous Files : |15'+MiscPath);
-          PrintACR('|07(|152|07) Message Storage     : |15'+MsgPath);
-          PrintACR('|07(|153|07) Nodelist (V7)       : |15'+NodePath);
-          PrintACR('|07(|154|07) Log/Trap Files      : |15'+LogsPath);
-          PrintACR('|07(|155|07) Temporary Files     : |15'+TempPath);
-          PrintACR('|07(|156|07) Protocols           : |15'+ProtPath);
-          PrintACR('|07(|157|07) Archivers           : |15'+ArcsPath);
-          PrintACR('|07(|158|07) File Attachments    : |15'+FileAttachPath);
-         {PrintACR('|07(|159|07) Strings             : |15'+DataPath);} { Strings & data files are combined now }
+          PrintACR('^0(^10^0) Data Files          : ^1'+DataPath);
+          PrintACR('^0(^11^0) Miscellaneous Files : ^1'+MiscPath);
+          PrintACR('^0(^12^0) Message Storage     : ^1'+MsgPath);
+          PrintACR('^0(^13^0) Nodelist (V7)       : ^1'+NodePath);
+          PrintACR('^0(^14^0) Log/Trap Files      : ^1'+LogsPath);
+          PrintACR('^0(^15^0) Temporary Files     : ^1'+TempPath);
+          PrintACR('^0(^16^0) Protocols           : ^1'+ProtPath);
+          PrintACR('^0(^17^0) Archivers           : ^1'+ArcsPath);
+          PrintACR('^0(^18^0) File Attachments    : ^1'+FileAttachPath);
           Nl;
-          Prt('|07Enter Selection Or (|15Q|07)uit: |15');
+          Prt('^0Enter Selection Or (^1Q^0)uit: ^1');
 
       OneK(Cmd,'QABCDEFGHIJKLMN0123456789',TRUE,TRUE);
       CASE Cmd OF
@@ -117,20 +116,20 @@ BEGIN
         'B' : Begin
 				Repeat
 				ClrScr;
-				PrintACR(PadLeftStr('|17|15 þ Renegade BBS Configuration : Connection Type',80));
-				PrintACR('|15Please select the method(s) that users will be able to connect to your BBS');
+				PrintACR(PadLeftStr('^2 þ Renegade BBS Configuration : Connection Type',80));
+				PrintACR('^1Please select the method(s) that users will be able to connect to your BBS');
 				PrintACR('through.');
 				Nl;
-				PrintACR('|07(|15A|07) Modem');
-				PrintACR('|07(|15B|07) Telnet');
-				PrintACR('|07(|15C|07) Both');
-				{PrintACR('|07(|15D|07) None');} { Don't think we need this as an option }
+				PrintACR('^0(^1A^0) Modem');
+				PrintACR('^0(^1B^0) Telnet');
+				PrintACR('^0(^1C^0) Both');
+				{PrintACR('^0(^1D^0) None');} { Don't think we need this as an option }
 				Nl;
-				Prt('|07Enter Selection or (|15Q|07) to Quit: |15');
+				Prt('^0Enter Selection or (^1Q^0) to Quit: ^1');
 				OneK(Cmd,'QABC',TRUE,TRUE);
 						  Case Cmd Of
 							'A' : Begin { Modem }
-									InputFormatted(RGSysCfgStr(3,TRUE),BBSPhone,'(###)###-####',FALSE);
+									InputFormatted(RGSysCfgStr(3,TRUE),BBSPhone,'###-###-####',FALSE);
 									General.ConnectionType[1] := True;
 									General.ConnectionType[2] := False;
 									Cmd := 'Q';
@@ -142,8 +141,8 @@ BEGIN
 									Cmd := 'Q';
 								  End;
 							'C' : Begin { Both }
-									{ Would be nice if phone number was remembered like telnet url }
-									InputFormatted(RGSysCfgStr(3,TRUE),BBSPhone,'(###)###-####',FALSE);
+									{ LeeW: Would be nice if phone number was remembered like telnet url }
+									InputFormatted(RGSysCfgStr(3,TRUE),BBSPhone,'###-###-####',FALSE);
 									InputWN1(RGSysCfgStr(4,TRUE),Liner.NodeTelnetURL,(SizeOf(Liner.NodeTelnetURL) - 1),[InteractiveEdit],Changed);
 									General.ConnectionType[2] := True;
 									General.ConnectionType[1] := True;
@@ -170,12 +169,12 @@ BEGIN
         'I' : BEGIN
                 REPEAT
 					ClrScr;
-					PrintACR(PadLeftStr('|17|15 þ Renegade BBS Configuration : System Passwords',80));
-					PrintACR('|07(|15A|07) SysOp Password         : |15'+SysOpPW);
-				   {PrintACR('|07(|15B|07) New User Password      : |15'+NewUserPW);}
-					PrintACR('|07(|15C|07) Baud Override Password : |15'+MinBaudOverride);
+					PrintACR(PadLeftStr('^2 þ Renegade BBS Configuration : System Passwords',80));
+					PrintACR('^0(^1A^0) SysOp Password         : ^1'+SysOpPW);
+				    PrintACR('^0(^1B^0) New User Password      : ^1'+NewUserPW);
+					PrintACR('^0(^1C^0) Baud Override Password : ^1'+MinBaudOverride);
 					Nl;
-					Prt('|07Enter Selection Or (|15Q|07) to Quit: |15');				  
+					Prt('^0Enter Selection Or (^1Q^0) to Quit: ^1');				  
                   OneK(Cmd,'QABC',TRUE,TRUE);
                   CASE Cmd OF
                     'A' : InputWN1(RGSysCfgStr(11,TRUE),SysOpPw,(SizeOf(SysOpPW) - 1),[InterActiveEdit,UpperOnly],Changed);
@@ -190,22 +189,22 @@ BEGIN
         'K' : BEGIN
                 REPEAT
 				  ClrScr;
-				  PrintACR(PadLeftStr('|17|15 þ Renegade BBS Configuration : System Menus',80));
+				  PrintACR(PadLeftStr('^2 þ Renegade BBS Configuration : System Menus',80));
 				  
-				PrintACR('|07(|151|07) Global        : |15'+IntToStr(GlobalMenu)+'');
+				PrintACR('^0(^11^0) Global        : ^1'+IntToStr(GlobalMenu)+'');
 				{ Menu commands here appear on other menus unless global display is toggled off }
-				PrintACR('|07(|152|07) Start         : |15'+IntToStr(AllStartMenu)+'');
+				PrintACR('^0(^12^0) Start         : ^1'+IntToStr(AllStartMenu)+'');
 				{ First menu users are sent to after default login sequence }
-				PrintACR('|07(|153|07) Shuttle Logon : |15'+IntToStr(ShuttleLogonMenu));
+				PrintACR('^0(^13^0) Shuttle Logon : ^1'+IntToStr(ShuttleLogonMenu));
 				{ Shuttle Logon Menu }
-				PrintACR('|07(|154|07) New User Info : |15'+IntToStr(NewUserInformationMenu));
+				PrintACR('^0(^14^0) New User Info : ^1'+IntToStr(NewUserInformationMenu));
 				{ New user information review before user saves profile }
-				PrintACR('|07(|155|07) Message Read  : |15'+IntToStr(MessageReadMenu));
+				PrintACR('^0(^15^0) Message Read  : ^1'+IntToStr(MessageReadMenu));
 				{ Prompt while listing files }
-				PrintACR('|07(|156|07) File List     : |15'+IntToStr(FileListingMenu));
+				PrintACR('^0(^16^0) File List     : ^1'+IntToStr(FileListingMenu));
 				{ Prompt while reading messages }
 				Nl;
-				Prt('|07Enter Selection Or (|15Q|07) to Quit: |15');				  
+				Prt('^0Enter Selection Or (^1Q^0) to Quit: ^1');				  
                   OneK(Cmd,'123456Q',TRUE,TRUE);
                   CASE Cmd OF
                     '1' : FindMenu(RGSysCfgStr(16,TRUE),GlobalMenu,0,NumMenus,Changed);

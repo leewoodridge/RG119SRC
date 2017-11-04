@@ -1,8 +1,11 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
+
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+
+  validation editor
+}
 
 UNIT SysOp2G;
 
@@ -83,8 +86,9 @@ BEGIN
   TempStr := '';
   NumOnline := 0;
   CLS;
-  PrintACR('^0##^4:^3K^4:^3Description                     ^0##^4:^3K^4:^3Description');
-  PrintACR('^4==:=:==============================  ==:=:==============================');
+  PrintACR('^4+----+---+-----------------------------+----+---+-----------------------------+');
+  PrintACR('^4| ^3## ^4| ^3K ^4| ^3Description                 ^4| ^3## ^4| ^3K ^4| ^3Description                 ^4|');
+  PrintACR('^4+----+---+-----------------------------+----+---+-----------------------------+');
   Reset(ValidationFile);
   NumDone := 0;
   WHILE (NumDone < (PageLength - 5)) AND (RecNumToList1 >= 1) AND (RecNumToList1 <= NumValKeys)
@@ -92,9 +96,9 @@ BEGIN
   BEGIN
     Seek(ValidationFile,(RecNumToList1 - 1));
     Read(ValidationFile,Validation);
-    TempStr := TempStr + '^0'+PadLeftStr(PadRightInt(RecNumToList1,2)+
-                         ' ^3'+Validation.Key+
-                         ' ^5'+Validation.Description,37);
+    TempStr := TempStr + '  ^0'+PadLeftStr(PadLeftInt(RecNumToList1,3)+
+                         '  ^0'+PadLeftStr(Validation.Key,2)+
+                         '  ^1'+Validation.Description,37);
     Inc(NumOnline);
     IF (NumOnline = 2) THEN
     BEGIN
@@ -110,7 +114,7 @@ BEGIN
   IF (NumOnline = 1) AND (NOT Abort) AND (NOT HangUp) THEN
     PrintaCR(TempStr);
   IF (NumValKeys = 0) AND (NOT Abort) AND (NOT HangUp) THEN
-    Print('^7No validation records.');
+    Print('^8[ NO VALIDATION RECORDS ]');
 END;
 
 PROCEDURE AutoValidate(VAR User: UserRecordType; UNum: Integer; Level: Char);
@@ -500,20 +504,20 @@ VAR
           ELSE
             PrintACR('^5Inserting validation record #'+IntToStr(RecNumToEdit)+' of '+IntToStr(NumValKeys + 1));
           NL;
-          PrintACR('^1A. Key        : ^5'+Key);
-          PrintACR('^1B. Description: ^5'+Description);
-          PrintACR('^1C. User msg   : ^5'+AOnOff(UserMsg = '','*None*',UserMsg));
-          PrintACR('^1D. New SL     : ^5'+IntToStr(NewSL));
-          PrintACR('^1E. New DSL    : ^5'+IntToStr(NewDSL));
-          PrintACR('^1G. AR         : Flags: ^5'+DisplayARFlags(NewAR,'5','1')+
-                   ' ^1Upgrade: ^5'+AOnOff(SoftAR,'Soft','Hard'));
-          PrintACR('^1H. AC         : Flags: ^5'+DisplayACFlags(NewAC,'5','1')+
-                   ' ^1Upgrade: ^5'+AOnOff(SoftAC,'Soft','Hard'));
-          PrintACR('^1I. New points : ^5'+IntToStr(NewFP));
-          PrintACR('^1K. New credit : ^5'+IntToStr(NewCredit));
-          PrintACR('^1M. Start menu : ^5'+IntToStr(NewMenu));
-          PrintACR('^1N. Expiration : Days: ^5'+AOnOff((Expiration > 0),IntToStr(Expiration),'No Expiration')+
-                   ' ^1Level: ^5'+AOnOff((ExpireTo IN ['!'..'~']),ExpireTo,'No Change'));
+          PrintACR('^1A^0'#242+' Key         : ^1'+Key);
+          PrintACR('^1B^0'#242+' Description : ^1'+Description);
+          PrintACR('^1C^0'#242+' User Msg    : ^1'+AOnOff(UserMsg = '','*None*',UserMsg));
+          PrintACR('^1D^0'#242+' New SL      : ^1'+IntToStr(NewSL));
+          PrintACR('^1E^0'#242+' New DSL     : ^1'+IntToStr(NewDSL));
+          PrintACR('^1G^0'#242+' AR          : Flags: ^1'+DisplayARFlags(NewAR,'1','0')+
+                   ' ^0Upgrade: ^1'+AOnOff(SoftAR,'Soft','Hard'));
+          PrintACR('^1H^0'#242+' AC          : Flags: ^1'+DisplayACFlags(NewAC,'1','0')+
+                   ' ^0Upgrade: ^1'+AOnOff(SoftAC,'Soft','Hard'));
+          PrintACR('^1I^0'#242+' New Points  : ^1'+IntToStr(NewFP));
+          PrintACR('^1K^0'#242+' New Credits : ^1'+IntToStr(NewCredit));
+          PrintACR('^1M^0'#242+' Start Menu  : ^1'+IntToStr(NewMenu));
+          PrintACR('^1N^0'#242+' Expiration  : Days: ^1'+AOnOff((Expiration > 0),IntToStr(Expiration),'No Expiration')+
+                   '^0 ... Level: ^1'+AOnOff((ExpireTo IN ['!'..'~']),ExpireTo,'No Change'));
         END;
         IF (NOT Editing) THEN
           CmdStr := 'ABCDEGHIKMN'
@@ -659,15 +663,15 @@ VAR
                   Cmd1 := #0;
                 END;
           '?' : BEGIN
-                  Print('%LF^1<^3CR^1>Redisplay current screen');
+                  {Print('%LF^1<^3CR^1>Redisplay current screen');}
                   Print('^3A^1-^3E^1,^3G^1-^3I^1,^3K^1,^3M^1-^3N^1:Modify item');
                   IF (NOT Editing) THEN
-                    LCmds(20,3,'Quit and save','')
+                    LCmds(20,3,'Quit','')
                   ELSE
                   BEGIN
-                    LCmds(20,3,'[Back entry',']Forward entry');
-                    LCmds(20,3,'First entry in list','Jump to entry');
-                    LCmds(20,3,'Last entry in list','Quit and save');
+                    LCmds(17,1,'[ Previous Entry','] Next Entry');
+                    LCmds(17,1,'F First Entry','J Jump To Entry');
+                    LCmds(17,1,'L Last Entry','Q Quit');
                   END;
                 END;
         END;
@@ -858,7 +862,7 @@ BEGIN
   REPEAT
     IF (Cmd <> '?') THEN
       DisplayValidationRecords(RecNumToList);
-    LOneK('%LFValidation editor [^5?^4=^5Help^4]: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
+    LOneK('^0%LFValidation Editor: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
     CASE Cmd OF
       ^M  : IF (RecNumToList < 1) OR (RecNumToList > NumValKeys) THEN
               RecNumToList := 1;
@@ -867,11 +871,11 @@ BEGIN
       'M' : ModifyValidationLevel(TempValidation,Cmd,RecNumToList);
       'P' : PositionValidationLevel(TempValidation,RecNumToList);
       '?' : BEGIN
-              Print('%LF^1<^3CR^1>Next screen or redisplay screen');
-              Print('^1(^3?^1)Help/First validation level');
-              LCmds(24,3,'Delete validation level','Insert validation level');
-              LCmds(24,3,'Modify validation level','Position validation level');
-              LCmds(24,3,'Quit','');
+              Print('%LF^0<^1CR^0> Next Page / Refresh');
+              {Print('^1(^3?^1)Help/First validation level');}
+              LCmds(26,3,'D Delete Validation Level','I Insert Validation Level');
+              LCmds(26,3,'M Modify Validation Level','P Position Validation Level');
+              LCmds(26,3,'Q Quit','');
             END;
     END;
     IF (Cmd <> ^M) THEN

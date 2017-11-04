@@ -1,8 +1,14 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
+
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+
+  MESSAGE AREA EDITOR
+  
+  header: flags alignment isnt same as file area hdr
+  prompts need fixin
+}
 
 UNIT SysOp8;
 
@@ -336,44 +342,49 @@ VAR
           Next := FALSE;
           CLS;
           IF (RecNumToEdit = -1) THEN
-            PrintACR('^5Default Message Area Configuration:')
+            PrintACR('^0Default Message Area Configuration:')
           ELSE
           BEGIN
             IF (Editing) THEN
-              PrintACR('^5Editing '+AOnOff(RecNumToEdit = 0,'private mail','message area #'+IntToStr(RecNumToEdit)+
+              PrintACR('^0Editing '+AOnOff(RecNumToEdit = 0,'private mail','message area #'+IntToStr(RecNumToEdit)+
                        ' of '+IntToStr(NumMsgAreas)))
             ELSE
-              PrintACR('^5Inserting message area #'+IntToStr(RecNumToEdit)+' of '+IntToStr(NumMsgAreas + 1));
+              PrintACR('^0Inserting message area #'+IntToStr(RecNumToEdit)+' of '+IntToStr(NumMsgAreas + 1));
           END;
           NL;
-          PrintACR('^1A. Area name   : ^5'+Name);
-          PrintACR('^1B. File name   : ^5'+FileName+'   ^7('+General.MsgPath+MemMsgArea.FileName+'.*)');
-          PrintACR('^1C. Area type   : ^5'+MATypeStr(MAType));
+          PrintACR('^1A^0> Area Name    : ^1'+Name);
+          PrintACR('^1B^0> File Name    : ^1'+FileName+' ^0[^1'+General.MsgPath+MemMsgArea.FileName+'.*^0]');
+          PrintACR('^1C^0> Area Type    : ^1'+MATypeStr(MAType));
           IF (MAType IN [1,2]) THEN
-            PrintACR('^1   Message path: ^5'+MsgPath);
-          PrintACR('^1D. ACS required: ^5'+AOnOff(ACS = '','*None*',ACS));
-          PrintACR('^1E. Post/MCI ACS: ^5'+AOnOff(PostACS = '','*None*',PostACS)+'^1 / ^5'
-                                       +AOnOff(MCIACS = '','*None*',MCIACS));
-          PrintACR('^1G. Sysop ACS   : ^5'+AOnOff(SysOpACS = '','*None*',SysOpACS));
-          PrintACR('^1H. Max messages: ^5'+IntToStr(MaxMsgs));
-          PrintACR('^1I. Anonymous   : ^5'+AnonTypeStr(Anonymous));
-          PrintACR('^1K. Password    : ^5'+AOnOff(Password = '','*None*',Password));
+            PrintACR('^1   Message Path : ^5'+MsgPath);
+          PrintACR('^1D^0> ACS Required : ^1'+AOnOff(ACS = '','*None*',ACS));
+          PrintACR('^1E^0> Post/MCI ACS : ^1'+AOnOff(PostACS = '','*None*',PostACS)+'^0 / ^1'
+											+AOnOff(MCIACS = '','*None*',MCIACS));
+          PrintACR('^1G^0> SysOp ACS    : ^1'+AOnOff(SysOpACS = '','*None*',SysOpACS));
+          PrintACR('^1H^0> Max Messages : ^1'+IntToStr(MaxMsgs));
+          PrintACR('^1I^0> Anonymous    : ^1'+AnonTypeStr(Anonymous));
+          PrintACR('^1K^0> Password     : ^1'+AOnOff(Password = '','*None*',Password));
           IF (MAType IN [1,2]) THEN
-            PrintACR('^1M. Net Address : ^5'+NodeStr(AKA));
-          PrintACR('^1N. Colors      : ^1Text=^'+IntToStr(Text_Color)+IntToStr(Text_Color)+
-                                      '^1, Quote=^'+IntToStr(Quote_Color)+IntToStr(Quote_Color)+
+            PrintACR('^1M^0> Net Address  : ^1'+NodeStr(AKA));
+ (*         PrintACR('^1N^0> Colors       : ^1Text=^'+IntToStr(Text_Color)+IntToStr(Text_Color)+
+									  '^1, Quote=^'+IntToStr(Quote_Color)+IntToStr(Quote_Color)+
                                       '^1, Tear=^'+IntToStr(Tear_Color)+IntToStr(Tear_Color)+
-                                      '^1, Origin=^'+IntToStr(Origin_Color)+IntToStr(Origin_Color));
-          PrintACR('^1O. Read menu   : ^5'+IntToStr(MessageReadMenu));
+                                      '^1, Origin=^'+IntToStr(Origin_Color)+IntToStr(Origin_Color)); *)
+          PrintACR('^1N^0> Colors       : ^'+IntToStr(Text_Color)+'Text^0 '+
+										 '^'+IntToStr(Quote_Color)+'Quote^0 '+
+										 '^'+IntToStr(Tear_Color)+'Tear^0 '+
+										 '^'+IntToStr(Origin_Color)+'Origin');
+
+          PrintACR('^1O^0> Read Menu    : ^1'+IntToStr(MessageReadMenu));
           IF (MAType IN [1,2]) THEN
-            PrintACR('^1P. Mail flags  : ^5'+DisplayNetFlags(MAFlags,'5','1'));
+            PrintACR('^1P^0> Mail Flags   : ^1'+DisplayNetFlags(MAFlags,'1','0'));
           IF (MAType IN [1..3]) THEN
-            PrintACR('^1R. Origin line : ^5'+Origin);
-          PrintACR('^1S. Start quote : ^5'+AOnOff(QuoteStart = '','*None*',QuoteStart));
-          PrintACR('^1T. End quote   : ^5'+AOnOff(QuoteEnd = '','*None*',QuoteEnd));
-          PrintACR('^1U. Post file   : ^5'+AOnOff(PrePostFile = '','*None*',PrePostFile));
-          PrintACR('^1V. QWK Index   : ^5'+IntToStr(QWKIndex));
-          PrintACR('^1W. Flags       : ^5'+DisplayMAFlags(MAFlags,'5','1'));
+            PrintACR('^1R^0> Origin Line  : ^1'+Origin);
+          PrintACR('^1S^0> Start Quote  : ^1'+AOnOff(QuoteStart = '','*None*',QuoteStart));
+          PrintACR('^1T^0> End Quote    : ^1'+AOnOff(QuoteEnd = '','*None*',QuoteEnd));
+          PrintACR('^1U^0> Post File    : ^1'+AOnOff(PrePostFile = '','*None*',PrePostFile));
+          PrintACR('^1V^0> QWK Index    : ^1'+IntToStr(QWKIndex));
+          PrintACR('^1W^0> Flags        : ^1'+DisplayMAFlags(MAFlags,'1','0'));
           MCIAllowed := TRUE;
         END;
         IF (RecNumToEdit = 0) THEN
@@ -389,7 +400,7 @@ VAR
           IF (MAType IN [1..3]) THEN
             CmdStr := CmdStr + 'R';
         END;
-        LOneK('%LFModify menu [^5?^4=^5Help^4]: ',Cmd1,'Q?'+CmdStr+^M,TRUE,TRUE);
+        LOneK('^0%LFModify Menu [^5?^4=^5Help^4]: ',Cmd1,'Q?'+CmdStr+^M,TRUE,TRUE);
         CASE Cmd1 OF
           'A' : REPEAT
                   TempMemMsgArea1.Name := MemMsgArea.Name;
@@ -522,11 +533,11 @@ VAR
                   TempMemMsgArea1.Anonymous := Anonymous;
                   Print('%LF^5Anonymous types:^1');
                   NL;
-                  LCmds(40,3,'Yes, Anonymous allowed, selectively','');
-                  LCmds(40,3,'No, Anonymous not allowed','');
-                  LCmds(40,3,'Forced Anonymous','');
-                  LCmds(40,3,'Dear Abby','');
-                  LCmds(40,3,'Any Name','');
+                  LCmds(40,1,'Y Yes, Anonymous Allowed, Selectively','');
+                  LCmds(40,1,'N No, Anonymous Not Allowed','');
+                  LCmds(40,1,'F Forced Anonymous','');
+                  LCmds(40,1,'D Dear Abby','');
+                  LCmds(40,1,'A Any Name','');
                   LOneK('%LFNew anonymous type [^5Y^4,^5N^4,^5F^4,^5D^4,^5A^4,^5<CR>^4=^5Quit^4]: ',Cmd1,'YNFDA'^M,TRUE,TRUE);
                   CASE Cmd1 OF
                     'Y' : Anonymous := ATYes;
@@ -562,27 +573,27 @@ VAR
                     Changed := TRUE;
                 END;
           'N' : BEGIN
-                  Prompt('%LF^5Colors: ');
+                  Prompt('%LF^0Colors: ');
                   ShowColors;
-                  InputByteWC('%LFNew standard text color',Text_Color,[DisplayValue,NumbersOnly],0,9,Changed);
-                  InputByteWC('%LFNew quoted text color',Quote_Color,[DisplayValue,NumbersOnly],0,9,Changed);
-                  InputByteWC('%LFNew tear line color',Tear_Color,[DisplayValue,NumbersOnly],0,9,Changed);
-                  InputByteWC('%LFNew origin line color',Origin_Color,[DisplayValue,NumbersOnly],0,9,Changed);
+                  InputByteWC('^0%LFNew Standard Text Color',Text_Color,[DisplayValue,NumbersOnly],0,9,Changed);
+                  InputByteWC('^0%LFNew Quoted Text Color',Quote_Color,[DisplayValue,NumbersOnly],0,9,Changed);
+                  InputByteWC('^0%LFNew Tear Line Color',Tear_Color,[DisplayValue,NumbersOnly],0,9,Changed);
+                  InputByteWC('^0%LFNew Origin Line Color',Origin_Color,[DisplayValue,NumbersOnly],0,9,Changed);
                 END;
           'O' : FindMenu('%LFNew read menu (^50^4=^5Default^4)',MessageReadMenu,0,NumMenus,Changed);
           'P' : IF (MAType IN [1,2]) THEN
                 BEGIN
                   REPEAT
-                    LOneK('%LFToggle which network flag ('+DisplayNetFlags(MAFlags,'5','4')+
-                        '^4) [^5?^4=^5Help^4,^5<CR>^4=^5Quit^4]: ',Cmd1,^M'IKSOCBMT?',TRUE,TRUE);
+                    LOneK('^0%LFToggle Which Network Flag? ['+DisplayNetFlags(MAFlags,'1','0')+
+                        '^0] [?=Help,<CR>=Quit]: ',Cmd1,^M'IKSOCBMT?',TRUE,TRUE);
                     CASE Cmd1 OF
                       'K','S','O','T','I' :
                             ToggleMAFlags(Cmd1,MAFlags,Changed);
                       '?' : BEGIN
                               NL;
-                              LCmds(22,3,'Kludge line strip','SEEN-BY line strip');
-                              LCmds(22,3,'Origin line strip','Tear/Origin line add');
-                              LCmds(22,3,'Internet flag','');
+                              LCmds(24,1,'K Kludge Line Strip','S SEEN-BY Line Strip');
+                              LCmds(24,1,'O Origin Line Strip','T Tear/Origin Line Add');
+                              LCmds(24,1,'I Internet Flag','');
                             END;
                     END;
                   UNTIL (Cmd1 = ^M) OR (HangUp);
@@ -599,7 +610,7 @@ VAR
           'U' : InputWN1('%LFNew pre-post filename: ',PrePostFile,(SizeOf(PrePostFile) - 1),[],Changed);
           'V' : BEGIN
                   SaveQWKIndex := QWKIndex;
-                  InputWordWOC('%LFNew permanent QWK Index',QWKIndex,[DisplayValue,NumbersOnly],1,(NumMsgAreas + 1));
+                  InputWordWOC('^0%LFNew Permanent QWK Index',QWKIndex,[DisplayValue,NumbersOnly],1,(NumMsgAreas + 1));
                   IF (SaveQWKIndex <> QWKIndex) AND (QWKIndex >= 1) AND (QWKIndex <= (NumMsgAreas + 1)) THEN
                   BEGIN
                     RecNum1 := -1;
@@ -623,16 +634,16 @@ VAR
                 END;
           'W' : BEGIN
                   REPEAT
-                    LOneK('%LFToggle which flag ('+DisplayMAFlags(MAFlags,'5','4')+
-                        '^4) [^5?^4=^5Help^4,^5<CR>^4=^5Quit^4]: ',Cmd1,^M'RUAPFQ?',TRUE,TRUE);
+                    LOneK('%LF^0Toggle Which Flag? ['+DisplayMAFlags(MAFlags,'1','0')+
+                        '^0] [^5?^4=^5Help^4,^5<CR>^4=^5Quit^4]: ',Cmd1,^M'RUAPFQ?',TRUE,TRUE);
                     CASE Cmd1 OF
                       'R','U','A','P','F','Q' :
                             ToggleMAFlags(Cmd1,MAFlags,Changed);
                       '?' : BEGIN
                               NL;
-                              LCmds(25,3,'Real names','Unhidden');
-                              LCmds(25,3,'AFilter ANSI/8-bit ASCII','Private msgs allowed');
-                              LCmds(25,3,'Force Read','Quote/Tagline');
+                              LCmds(26,1,'R Real Names','U Unhidden');
+                              LCmds(26,1,'A Filter ANSI/8-Bit ASCII','P Private Msgs Allowed');
+                              LCmds(26,1,'F Force Read','Q Quote/Tagline');
                             END;
                     END;
                   UNTIL (Cmd1 = ^M) OR (HangUp);
@@ -672,15 +683,15 @@ VAR
                   Cmd1 := #0;
                 END;
           '?' : BEGIN
-                  Print('%LF^1<^3CR^1>Redisplay current screen');
-                  Print('^3A^1-^3E^1,^3G^1-^3I^1,^3K^1,^3M^1-^3P^1,^3R^1-^3W^1:Modify item');
+                  {Print('%LF^1<^3CR^1>Redisplay current screen');
+                  Print('^3A^1-^3E^1,^3G^1-^3I^1,^3K^1,^3M^1-^3P^1,^3R^1-^3W^1:Modify item');}
                   IF (NOT Editing) THEN
-                    LCmds(20,3,'Quit and save','')
+                    LCmds(22,1,'Q Quit','')
                   ELSE
                   BEGIN
-                    LCmds(20,3,'[Back entry',']Forward entry');
-                    LCmds(20,3,'First entry in list','Jump to entry');
-                    LCmds(20,3,'Last entry in list','Quit and save');
+                    LCmds(22,1,'[ Previous Entry','] Next Entry');
+                    LCmds(22,1,'F First Entry','J Jump To Entry');
+                    LCmds(22,1,'L Last Entry','Q Quit');
                   END;
                 END;
         END;
@@ -1005,18 +1016,19 @@ VAR
   BEGIN
     WITH MemMsgArea DO
       CASE DisplayType OF
-        1 : PrintACR('^0'+PadRightInt(RecNumToList1,5)+
-                     ' ^5'+PadLeftStr(Name,24)+
-                     ' ^3'+Copy('LEGQ',(MAType + 1),1)+DisplayMAFlags(MAFlags,'5','4')+
-                     ' ^9'+PadLeftStr(AOnOff(ACS = '','*None*',ACS),10)+
-                     ' '+PadLeftStr(AOnOff(PostACS = '','*None*',PostACS),9)+
-                     ' '+PadLeftStr(AOnOff(MCIACS = '','*None*',MCIACS),9)+
-                     ' ^3'+PadLeftInt(MaxMsgs,6)+
-                     ' '+AnonTypeChar(Anonymous));
-        2 : PrintACR('^0'+PadRightInt(RecNumToList1,5)+
-                     ' ^5'+PadLeftStr(Name,27)+
-                     ' ^3'+PadLeftStr(AOnOff(MAType IN [0,3],'*None*',NodeStr(AKA)),11)+
-                     ' '+PadLeftStr(AOnOff(MsgPath = '','*None*',MsgPath),33));
+        1 : PrintACR('  ^0'+PadLeftInt(RecNumToList1,5)+
+                     '  ^1'+PadLeftStr(Name,33)+
+                     '  ^0'+PadLeftStr(Copy('LEGQ',(MAType + 1),1),2)+
+					 '  ^0'+PadLeftStr(DisplayMAFlags(MAFlags,'1','0'),6)+
+                     '  ^0'+PadLeftStr(AOnOff(ACS = '','*None*',ACS),8)+
+                     '  ^0'+PadLeftStr(AOnOff(PostACS = '','*None*',PostACS),8)+
+                    {'  ^0'+PadLeftStr(AOnOff(MCIACS = '','None',MCIACS),5)+}	{ LeeW: Seems Irrelevant }
+                    {'  ^0'+PadLeftInt(MaxMsgs,5)+}								{ LeeW: Seems Irrelevant }
+                     '  ^0'+PadLeftStr(AnonTypeChar(Anonymous),1));
+        2 : PrintACR('  ^0'+PadLeftInt(RecNumToList1,5)+
+                     '  ^1'+PadLeftStr(Name,33)+
+                     '  ^0'+PadLeftStr(AOnOff(MAType IN [0,3],'*None*',NodeStr(AKA)),11)+
+                     '  ^0'+PadLeftStr(AOnOff(MsgPath = '','*None*',MsgPath),21));
       END;
   END;
 
@@ -1032,13 +1044,14 @@ VAR
     CLS;
     CASE DisplayType OF
       1 : BEGIN
-            PrintACR('^0#####^4:^3Message area name       ^4:^3Flag   ^4:^3ACS       ^4:^3Post ACS ^4:^3MCI ACS'+
-                     '  ^4:^3MaxM  ^4:^3A');
-            PrintACR('^4=====:========================:=======:==========:=========:=========:======:=');
+			PrintACR('^4+------+----------------------------------+---+-------+---------+---------+---+');
+			PrintACR('^4| ^3#### ^4| ^3Message Area Name                ^4| ^3T ^4| ^3Flags ^4| ^3ReadACS ^4| ^3PostACS ^4| ^3A ^4|');
+			PrintACR('^4+------+----------------------------------+---+-------+---------+---------+---+');
           END;
       2 : BEGIN
-            PrintACR('^0#####^4:^3Message area name          ^4:^3Address    ^4:^3Message path');
-            PrintACR('^4=====:===========================:===========:=================================');
+            PrintACR('^4+------+----------------------------------+------------+----------------------+');
+			PrintACR('^4| ^3#### ^4| ^3Message Area Name                ^4| ^3Addresss   ^4| ^3Path                 ^4|');
+            PrintACR('^4+------+----------------------------------+------------+----------------------+');
           END;
     END;
     IF (RecNumToList1 = 0) THEN
@@ -1078,7 +1091,7 @@ BEGIN
   REPEAT
     IF (Cmd <> '?') THEN
       ListMsgAreas(RecNumToList);
-    LOneK('%LFMessage area editor [^5?^4=^5Help^4]: ',Cmd,'QCDIMPRTX?'^M,TRUE,TRUE);
+    LOneK('^0%LFMessage Area Editor: ',Cmd,'QCDIMPRTX?'^M,TRUE,TRUE);
     CASE Cmd OF
       ^M  : IF (RecNumToList < 0) OR (RecNumToList > NumMsgAreas) THEN
               RecNumToList := 0;
@@ -1110,13 +1123,13 @@ BEGIN
               Cmd := #0;
             END;
       '?' : BEGIN
-              Print('%LF^1<^3CR^1>Next screen or redisplay current screen');
-              Print('^1(^3?^1)Help/First message area');
-              LCmds(22,3,'Change message storage drive','');
-              LCmds(22,3,'Delete message area','Insert message area');
-              LCmds(22,3,'Modify message area','Position message area');
-              LCmds(22,3,'Quit','Renumber QWK index');
-              LCmds(22,3,'Toggle display format','XDefault configuration');
+              Print('^0%LF<^1CR^0> Next Page / Refresh');
+              {Print('^1(^3?^1)Help/First message area');} { LeeW: useless }
+              LCmds(24,1,'C Change Message Storage Drive','');
+              LCmds(24,1,'D Delete Message Area','I Insert Message Area');
+              LCmds(24,1,'M Modify Message Area','P Position Message Area');
+              LCmds(24,1,'T Toggle Display Format','X Default Configuration');
+			  LCmds(24,1,'Q Quit','R Renumber QWK Index');
             END;
     END;
     IF (Cmd <> ^M) THEN

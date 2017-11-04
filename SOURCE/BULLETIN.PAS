@@ -1,7 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D-,E-,F+,I-,L-,N-,O+,R-,S+,V-}
 UNIT Bulletin;
 
@@ -14,7 +10,7 @@ FUNCTION FindOnlyOnce: Boolean;
 FUNCTION NewBulletins: Boolean;
 PROCEDURE Bulletins(MenuOption: Str50);
 PROCEDURE UList(MenuOption: Str50);
-PROCEDURE TodaysCallers(x: Byte; MenuOptions: Str50);
+PROCEDURE TodaysCallers(NumToList: Integer);
 PROCEDURE RGQuote(MenuOption: Str50);
 
 IMPLEMENTATION
@@ -24,7 +20,8 @@ USES
   Common5,
   Mail1,
   ShortMsg,
-  TimeFunc;
+  TimeFunc,
+  CRT;
 
 TYPE
   LastCallerPtrType = ^LastCallerRec;
@@ -243,11 +240,11 @@ VAR
 
   PROCEDURE Option(c1: Char; s1,s2: Str160);
   BEGIN
-    Prompt('^4<^5'+c1+'^4>'+s1+': ');
+    Prompt('^0(^1'+c1+'^0)'+s1+': ');
     IF (s2 <> '') THEN
-      Print('^5"^4'+s2+'^5"^1')
+      Print('^0"^1'+s2+'^0"')
     ELSE
-      Print('^5<<INACTIVE>>^1');
+      Print('^8[INACTIVE]');
   END;
 
 BEGIN
@@ -264,35 +261,35 @@ BEGIN
   State := '';
   UName := '';
   REPEAT
+    ClrScr;
+    Print('^0User List Search Options');
     NL;
-    Print('^5User lister search options:');
+    Option('U','ser Name        ',UName);
+    Option('R','eal Name        ',RName);
+    Option('A','ge              ',Age);
+    Option('G','ender           ',Gender);
+    Option('C','ity             ',City);
+    Option('S','tate            ',State);
+    Option('D','ate Last Online ',DateLastOn);
     NL;
-    Option('A','ge match string             ',Age);
-    Option('C','ity match string            ',City);
-    Option('D','ate last online match string',DateLastOn);
-    Option('G','ender match string          ',Gender);
-    Option('R','eal name match string       ',RName);
-    Option('S','tate match string           ',State);
-    Option('U','ser name match string       ',UName);
-    NL;
-    Prompt('^4Enter choice (^5A^4,^5C^4,^5D^4,^5G^4,^5R^4,^5S^4,^5U^4) [^5L^4]ist [^5Q^4]uit: ');
+    Prompt('^0Enter Command [(^1Enter^0/^1L^0)ist,(^1Q^0)uit]: ');
     OneK(Cmd,'QACDGLRSU'^M,TRUE,TRUE);
     NL;
     IF (Cmd IN ['A','C','D','G','R','S','U']) THEN
     BEGIN
-      TempStr := 'Enter new match string for the ';
+      TempStr := 'Enter New Match String For ';
       CASE Cmd OF
-        'A' : TempStr := TempStr + 'age';
-        'C' : TempStr := TempStr + 'city';
-        'D' : TempStr := TempStr + 'date last online';
-        'G' : TempStr := TempStr + 'gender';
-        'R' : TempStr := TempStr + 'real name';
-        'S' : TempStr := TempStr + 'state';
-        'U' : TempStr := TempStr + 'user name';
+        'A' : TempStr := TempStr + 'Age';
+        'C' : TempStr := TempStr + 'City';
+        'D' : TempStr := TempStr + 'Date Last Online';
+        'G' : TempStr := TempStr + 'Gender';
+        'R' : TempStr := TempStr + 'Real Name';
+        'S' : TempStr := TempStr + 'State';
+        'U' : TempStr := TempStr + 'User Name';
       END;
-      TempStr := TempStr + ' (<CR>=Make INACTIVE)';
-      Print('^4'+TempStr);
-      Prompt('^4: ');
+      TempStr := TempStr + ' [(^1ENTER^0)None]: ';
+	  Print('^0'+TempStr);
+      Prompt('');
     END;
     CASE Cmd OF
       'A' : BEGIN
@@ -378,6 +375,8 @@ FUNCTION TodaysCallerMCI(CONST S: ASTR; Data1,Data2: Pointer): STRING;
 VAR
   LastCallerPtr: LastCallerPtrType;
   s1: STRING[100];
+  AMPM: STRING[2];
+  DT: DateTime;
 BEGIN
   LastCallerPtr := Data1;
   TodaysCallerMCI := S;
@@ -397,20 +396,13 @@ BEGIN
           END;
     'L' : CASE S[2] OF
             'C' : TodaysCallerMCI := LastCallerPtr^.Location;
-            'O' : BEGIN
-                    s1 := PDT2Dat(LastCallerPtr^.LogonTime,0);
-                    s1[0] := Char(Pos('m',s1) - 2);
-                    s1[Length(s1)] := s1[Length(s1) + 1];
-                    TodaysCallerMCI := s1;
-                  END;
+            'O' : TodaysCallerMCI := PDToTime(LastCallerPtr^.LogonTime); { LeeW: Fix'd }
             'T' : BEGIN
                     IF (LastCallerPtr^.LogoffTime = 0) THEN
                       S1 := 'Online'
                     ELSE
                     BEGIN
-                      s1 := PDT2Dat(LastCallerPtr^.LogoffTime,0);
-                      s1[0] := Char(Pos('m',s1) - 2);
-                      s1[Length(s1)] := s1[Length(s1) + 1];
+                      S1 := PDToTime(LastCallerPtr^.LogoffTime); { LeeW: Fix'd }
                     END;
                     TodaysCallerMCI := s1;
                   END;
@@ -446,7 +438,7 @@ BEGIN
   END;
 END;
 
-PROCEDURE TodaysCallers(x: Byte; MenuOptions: Str50);
+PROCEDURE TodaysCallers(NumToList: Integer);
 VAR
   Junk: Pointer;
   LastCallerFile: FILE OF LastCallerRec;
@@ -456,29 +448,29 @@ BEGIN
   Abort := FALSE;
   Next := FALSE;
   AllowContinue := TRUE;
-  IF (MenuOptions = '') THEN
-    MenuOptions := 'LAST';
-  IF (NOT ReadBuffer(MenuOptions+'M')) THEN
+  IF (NOT ReadBuffer('LASTM')) THEN
     Exit;
   Assign(LastCallerFile,General.DataPath+'LASTON.DAT');
   Reset(LastCallerFile);
   IF (IOResult <> 0) THEN
     Exit;
   RecNum := 0;
-  IF (x > 0) AND (x <= FileSize(LastCallerFile)) THEN
-    RecNum := (FileSize(LastCallerFile) - x);
-  PrintF(MenuOptions+'H');
+  IF (NumToList > 0) AND (NumToList <= FileSize(LastCallerFile)) THEN
+    RecNum := (FileSize(LastCallerFile) - NumToList);
+  PrintF('LASTH');
   Seek(LastCallerFile,RecNum);
   WHILE (NOT EOF(LastCallerFile)) AND (NOT Abort) AND (NOT HangUp) DO
   BEGIN
     Read(LastCallerFile,LastCaller);
-    IF (((LastCaller.LogonTime DIV 86400) <> (GetPackDateTime DIV 86400)) AND (x > 0)) OR
-       (((LastCaller.LogonTime DIV 86400) = (GetPackDateTime DIV 86400))) AND (NOT LastCaller.Invisible) THEN
-      DisplayBuffer(TodaysCallerMCI,@LastCaller,Junk);
+    IF (((LastCaller.LogonTime DIV 86400) <> (GetPackDateTime DIV 86400))) OR
+       (((LastCaller.LogonTime DIV 86400) = (GetPackDateTime DIV 86400))) THEN
+	   BEGIN
+	   DisplayBuffer(TodaysCallerMCI,@LastCaller,Junk);
+	   END;
   END;
   Close(LastCallerFile);
   IF (NOT Abort) THEN
-    PrintF(MenuOptions+'T');
+    PrintF('LASTT');
   AllowContinue := FALSE;
   SysOpLog('Viewed Todays Callers.');
   LastError := IOResult;
@@ -498,7 +490,7 @@ VAR
 BEGIN
   IF (MenuOption = '') THEN
     Exit;
-  Assign(StrPointerFile,General.LMultPath+MenuOption+'.PTR');
+  Assign(StrPointerFile,General.DataPath+MenuOption+'.PTR');
   Reset(StrPointerFile);
   TotLoad := FileSize(StrPointerFile);
   IF (TotLoad < 1) THEN
@@ -518,11 +510,11 @@ BEGIN
   ELSE
   BEGIN
     NL;
-    Print('|03[컴컴컴컴컴컴컴컴컴컴컴�[ |11And Now |03... |11A Quote For You! |03]컴컴컴컴컴컴컴컴컴컴컴]');
+    Print('|03[컴컴컴컴컴컴컴컴컴컴컴? |11And Now |03... |11A Quote For You! |03]컴컴컴컴컴컴컴컴컴컴컴]');
     NL;
   END;
   TotLoad := 0;
-  Assign(RGStrFile,General.LMultPath+MenuOption+'.DAT');
+  Assign(RGStrFile,General.DataPath+MenuOption+'.DAT');
   Reset(RGStrFile,1);
   Seek(RGStrFile,(StrPointer.Pointer - 1));
   REPEAT
@@ -544,7 +536,7 @@ BEGIN
   ELSE
   BEGIN
     NL;
-    Print('|03[컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�]');
+    Print('|03[컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴?');
     NL;
   END;
   IF (NOT General.UserAddQuote) THEN
@@ -554,16 +546,16 @@ BEGIN
     PrintF('QUOTE');
     InResponseTo := '';
     MHeader.Status := [];
-    IF (InputMessage(TRUE,FALSE,'New Quote',MHeader,General.LMultPath+MenuOption+'.TMP',78,500)) then
-      IF Exist(General.LMultPath+MenuOption+'.TMP') THEN
+    IF (InputMessage(TRUE,FALSE,'New Quote',MHeader,General.DataPath+MenuOption+'.TMP',78,500)) then
+      IF Exist(General.DataPath+MenuOption+'.TMP') THEN
       BEGIN
-        Assign(F,General.LMultPath+MenuOption+'.NEW');
+        Assign(F,General.DataPath+MenuOption+'.NEW');
         Reset(F);
         IF (IOResult <> 0) THEN
           ReWrite(F)
         ELSE
           Append(F);
-        Assign(F1,General.LMultPath+MenuOption+'.TMP');
+        Assign(F1,General.DataPath+MenuOption+'.TMP');
         Reset(F1);
         IF (IOResult <> 0) THEN
           Exit;
@@ -580,7 +572,7 @@ BEGIN
         WriteLn(F);
         Close(F);
         Close(F1);
-        Kill(General.LMultPath+MenuOption+'.TMP');
+        Kill(General.DataPath+MenuOption+'.TMP');
         NL;
         Print('^7Your new quote was saved.');
         PauseScr(FALSE);

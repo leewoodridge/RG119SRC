@@ -179,17 +179,10 @@ BEGIN
     IF (IOResult <> 0) THEN
       SysOpLog('Cannot open chat log file: '+s);
     lStatus_Screen(100,'Recording chat to '+s,FALSE,s);
-    WriteLn(ChatFile);
-    WriteLn(ChatFile);
-    WriteLn(ChatFile,Dat);
-    WriteLn(ChatFile);
-    Writeln(ChatFile,'Recorded with user: '+Caps(ThisUser.Name));
-    WriteLn(ChatFile);
-    WriteLn(ChatFile,'Chat reason: '+AOnOff(ChatReason = '','None',ChatReason));
-    WriteLn(ChatFile);
-    WriteLn(ChatFile);
-    WriteLn(ChatFile,'------------------------------------');
-    WriteLn(ChatFile);
+{ CHAT LOG HEADER }
+	WriteLN(ChatFile,'===================================================================================');
+	WriteLn(ChatFile,'Chatting With '+ThisUser.Name+'. Reason: '+AOnOff(ChatReason = '','None',ChatReason)+' On '+Dat);
+	WriteLN(ChatFile,'===================================================================================');
   END;
 END;
 
@@ -321,7 +314,7 @@ BEGIN
   ELSE IF (ChatAuto IN ThisUser.SFlags) THEN
     ChatFileLog(TRUE);
   NL;
-  Exclude(ThisUser.Flags,Alert);
+  Exclude(ThisUser.SFlags,Alert);
   PrintF('CHATINIT');
   IF (NoFile) THEN
     (*
@@ -358,7 +351,7 @@ BEGIN
     ELSE IF ((S = '/HELP') OR (S = '/?')) THEN
     BEGIN
       IF (SysOp) THEN
-        Print('^5/TYPE d:\path\filename.ext^3: Type a file');
+        Print('^1/TYPE D:\PATH\FILENAME.EXT^0: Type a file');
       (*
       Print('^5/BYE^3:   Hang up');
       Print('^5/CLS^3:   Clear the screen');

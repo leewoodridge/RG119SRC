@@ -1,8 +1,14 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
+
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+
+  FILE AREA EDITOR
+  
+  remove all of the strings from lang files that need not be there
+}
+
 UNIT SysOp9;
 
 INTERFACE
@@ -178,14 +184,14 @@ VAR
     TotLoad: LongInt;
     Found: Boolean;
   BEGIN
-    Assign(StrPointerFile,General.LMultPath+'FAEPR.DAT');
+    Assign(StrPointerFile,General.DataPath+'FAEPR.DAT');
     Reset(StrPointerFile);
     Seek(StrPointerFile,StrNum);
     Read(StrPointerFile,StrPointer);
     Close(StrPointerFile);
     LastError := IOResult;
     TotLoad := 0;
-    Assign(RGStrFile,General.LMultPath+'FAETX.DAT');
+    Assign(RGStrFile,General.DataPath+'FAETX.DAT');
     Reset(RGStrFile,1);
     Seek(RGStrFile,(StrPointer.Pointer - 1));
     REPEAT
@@ -1153,24 +1159,6 @@ VAR
     END;
   END;
 
-  {
-  ListFileAreas External String Table
-
-     1. FILE_AREA_HEADER_TOGGLE_ONE
-
-        ^0#####^4:^3File area name           ^4:^3Flags   ^4:^3ACS       ^4:^3UL ACS    ^4:^3DL ACS   ^4:^3MaxF
-        ^4=====:=========================:========:==========:==========:==========:=====
-
-     2. FILE_AREA_HEADER_TOGGLE_TWO
-
-        ^0#####^4:^3File area name  ^4:^3FileName^4:^3Download path          ^4:^3Upload path
-        ^4=====:================:========:=======================:=======================
-
-     3. FILE_AREA_HEADER_NO_FILE_AREAS
-
-        #7*** No file areas defined ***^1
-  }
-
   PROCEDURE ListFileAreas(VAR RecNumToList1: Integer; MCIVars1: MCIVarRecord);
   VAR
     NumDone: Integer;
@@ -1181,8 +1169,16 @@ VAR
     Next := FALSE;
     CLS;
     CASE DisplayType OF
-      1 : FAELngStr(0,MemFileArea,MCIVars1,FALSE);
-      2 : FAELngStr(1,MemFileArea,MCIVars1,FALSE);
+      1 : BEGIN {FAELngStr(0,MemFileArea,MCIVars1,FALSE);}
+			PrintACR('^4+------+-----------------------------------+----------+-------+-------+-------+');
+			PrintACR('^4| ^3#### ^4| ^3File Area Name                    ^4| ^3Flags    ^4| ^3ACS   ^4| ^3ULACS ^4| ^3DLACS ^4|');
+			PrintACR('^4+------+-----------------------------------+----------+-------+-------+-------+');
+		END;
+      2 : BEGIN {FAELngStr(1,MemFileArea,MCIVars1,FALSE);}
+			PrintACR('^4+------+-------------------+----------+-------------------+-------------------+');
+			PrintACR('^4| ^3#### ^4| ^3File Area Name    ^4| ^3File Nm  ^4| ^3Download Path     ^4| ^3Upload Path       ^4|');
+			PrintACR('^4+------+-------------------+----------+-------------------+-------------------+');
+		END;
     END;
     Reset(FileAreaFile);
     NumDone := 0;
@@ -1193,18 +1189,18 @@ VAR
       Read(FileAreaFile,MemFileArea);
       WITH MemFileArea DO
         CASE DisplayType OF
-          1 : PrintACR('^0'+PadRightInt(RecNumToList1,5)+
-                       ' ^5'+PadLeftStr(AreaName,25)+
-                       ' ^3'+DisplayFAFlags(FAFlags,'5','4')+
-                       ' ^9'+PadLeftStr(AOnOff(ACS = '','*None*',ACS),10)+
-                       ' '+PadLeftStr(AOnOff(ULACS = '','*None*',ULACS),10)+
-                       ' '+PadLeftStr(AOnOff(DLACS = '','*None*',DLACS),10)+
-                       ' ^3'+PadRightInt(MaxFiles,5));
-          2 : PrintACR('^0'+PadRightInt(RecNumToList1,5)+
-                       ' ^5'+PadLeftStr(AreaName,16)+
-                       ' ^3'+PadLeftStr(FileName,8)+
-                       ' '+PadLeftStr(DLPath,23)+
-                       ' '+PadLeftStr(ULPath,23));
+          1 : PrintACR('  ^0'+PadLeftInt(RecNumToList1,5)+
+                       '  ^1'+PadLeftStr(AreaName,34)+
+                       '  ^0'+PadLeftStr(DisplayFAFlags(FAFlags,'1','0'),9)+
+                       '  ^0'+PadLeftStr(AOnOff(ACS = '','*None*',ACS),6)+
+                       '  ^0'+PadLeftStr(AOnOff(ULACS = '','*None*',ULACS),6)+
+                       '  ^0'+PadLeftStr(AOnOff(DLACS = '','*None*',DLACS),6){+
+                       '  ^0'+PadRightInt(MaxFiles,5)}); {LeeW: This seems pretty irrelevant}
+          2 : PrintACR('  ^0'+PadLeftInt(RecNumToList1,5)+
+                       '  ^1'+PadLeftStr(AreaName,18)+
+                       '  ^0'+PadLeftStr(FileName,9)+
+                       '  ^0'+PadLeftStr(DLPath,18)+
+                       '  ^0'+PadLeftStr(ULPath,18));
         END;
       Inc(RecNumToList1);
       Inc(NumDone);

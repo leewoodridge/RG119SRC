@@ -1,6 +1,10 @@
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+  
+  NEW USER APPLICATION TOGGLES
 
-{ Lee Woodridge } { New User Options Menu }
-
+}
 UNIT SysOp2M;
 
 INTERFACE
@@ -30,43 +34,37 @@ BEGIN
     WITH General DO
     BEGIN
       Cls;
-      Print(PadLeftStr('|17|15 þ Renegade BBS Configuration : New User Application Toggles',80));
-      Print('Here you can configure which questions and options you`d like new users to be');
-      Print('prompted on during their application.');
+      Print(PadLeftStr('^2 '#240' Renegade BBS Configuration : New User Application Toggles',80));
+      Print('^0Here you can configure which questions and options you`d like new users to be');
+      Print('^0prompted on during their application.');
       Nl;
-      PrintACR('|07(|15A|07) Real Name       : |15'+ShowYesNo(NewUserToggles[2])+
-       '  |08³  |07(|15S|07) Hotkeys         : |15'+ShowYesNo(NewUserToggles[19]));
-      PrintACR('|07(|15B|07) Country         : |15'+ShowYesNo(NewUserToggles[3])+
-       '  |08³  |07(|15T|07) QWK             : |15'+ShowYesNo(NewUserToggles[20]));
-      PrintACR('|07(|15C|07) City, State     : |15'+ShowYesNo(NewUserToggles[4])+
-       '  |08³  |07(|15U|07) Expert Mode     : |15'+ShowYesNo(NewUserToggles[21]));
-      PrintACR('|07(|15D|07) Address         : |15'+ShowYesNo(NewUserToggles[5])+
-       '  |08³  |07(|15V|07) Forgot Password : |15'+ShowYesNo(NewUserToggles[23]){+' |07(|15^5'+ForgotPWQuestion+'|07)'});
-      PrintACR('|07(|15E|07) Zip Code        : |15'+ShowYesNo(NewUserToggles[6])+
-	   '  |08³  |07---------------------------');
-      PrintACR('|07(|15F|07) Phone Number    : |15'+ShowYesNo(NewUserToggles[7])+
-	   '  |08³  |07(|15W|07) Allow Aliases   : |15'+ShowOnOff(AllowAlias));
-      PrintACR('|07(|15G|07) Birthdate       : |15'+ShowYesNo(NewUserToggles[8])+
-	   '  |08³  |07(|15X|07) Refuse New Users: |15'+ShowOnOff(ClosedSystem));
-      PrintACR('|07(|15H|07) Gender Identity : |15'+ShowYesNo(NewUserToggles[9])+
-	   '  |08³  |07(|15Y|07) New User Message Sent To : |15'+AOnOff((NewApp = -1),'Off',PadLeftInt(NewApp,5)));
-	   { Display Username Next To Number }
-      PrintACR('|07(|15I|07) Question #1     : |15'+ShowYesNo(NewUserToggles[10]){+' |07(|15^5'+lRGLngStr(38,True)+'|07)'}+
-	   '  |08³  |07(|15Z|07) New User PW     : |15'+NewUserPW);
-      PrintACR('|07(|15J|07) Question #2     : |15'+ShowYesNo(NewUserToggles[11]){+' |07(|15^5'+lRGLngStr(39,True)+'|07)'}+
-	   '  |08³  |07(|151|07) Can Unval''d Users Log In From Shuttle: |15'+ShowOnOff(ShuttleUnvalLogin));
-      PrintACR('|07(|15K|07) Question #3     : |15'+ShowYesNo(NewUserToggles[12]){+' |07(|15^5'+lRGLngStr(40,True)+'|07)'});
-      PrintACR('|07(|15L|07) Term Emulation  : |15'+ShowYesNo(NewUserToggles[13]));
-      PrintACR('|07(|15M|07) ANSI Colors     : |15'+ShowYesNo(NewUserToggles[14]));
-      PrintACR('|07(|15N|07) Color Scheme    : |15'+ShowYesNo(NewUserToggles[15]));
-      PrintACR('|07(|15O|07) Screen Size     : |15'+ShowYesNo(NewUserToggles[16]));
-      PrintACR('|07(|15P|07) Screen Clearing : |15'+ShowYesNo(NewUserToggles[17]));
-      PrintACR('|07(|15R|07) Screen Pause    : |15'+ShowYesNo(NewUserToggles[18]));  
+      PrintACR('^0(^1A^0) Real Name       : ^1'+ShowYesNo(NewUserToggles[2])+' |08³ '+
+			   '^0(^1S^0) Hotkeys         : ^1'+ShowYesNo(NewUserToggles[19]));
+      PrintACR('^0(^1B^0) Country         : ^1'+ShowYesNo(NewUserToggles[3])+' |08³ '+
+			   '^0(^1T^0) QWK             : ^1'+ShowYesNo(NewUserToggles[20]));
+      PrintACR('^0(^1C^0) City, State     : ^1'+ShowYesNo(NewUserToggles[4])+' |08³ '+
+			   '^0(^1U^0) Expert Mode     : ^1'+ShowYesNo(NewUserToggles[21]));
+      PrintACR('^0(^1D^0) Address         : ^1'+ShowYesNo(NewUserToggles[5])+' |08³ '+
+			   '^0(^1V^0) Forgot Password : ^1'+ShowYesNo(NewUserToggles[23]));
+      PrintACR('^0(^1E^0) Zip Code        : ^1'+ShowYesNo(NewUserToggles[6])+' |08³ ');
+      PrintACR('^0(^1F^0) Phone Number    : ^1'+ShowYesNo(NewUserToggles[7])+' |08³ '+
+			   '^0(^1W^0) Allow Aliases?  : ^1'+ShowYesNo(AllowAlias));
+      PrintACR('^0(^1G^0) Birthdate       : ^1'+ShowYesNo(NewUserToggles[8])+' |08³ ');
+      PrintACR('^0(^1H^0) Gender Identity : ^1'+ShowYesNo(NewUserToggles[9])+' |08³ ');
+      PrintACR('^0(^1I^0) Question #1     : ^1'+ShowYesNo(NewUserToggles[10])+' |08³ ');
+      PrintACR('^0(^1J^0) Question #2     : ^1'+ShowYesNo(NewUserToggles[11])+' |08³ ');
+      PrintACR('^0(^1K^0) Question #3     : ^1'+ShowYesNo(NewUserToggles[12])+' |08³ ');
+      PrintACR('^0(^1L^0) Term Emulation  : ^1'+ShowYesNo(NewUserToggles[13])+' |08³ ');
+      PrintACR('^0(^1M^0) ANSI Colors     : ^1'+ShowYesNo(NewUserToggles[14])+' |08³ ');
+      PrintACR('^0(^1N^0) Color Scheme    : ^1'+ShowYesNo(NewUserToggles[15])+' |08³ ');
+      PrintACR('^0(^1O^0) Screen Size     : ^1'+ShowYesNo(NewUserToggles[16])+' |08³ ');
+      PrintACR('^0(^1P^0) Screen Clearing : ^1'+ShowYesNo(NewUserToggles[17])+' |08³ ');
+      PrintACR('^0(^1R^0) Screen Pause    : ^1'+ShowYesNo(NewUserToggles[18])+' |08³ ');  
     END;
     MCIAllowed := TRUE;
     Nl;
-    Prt('|07Enter Selection Or (|15Q|07)uit: |15');
-    OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ1',TRUE,TRUE);
+    Prt('^0Enter Selection Or (^1Q^0)uit: ^1');
+    OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ1!',TRUE,TRUE);
     WITH General DO
       CASE Cmd OF
         'A' : NewUserToggles[02] := NOT NewUserToggles[02];
@@ -110,10 +108,9 @@ BEGIN
 			     PauseScr(False);
 			   End;
 	         END;
-	   'X' : ClosedSystem := NOT ClosedSystem;
 	   'Y' : BEGIN
 			  Nl;
-                Prt('|07Select (|15E|07)nable, (|15D|07)isable, Or [|15ENTER|07] To Abort: |15');
+                Prt('^0Select (^1E^0)nable, (^1D^0)isable, Or [^1ENTER^0] To Abort: ^1');
                 OneK(Cmd1,^M'ED',TRUE,TRUE);
                 IF (Cmd1 IN ['E','D']) THEN
                 BEGIN
@@ -131,7 +128,12 @@ BEGIN
                 END;
           END;
 	   'Z' : InputWN1(RGSysCfgStr(12,TRUE),NewUserPW,(SizeOf(SysOpPW) - 1),[InterActiveEdit,UpperOnly],Changed);
-	   '1' : ShuttleUnvalLogin := NOT ShuttleUnvalLogin;
+	   '!' : Begin { LeeW: for my testing, remove after }
+			   NewUserToggles[01] := True;
+			   NewUserToggles[22] := True;
+			   Print('Username And Password Reset To True');
+			   PauseScr(False);
+			 End;
       END;
   UNTIL (Cmd = 'Q') OR (HangUp);
 END;

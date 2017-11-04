@@ -1,8 +1,12 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B+,D+,E+,F+,I+,L+,N-,O+,R-,S+,V-}
+
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+  ======================================================================
+  MENU COMMAND EDITOR
+}
+
 UNIT SysOp7M;
 
 INTERFACE
@@ -128,16 +132,16 @@ VAR
     ELSE
     BEGIN
       RecNumToDelete := -1;
-      InputIntegerWOC('%LFDelete which command?',RecNumToDelete,[NumbersOnly],1,CmdNumArray[MenuToModify]);
+      InputIntegerWOC('^0%LFDelete Which Command?',RecNumToDelete,[NumbersOnly],1,CmdNumArray[MenuToModify]);
       IF (RecNumToDelete >= 1) AND (RecNumToDelete <= CmdNumArray[MenuToModify]) THEN
       BEGIN
         Seek(MenuFile,(MenuRecNumArray[MenuToModify] + RecNumToDelete));
         Read(MenuFile,MenuR);
-        Print('%LFCommand: ^5'+MenuR.LDesc[1]);
-        IF PYNQ('%LFAre you sure you want to delete it? ',0,FALSE) THEN
+        Print('^0%LFCommand: ^1'+MenuR.LDesc[1]);
+        IF PYNQ('^0%LFAre you sure you want to delete it? ',0,FALSE) THEN
         BEGIN
           Print('%LF[> Deleting command record ...');
-          SysOpLog('* Deleted command: ^5'+MenuR.LDesc[1]);
+          SysOpLog('* Deleted command: '+MenuR.LDesc[1]);
           RecNumToDelete := (MenuRecNumArray[MenuToModify] + RecNumToDelete); { Convert To Real Record Number }
           IF (RecNumToDelete <= (FileSize(MenuFile) - 2)) THEN
             FOR RecNum := RecNumToDelete TO (FileSize(MenuFile) - 2) DO
@@ -216,7 +220,7 @@ VAR
     ELSE
     BEGIN
       RecNumToModify := -1;
-      InputIntegerWOC('%LFCommand to modify?',RecNumToModify,[NumbersOnly],1,CmdNumArray[MenuToModify]);
+      InputIntegerWOC('^0%LFModify Which Command?',RecNumToModify,[NumbersOnly],1,CmdNumArray[MenuToModify]);
       IF (RecNumToModify >= 1) AND (RecNumToModify <= CmdNumArray[MenuToModify]) THEN
       BEGIN
         SaveRecNumToModify := -1;
@@ -238,32 +242,33 @@ VAR
                 Next := FALSE;
                 MCIAllowed := FALSE;
                 CLS;
-                Print('^5'+MenuName+' #'+IntToStr(MenuNumber));
-                Print('^5Command #'+IntToStr(RecNumToModify)+' of '+IntToStr(CmdNumArray[MenuToModify]));
+				Print(PadLeftStr('^2 '#254' Menu Editor : Menu #'+IntToStr(MenuNumber)+' "'+MenuName+'"',80));
+                
+                Print('^0Command #^1'+IntToStr(RecNumToModify)+'^0 Of ^1'+IntToStr(CmdNumArray[MenuToModify]));
                 NL;
-                PrintACR('^11. Long descript : ^5'+LDesc[1]);
-                PrintACR('^12. Short descript: ^5'+SDesc);
-                PrintACR('^13. Menu keys     : ^5'+CKeys);
-                PrintACR('^14. ACS required  : ^5"'+ACS+'"');
-                PrintACR('^15. CmdKeys       : ^5'+CmdKeys);
-                PrintACR('^16. Options       : ^5'+Options+'^1');
+                PrintACR('^0<^11^0> Long Description  : ^1'+LDesc[1]);
+                PrintACR('^0<^12^0> Short Description : ^1'+SDesc);
+                PrintACR('^0<^13^0> Menu Keys         : ^1'+CKeys);
+                PrintACR('^0<^14^0> ACS Required      : ^1"'+ACS+'"');
+                PrintACR('^0<^15^0> Cmd Keys          : ^1'+CmdKeys);
+                PrintACR('^0<^16^0> Options           : ^1'+Options);
                 IF (General.MultiNode) THEN
-                  PrintACR('^1N. Node activity : ^5'+NodeActivityDesc);
-                PrintACR('^1T. Flags         : ^5'+DisplayCmdFlags(CmdFlags,'5','1'));
+                  PrintACR('^0<^1N^0> Node Activity     : ^1'+NodeActivityDesc);
+                PrintACR('^0<^1T^0> Flags             : ^1'+DisplayCmdFlags(CmdFlags,'1','0'));
                 MCIAllowed := TRUE;
               END;
               IF (General.MultiNode) THEN
-                LOneK('%LFModify menu [^5?^4=^5Help^4]: ',Cmd1,'Q123456NT[]FJL?'^M,TRUE,TRUE)
+                LOneK('^0%LFMenu Editor [(^1?^0)Help]: ',Cmd1,'Q123456NT[]FJL?'^M,TRUE,TRUE)
               ELSE
-                LOneK('%LFModify menu [^5?^4=^5Help^4]: ',Cmd1,'Q123456T[]FJL?'^M,TRUE,TRUE);
+                LOneK('^0%LFMenu Editor [(^1?^0)Help]: ',Cmd1,'Q123456T[]FJL?'^M,TRUE,TRUE);
               CASE Cmd1 OF
-                '1' : InputWNWC('%LF^1New long description:%LF^4: ',LDesc[1],(SizeOf(LDesc[1]) - 1),Changed);
-                '2' : InputWNWC('%LFNew short description: ',SDesc,(SizeOf(SDesc) - 1),Changed);
-                '3' : InputWN1('%LFNew menu keys: ',Ckeys,(SizeOf(CKeys) - 1),[InterActiveEdit,UpperOnly],Changed);
-                '4' : InputWN1('%LFNew ACS: ',ACS,(SizeOf(ACS) - 1),[InterActiveEdit],Changed);
+                '1' : InputWNWC('^0%LFNew Long Description:%LF',LDesc[1],(SizeOf(LDesc[1]) - 1),Changed);
+                '2' : InputWNWC('^0%LFNew Short Description: ',SDesc,(SizeOf(SDesc) - 1),Changed);
+                '3' : InputWN1('^0%LFNew Menu Keys: ',Ckeys,(SizeOf(CKeys) - 1),[InterActiveEdit,UpperOnly],Changed);
+                '4' : InputWN1('^0%LFNew ACS: ',ACS,(SizeOf(ACS) - 1),[InterActiveEdit],Changed);
                 '5' : BEGIN
                         REPEAT
-                          Prt('%LFNew command keys [^5?^4=^5List^4]: ');
+                          Prt('^0%LFNew Command Keys [(^1?^0)List]: ');
                           MPL(2);
                           Input(TempS1,2);
                           IF (TempS1 = '?') THEN
@@ -279,20 +284,20 @@ VAR
                           Changed := TRUE;
                         END;
                       END;
-                '6' : InputWNWC('%LFNew options: ',Options,(SizeOf(Options) - 1),Changed);
+                '6' : InputWNWC('^0%LFNew Options: ',Options,(SizeOf(Options) - 1),Changed);
                 'N' : IF (General.MultiNode) THEN
-                        InputWNWC('%LF^1New node activity description:%LF^4: ',NodeActivityDesc,
-                                  (SizeOf(NodeActivityDesc) - 1),Changed);
+                        InputWNWC('^0%LFNew Node Activity Description :%LF',NodeActivityDesc,
+						(SizeOf(NodeActivityDesc) - 1),Changed);
                 'T' : BEGIN
                         REPEAT
-                          LOneK('%LFToggle which flag? ('+DisplayCmdFlags(CmdFlags,'5','4')+')'+
-                                ' [^5?^4=^5Help^4,^5<CR>^4=^5Quit^4]: ',Cmd1,^M'HU?',TRUE,TRUE);
+                          LOneK('^0%LFToggle Which Flag? ('+DisplayCmdFlags(CmdFlags,'1','0')+')'+
+                                '^0 [(^1?^0)Help,<^1CR^0>Quit]: ',Cmd1,^M'HU?',TRUE,TRUE);
                           CASE Cmd1 OF
                             'H','U' :
                                     ToggleCmdFlags(Cmd1,CmdFlags,Changed);
                             '?' : BEGIN
                                     NL;
-                                    LCmds(17,3,'Hidden command','UnHidden Command');
+                                    LCmds(17,1,'Hidden command','UnHidden Command');
                                   END;
                           END;
                         UNTIL (Cmd1 = ^M) OR (HangUp);
@@ -320,7 +325,7 @@ VAR
                         Cmd1 := #0;
                       END;
                 'J' : BEGIN
-                        InputIntegerWOC('%LFJump to entry',RecNumToModify,[NumbersOnly],1,CmdNumArray[MenuToModify]);
+                        InputIntegerWOC('^0%LFJump To Which Entry?',RecNumToModify,[NumbersOnly],1,CmdNumArray[MenuToModify]);
                         IF (RecNumToModify < 1) and (RecNumToModify > CmdNumArray[MenuToModify]) THEN
                           Cmd1 := #0;
                       END;
@@ -332,11 +337,12 @@ VAR
                         Cmd1 := #0;
                       END;
                 '?' : BEGIN
-                        Print('%LF^1<^3CR^1>Redisplay screen');
-                        Print('^31-6,N,T^1:Modify item');
-                        LCmds(20,3,'[Back entry',']Forward entry');
-                        LCmds(20,3,'First entry in list','Jump to entry');
-                        LCmds(20,3,'Last entry in list','Quit and save');
+						NL;
+                        {Print('<CR> Refresh Screen');}
+                        {Print('1-6,N,T: Modify Item');}
+                        LCmds(17,1,'[ Previous Entry','] Next Entry');
+                        LCmds(17,1,'F First Entry','L Last Entry');
+                        LCmds(17,1,'J Jump To Entry','Q Quit');
                       END;
               END;
             UNTIL (Pos(Cmd1,'Q[]FJL') <> 0) OR (HangUp);
@@ -345,7 +351,7 @@ VAR
             Seek(MenuFile,(MenuRecNumArray[MenuToModify] + SaveRecNumToModify));
             Write(MenuFile,MenuR);
             Changed := FALSE;
-            SysOpLog('* Modified command: ^5'+MenuR.LDesc[1]);
+            SysOpLog('* Modified Command: '+MenuR.LDesc[1]);
           END;
         END;
         LastError := IOResult;
@@ -417,37 +423,40 @@ BEGIN
       Next := FALSE;
       MCIAllowed := FALSE;
       CLS;
-      PrintACR('^0###^4:^3Short Desc.           ^0###^4:^3Short Desc.           ^0###^4:^3Short Desc.');
-      PrintACR('^4===:===================== ===:===================== ===:=====================');
+   (* PrintACR('^0###^4:^3Short Desc.           ^0###^4:^3Short Desc.           ^0###^4:^3Short Desc.');
+      PrintACR('^4===:===================== ===:===================== ===:====================='); *)
+	  PrintACR('^4+----+--------------------+----+--------------------+-----+-------------------+');
+	  PrintACR('^4| ^3## ^4| ^3Short Description  ^4| ^3## ^4| ^3Short Description  ^4| ^3## ^4| ^3Short Description  ^4|');
+	  PrintACR('^4+----+--------------------+----+--------------------+-----+-------------------+');
       Reset(MenuFile);
       RecNumToList := 1;
       WHILE (RecNumToList <= GetRecNum(CmdNumArray[MenuToModify])) AND (NOT Abort) AND (NOT HangUp) DO
       BEGIN
         Seek(MenuFile,(RecNumToList + MenuRecNumArray[MenuToModify]));
         Read(MenuFile,MenuR);
-        TempS := '^0'+PadRightStr(IntToStr(RecNumToList),3)+' ^5'+PadLeftStr(MenuR.SDesc,21)+' ';
+        TempS := '  ^0'+PadLeftStr(IntToStr(RecNumToList),3)+'  ^1'+PadLeftStr(MenuR.SDesc,19){+' '};
         Counter := (RecNumToList + GetRecNum(CmdNumArray[MenuToModify]));
         IF (Counter <= CmdNumArray[MenuToModify]) THEN
         BEGIN
           Seek(MenuFile,(Counter + MenuRecNumArray[MenuToModify]));
           Read(MenuFile,MenuR);
-          TempS := TempS + '^0'+PadRightStr(IntToStr(Counter),3)+' ^5'+PadLeftStr(MenuR.SDesc,21)+' ';
+          TempS := TempS + '  ^0'+PadLeftStr(IntToStr(Counter),3)+'  ^1'+PadLeftStr(MenuR.SDesc,19){+' '};
         END;
         Counter := (Counter + GetRecNum(CmdNumArray[MenuToModify]));
         IF (Counter <= CmdNumArray[MenuToModify]) THEN
         BEGIN
           Seek(MenuFile,Counter + MenuRecNumArray[MenuToModify]);
           Read(MenuFile,MenuR);
-          TempS := TempS + '^0'+PadRightStr(IntToStr(Counter),3)+' ^5'+PadLeftStr(MenuR.SDesc,21);
+          TempS := TempS + '  ^0'+PadLeftStr(IntToStr(Counter),3)+'  ^1'+PadLeftStr(MenuR.SDesc,19);
         END;
         PrintACR(TempS);
         Inc(RecNumToList);
       END;
       IF (CmdNumArray[MenuToModify] = 0) THEN
-        Print('*** No commands defined ***');
+        Print('^8[ NO COMMANDS DEFINED ]');
       MCIAllowed := TRUE;
     END;
-    LOneK('%LFCommand editor [^5?^4=^5Help^4]: ',Cmd,'QDILMPSX?'^M,TRUE,TRUE);
+    LOneK('^0%LFCommand Editor [(^1?^0)Help]: ',Cmd,'QDILMPSX?'^M,TRUE,TRUE);
     CASE Cmd OF
       'D' : DeleteCommand;
       'I' : InsertCommand;
@@ -474,11 +483,12 @@ BEGIN
               PauseScr(FALSE);
             END;
       '?' : BEGIN
-              Print('%LF^1<^3CR^1>Redisplay screen');
-              LCmds(20,3,'Delete command','Insert command');
-              LCmds(20,3,'Long generic menu','Modify commands');
-              LCmds(20,3,'Position command','Quit');
-              LCmds(20,3,'Short generic menu','');
+			  NL;
+              {Print('<CR> Refresh Screen');}
+              LCmds(22,1,'D Delete Command','I Insert Command');
+              LCmds(22,1,'L Long Generic Menu','M Modify Command');
+              LCmds(22,1,'P Position Command','Q Quit');
+              LCmds(22,1,'S Short Generic Menu','');
             END;
     END;
   UNTIL (Cmd = 'Q') OR (HangUp);

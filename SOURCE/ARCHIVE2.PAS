@@ -628,14 +628,13 @@ BEGIN
             IF (FileName = '') THEN
             BEGIN
               NL;
-              Print('Aborted!');
+              Print('^8Aborted!');
             END
             ELSE
             BEGIN
-
               NL;
               REPEAT
-                Prt('Archive type to use? (?=List): ');
+                Prt('^0Archive Type To Use? [(^1?^0)List]: ');
                 MPL(3);
                 Input(S,3);
                 IF (S = '?') THEN

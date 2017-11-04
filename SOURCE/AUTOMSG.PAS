@@ -47,7 +47,7 @@ BEGIN
 	UnpackTime(FileDateTime,FileDateTime2);
 	With FileDateTime2 Do
 	  Begin
-        Print(lRGLngStr(10,TRUE)+TempStr+' on '+IntToStr(Month)+'/'+IntToStr(Day)+'/'+IntToStr(Year));
+        Print(lRGLngStr(10,TRUE)+TempStr+'|07 on |15'+IntToStr(Month)+'/'+IntToStr(Day)+'/'+IntToStr(Year));
 		{ AutoMessage Posted By USERNAME On 01/01/2017 }
       End;
 	  

@@ -139,9 +139,9 @@ VAR
 BEGIN
   SaveL := L;
   IF (NOT (DisplayValue IN InputFlags)) THEN
-    Prt(S+' (^5'+IntToStr(LowNum)+'^4-^5'+IntToStr(HighNum)+'^4): ')
+    Prt(S+'^0 [^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0]: ')
   ELSE
-    Prt(S+' (^5'+IntToStr(LowNum)+'^4-^5'+IntToStr(HighNum)+'^4) [^5'+IntToStr(L)+'^4]: ');
+    Prt(S+'^0 [^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0] [^1'+IntToStr(L)+'^0]: ');
   MPL(Length(IntToStr(HighNum)));
   TempStr := IntToStr(L);
   InputMain(TempStr,Length(IntToStr(HighNum)),InputFlags);
@@ -215,9 +215,9 @@ VAR
 BEGIN
   SaveI := I;
   IF (NOT (DisplayValue IN InputFlags)) THEN
-    Prt(S+' (^5'+IntToStr(LowNum)+'^4-^5'+IntToStr(HighNum)+'^4): ')
+    Prt(S+' ^0[^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0]: ')
   ELSE
-    Prt(S+' (^5'+IntToStr(LowNum)+'^4-^5'+IntToStr(HighNum)+'^4) [^5'+IntToStr(I)+'^4]: ');
+    Prt(S+' ^0[^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0] [^1'+IntToStr(I)+'^0]: ');
   MPL(Length(IntToStr(HighNum)));
   TempStr := IntToStr(I);
   InputMain(TempStr,Length(IntToStr(HighNum)),InputFlags);
@@ -229,7 +229,7 @@ BEGIN
     ELSE
     BEGIN
       NL;
-      Print('^7The range must be from '+IntToStr(LowNum)+' to '+IntToStr(HighNum)+'!^1');
+      Print('^8ERROR: Valid range is between '+IntToStr(LowNum)+' and '+IntToStr(HighNum)+'!^1'); { LeeW: Word this better }
       PauseScr(FALSE);
     END;
   END;
@@ -253,9 +253,9 @@ VAR
 BEGIN
   SaveB := B;
   IF (NOT (DisplayValue IN InputFlags)) THEN
-    Prt(S+' (^5'+IntToStr(LowNum)+'^4-^5'+IntToStr(HighNum)+'^4): ')
+    Prt(S+' ^0[^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0]: ')
   ELSE
-    Prt(S+' (^5'+IntToStr(LowNum)+'^4-^5'+IntToStr(HighNum)+'^4) [^5'+IntToStr(B)+'^4]: ');
+    Prt(S+' ^0[^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0] [^1'+IntToStr(B)+'^0]: ');
   MPL(Length(IntToStr(HighNum)));
   TempStr := IntToStr(B);
   InputMain(TempStr,Length(IntToStr(HighNum)),InputFlags);
@@ -267,7 +267,7 @@ BEGIN
     ELSE
     BEGIN
       NL;
-      Print('^7The range must be from '+IntToStr(LowNum)+' to '+IntToStr(HighNum)+'!^1');
+      Print('^8ERROR: Valid range is between '+IntToStr(LowNum)+' and '+IntToStr(HighNum)+'!^0');
       PauseScr(FALSE);
     END;
   END;

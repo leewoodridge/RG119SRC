@@ -1,12 +1,24 @@
+{$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
 
-{ USER EDITOR }
+  USER EDITOR
+  ======================================================================
+    [TODO]
+      - Add Country field
+    [ISSUES]
+      - Preference Records: Change conference not working, should add it to CUser
+	  - Add a few pieces of info to records (uploaded #/k etc..)
+}
 
 UNIT SysOp3;
 
 INTERFACE
 
 USES
-  Common;
+Crt,
+Common;
 
 PROCEDURE ShowUserInfo(DisplayType: Byte; UNum: Integer; CONST User: UserRecordType);
 PROCEDURE UserEditor(UNum: Integer);
@@ -20,6 +32,7 @@ USES
   ShortMsg,
   SysOp2G,
   SysOp7,
+  SysOp12, { Conferences }
   TimeFunc,
   MiscUser;
 
@@ -27,9 +40,9 @@ FUNCTION DisplayTerminalStr(StatusFlags: StatusFlagSet; Flags: FlagSet): Str8;
 VAR
   TempS: Str8;
 BEGIN
-  IF (AutoDetect IN StatusFlags) THEN
+  IF (AutoDetect IN Flags) THEN
     TempS := 'Auto'
-  ELSE IF (RIP IN StatusFlags) THEN
+  ELSE IF (RIP IN Flags) THEN
     TempS := 'RIP'
   ELSE IF (Avatar IN Flags) THEN
     TempS := 'Avatar'
@@ -54,38 +67,33 @@ VAR
       CASE Counter1 OF
         1 : BEGIN
               IF (UNum = 0) THEN
-                S := '^5New User Configuration:'
+                S := 'New User Configuration'
               ELSE
               BEGIN
-                S := '^5User #'+IntToStr(UNum)+' of '+IntToStr(MaxUsers - 1);
+                S := '#'+IntToStr(UNum)+' Of '+IntToStr(MaxUsers - 1)+' ';
                 IF NOT (OnNode(UNum) IN [0,ThisNode]) THEN
-                  S := PadLeftStr(S,45)+'^8Note: ^3User is on node '+IntToStr(OnNode(UNum));
+                  S := S+'[ On Node '+IntToStr(OnNode(UNum))+' ]'; { LeeW: Test this }
               END;
-              S := S + #13#10;
+			  S := PadLeftStr('|17|15 '#254' User Editor : '+ S,80);
             END;
-        2 : S := '^1A. User Name : ^3'+PadLeftStr(Name,29)+'^1 L. Security  : ^3'+IntToStr(SL);
-        3 : S := '^1B. Real Name : ^3'+PadLeftStr(RealName,29)+'^1 M. D Security: ^3'+IntToStr(DSL);
-        4 : S := '^1C. Address   : ^3'+PadLeftStr(Street,29)+'^1 N. AR: ^3'+DisplayARFlags(AR,'3','1');
-        5 : S := '^1D. City/State: ^3'+PadLeftStr(CityState,29)+'^1 O. AC: ^3'+DisplayACFlags(Flags,'3','1');
-        6 : S := '^1E. Zip code  : ^3'+PadLeftStr(ZipCode,29)+'^1 P. Sex/Age   : ^3'+
-                                     Sex+IntToStr(AgeUser(BirthDate))+' ('+ToDate8(PD2Date(BirthDate))+')';
-        7 : S := '^1F. SysOp note: ^3'+PadLeftStr(Note,29)+'^1 R. Phone num : ^3'+Ph;
-        8 : S := '^1G. '+PadLeftStr(lRGLngStr(41,TRUE){FString.UserDefEd[1]},10)+': ^3'+PadLeftStr(UsrDefStr[1],29)+
-                                                              '^1 T. Last/1st  : ^3'+ToDate8(PD2Date(LastOn))+
-                                                              ' ('+ToDate8(PD2Date(FirstOn))+')';
-        9 : BEGIN
-              S := '^1H. '+PadLeftStr(lRGLngStr(42,TRUE){FString.UserDefEd[2]},10)+': ^3'+PadLeftStr(UsrDefStr[2],29)+
-                   '^1 V. Locked out: '+AOnOff(LockedOut IN SFlags,'^7'+LockedFile+'.ASC','^3Inactive');
-            END;
-       10 : BEGIN
-              S := '^1I. '+PadLeftStr(lRGLngStr(43,TRUE){FString.UserDefEd[3]},10)+': ^3'+PadLeftStr(UsrDefStr[3],29)+
-                '^1 W. Password  : [Not Shown]';
-            END;
+        2 : S := '^1A^0'#242' User Name : ^1'+PadLeftStr(Name,29)+' ^1L^0'#242' Security  : ^1'+IntToStr(SL);
+        3 : S := '^1B^0'#242' Real Name : ^1'+PadLeftStr(RealName,29)+' ^1M^0'#242' D Security: ^1'+IntToStr(DSL);
+        4 : S := '^1C^0'#242' Address   : ^1'+PadLeftStr(Street,29)+' ^1N^0'#242' AR: ^3'+DisplayARFlags(AR,'1','0');
+        5 : S := '^1D^0'#242' City/State: ^1'+PadLeftStr(CityState,29)+' ^1O^0'#242' AC: ^3'+DisplayACFlags(Flags,'1','0');
+        6 : S := '^1E^0'#242' Zip Code  : ^1'+PadLeftStr(ZipCode,29)+
+		' ^1P^0'#242' Sex/Age   : ^1'+Sex+'^0 / ^1'+IntToStr(AgeUser(BirthDate))+' ^0(^1'+ToDate8(PD2Date(BirthDate))+'^0)';
+        7 : S := '^1F^0'#242' SysOp Note: ^1'+PadLeftStr(Note,29)+' ^1R^0'#242' Phone Num : ^1'+Ph;
+        8 : S := '^1G^0'#242' '+PadLeftStr(lRGLngStr(41,TRUE),10)+': ^1'+PadLeftStr(UsrDefStr[1],29)+ { SysOp Q 1 }
+				' ^1T^0'#242' Last/First: ^1'+ToDate8(PD2Date(LastOn))+'^0 / ^1'+ToDate8(PD2Date(FirstOn));
+        9 : S := '^1H^0'#242' '+PadLeftStr(lRGLngStr(42,TRUE),10)+': ^1'+PadLeftStr(UsrDefStr[2],29)+ { SysOp Q 2 }
+                ' ^1V^0'#242' Locked Out: '+AOnOff(LockedOut IN SFlags,'^8'+LockedFile+'.ASC','^1*None*');
+       10 : S := '^1I^0'#242' '+PadLeftStr(lRGLngStr(43,TRUE),10)+': ^1'+PadLeftStr(UsrDefStr[3],29)+ { SysOp Q 3 }
+                ' ^1W^0'#242' Password  : ^8[NOT SHOWN]';
        11 : BEGIN
               IF (Deleted IN SFlags) THEN
                 S := '^8'
               ELSE
-                S := '^1';
+                S := '^0';
               S := S + '[DEL] ';
               IF (TrapActivity IN SFlags) AND ((UNum <> UserNum) OR (UserNum = 1)) THEN
                 IF (TrapSeparate IN SFlags) THEN
@@ -93,45 +101,46 @@ VAR
                 ELSE
                   S := S + '^8[TRP COM] '
                 ELSE
-                  S := S + '^1[TRP OFF] ';
+                  S := S + '^0[TRP OFF] ';
               IF (LockedOut IN SFlags) THEN
                 S := S + '^8'
               ELSE
-                S := S + '^1';
+                S := S + '^0';
               S := S + '[LOCK] ';
-              IF (Alert IN Flags) THEN
+              IF (Alert IN SFlags) THEN
                 S := S + '^8'
               ELSE
-                S := S + '^1';
+                S := S + '^0';
               S := S + '[ALRT] ';
-              S := '^1J. Status    : ^3'+PadLeftStr(S,29)+'^1 X. Caller ID : ^3'+CallerID;
+              S := '^1J^0'#242' Status    : ^1'+PadLeftStr(S,29)+
+			      ' ^1X^0'#242' Caller ID : ^1'+CallerID;
             END;
-       12 : S := '^1K. QWK setup : ^3'+PadLeftStr(General.FileArcInfo[DefArcType].ext,29)+
-                 '^1 Y. Start Menu: ^3'+IntToStr(UserStartMenu);
-       13 : S := '^1Z. Forgot PW : ^3'+ForgotPWAnswer+#13#10;
-       14 : S := '^11. Call records - TC: ^3'+PadLeftInt(LoggedOn,8)+
-                                   ' ^1TT: ^3'+PadLeftInt(TTimeOn,8)+
-                                   ' ^1CT: ^3'+PadLeftInt(OnToday,8)+
-                                   ' ^1TL: ^3'+PadLeftInt(TLToday,8)+
-                                   ' ^1TB: ^3'+IntToStr(TimeBank);
-       15 : S := '^12. Mail records - PB: ^3'+PadLeftInt(MsgPost,8)+
-                                   ' ^1PV: ^3'+PadLeftInt(EmailSent,8)+
-                                   ' ^1FB: ^3'+PadLeftInt(FeedBack,8)+
-                                   ' ^1WT: ^3'+IntToStr(Waiting);
-       16 : S := '^13. File records - DL: ^3'+PadLeftStr(IntToStr(Downloads)+'-'+FormatNumber(DK)+'k',15)+
-                                   ' ^1UL: ^3'+PadLeftStr(IntToStr(Uploads)+'-'+FormatNumber(UK)+'k',15)+
-                                   ' ^1DT: ^3'+IntToStr(DLToday)+'-'+FormatNumber(DLKToday)+'k';
-       17 : S := '                  ^1FP: ^3'+IntToStr(FilePoints);
-       18 : S := '^14. Pref records - EM: ^3'+DisplayTerminalStr(SFlags,Flags)+
-                                   ' ^1CS: ^3'+PadLeftStr(ShowYesNo(CLSMsg IN SFlags),8)+
-                                   ' ^1PS: ^3'+PadLeftStr(ShowYesNo(Pause IN Flags),8)+
-                                   ' ^1CL: ^3'+PadLeftStr(ShowYesNo(Color IN Flags),8)+
-                                   ' ^1ED: ^3'+AOnOff((FSEditor IN SFlags),'F/S','Reg');
-       19 : S := '^15. Subs records - CR: ^3'+PadLeftInt(lCredit,8)+
-                                   ' ^1DB: ^3'+PadLeftInt(Debit,8)+
-                                   ' ^1BL: ^3'+PadLeftInt(lCredit - Debit,8)+
-                                   ' ^1ED: ^3'+AOnOff((Expiration > 0),ToDate8(PD2Date(Expiration)),'Never   ')+
-                                   ' ^1ET: ^3'+AOnOff(ExpireTo <> ' ',ExpireTo,'None');
+       12 : S := '^1K^0'#242' UNUSED    : ^1'+PadLeftStr('',29)+
+                ' ^1Y^0'#242' UNUSED    : ^1'; { LeeW: Was +IntToStr(UserStartMenu); }
+       13 : S := PadLeftStr('',45)+'^1Z^0'#242' Forgot PW : ^1'+PadLeftStr(ForgotPWAnswer,29){+^M^J};
+       14 : S := '^11^0'#242' Call Records - TC: ^1'+PadLeftInt(LoggedOn,8)+
+                                    ' ^0TT: ^1'+PadLeftInt(TTimeOn,8)+
+                                    ' ^0CT: ^1'+PadLeftInt(OnToday,8)+
+                                    ' ^0TL: ^1'+PadLeftInt(TLToday,8)+
+                                    ' ^0TB: ^1'+IntToStr(TimeBank);
+       15 : S := '^12^0'#242' Mail Records - PB: ^1'+PadLeftInt(MsgPost,8)+
+                                    ' ^0PV: ^1'+PadLeftInt(EmailSent,8)+
+                                    ' ^0FB: ^1'+PadLeftInt(FeedBack,8)+
+                                    ' ^0WT: ^1'+IntToStr(Waiting);
+       16 : S := '^13^0'#242' File Records - DL: ^1'+PadLeftStr(IntToStr(Downloads)+' ^0/ ^1'+FormatNumber(DK)+'k',21)+
+                                    ' ^0UL: ^1'+PadLeftStr(IntToStr(Uploads)+' ^0/ ^1'+FormatNumber(UK)+'k',21);
+       17 : S :=   '                  ^0DT: ^1'+PadLeftStr(IntToStr(DLToday)+' ^0/ ^1'+FormatNumber(DLKToday)+'k',21)+
+								    ' ^0FP: ^1'+IntToStr(FilePoints);
+       18 : S := '^14^0'#242' Pref Records - EM: ^1'+DisplayTerminalStr(SFlags,Flags)+
+                                    ' ^0CS: ^1'+PadLeftStr(ShowYesNo(CLSMsg IN Flags),8)+
+                                    ' ^0PS: ^1'+PadLeftStr(ShowYesNo(Pause IN Flags),8)+
+                                    ' ^0CL: ^1'+PadLeftStr(ShowYesNo(Color IN Flags),8)+
+                                    ' ^0ED: ^1'+AOnOff((FSEditor IN Flags),'F/S','Reg');
+       19 : S := '^15^0'#242' Subs Records - CR: ^1'+PadLeftInt(lCredit,8)+
+                                    ' ^0DB: ^1'+PadLeftInt(Debit,8)+
+                                    ' ^0BL: ^1'+PadLeftInt(lCredit - Debit,8)+
+                                    ' ^0ED: ^1'+AOnOff((Expiration > 0),ToDate8(PD2Date(Expiration)),'Never   ')+
+                                    ' ^0ET: ^1'+AOnOff(ExpireTo <> ' ',ExpireTo,'None');
       END;
     PrintACR(S);
     Inc(Counter1);
@@ -200,21 +209,21 @@ VAR
   FUNCTION SearchType(SType: Byte): AStr;
   BEGIN
     CASE SType OF
-      0 : SearchType := 'General text';
+      0 : SearchType := 'General Text';
       1 : SearchType := 'Search ACS';
       2 : SearchType := 'User SL';
       3 : SearchType := 'User DSL';
       4 : SearchType := 'User AR Flags';
       5 : SearchType := 'User AC Flags';
-      6 : SearchType := 'User status';
-      7 : SearchType := 'Date since last on';
-      8 : SearchType := 'Date since first on';
-      9 : SearchType := 'Number of calls';
-     10 : SearchType := 'User age';
-     11 : SearchType := 'User gender';
-     12 : SearchType := '# 1/10''s call/post';
-     13 : SearchType := '#k DL/1k UL';
-     14 : SearchType := '# DLs/1 UL';
+      6 : SearchType := 'User Status';
+      7 : SearchType := 'Date Since Last On';
+      8 : SearchType := 'Date Since First On';
+      9 : SearchType := 'Number Of Calls';
+     10 : SearchType := 'User Age';
+     11 : SearchType := 'User Gender';
+     12 : SearchType := '# 1/10''s Call/Post';
+     13 : SearchType := '#K DL/1K UL';
+     14 : SearchType := '# DL/1 UL';
     END;
   END;
 
@@ -227,17 +236,17 @@ VAR
     FOR FSF := FS_Deleted TO FS_SLogging DO
       IF (FSF IN F_Status) THEN
         CASE FSF OF
-          FS_Deleted   : TempStr1 := TempStr1 +'Deleted,';
-          FS_Trapping  : TempStr1 := TempStr1 +'Trapping,';
-          FS_ChatBuffer: TempStr1 := TempStr1 +'Chat Buffering,';
-          FS_LockedOut : TempStr1 := TempStr1 +'Locked Out,';
-          FS_Alert     : TempStr1 := TempStr1 +'Alert,';
-          FS_SLogging  : TempStr1 := TempStr1 +'Sep. SysOp Log,';
+          FS_Deleted   : TempStr1 := TempStr1 +'^1Deleted^0, ';
+          FS_Trapping  : TempStr1 := TempStr1 +'^1Trapping^0, ';
+          FS_ChatBuffer: TempStr1 := TempStr1 +'^1Chat Buffering^0, ';
+          FS_LockedOut : TempStr1 := TempStr1 +'^1Locked Out^0, ';
+          FS_Alert     : TempStr1 := TempStr1 +'^1Alert^0, ';
+          FS_SLogging  : TempStr1 := TempStr1 +'^1Sep. SysOp Log^0, ';
         END;
     IF (TempStr1 <> '') THEN
-      TempStr1 := Copy(TempStr1,1,(Length(TempStr1) - 1))
+      TempStr1 := Copy(TempStr1,1,(Length(TempStr1) - 2))
     ELSE
-      TempStr1 := 'None.';
+      TempStr1 := '^1None^0';
     Find_FS := TempStr1;
   END;
 
@@ -247,7 +256,8 @@ VAR
     Cmd1: Char;
     Counter1: Byte;
   BEGIN
-    Print('^5Search Criterea:^1');
+  Cls;
+    Print('^0Search Criterea:');
     NL;
     Abort := FALSE;
     Next := FALSE;
@@ -263,30 +273,36 @@ VAR
         13 : Cmd1 := 'K';
         14 : Cmd1 := 'N';
       END;
-      Prompt('^1'+Cmd1+'. '+PadLeftStr(SearchType(Counter1),19)+': ');
+      Prompt('^0(^1'+Cmd1+'^0'#242' '+PadLeftStr(SearchType(Counter1),19)+': ');
       TempStr1 := '';
       IF (NOT F_State[Counter1]) THEN
-        TempStr1 := '^5<INACTIVE>'
+        TempStr1 := '^8<INACTIVE>'
       ELSE
       BEGIN
         CASE Counter1 OF
-          0 : TempStr1 := '"'+F_GenText+'"';
-          1 : TempStr1 := '"'+F_ACS+'"';
-          2 : TempStr1 := IntToStr(F_SL1)+' SL ... '+IntToStr(F_SL2)+' SL';
-          3 : TempStr1 := IntToStr(F_DSL1)+' DSL ... '+IntToStr(F_DSL2)+' DSL';
-          4 : TempStr1 := DisplayARFlags(F_AR,'3','1');
-          5 : TempStr1 := DisplayACFlags(F_AC,'3','1');
-          6 : TempStr1 := Find_FS;
-          7 : TempStr1 := PD2Date(F_LastOn1)+' ... '+PD2Date(F_LastOn2);
-          8 : TempStr1 := PD2Date(F_FirstOn1)+' ... '+PD2Date(F_FirstOn2);
-          9 : TempStr1 := IntToStr(F_NumCalls1)+' calls ... '+IntToStr(F_NumCalls2)+' calls';
-         10 : TempStr1 := IntToStr(F_Age1)+' years ... '+IntToStr(F_Age2)+' years';
-         11 : TempStr1 := AOnOff(F_Gender = 'M','Male','Female');
-         12 : TempStr1 := IntToStr(F_PostRatio1)+' ... '+IntToStr(F_PostRatio2);
-         13 : TempStr1 := IntToStr(F_DLKRatio1)+' ... '+IntToStr(F_DLKRatio2);
-         14 : TempStr1 := IntToStr(F_DLRatio1)+' ... '+IntToStr(F_DLRatio2);
+          0 : TempStr1 := '^0"^1'+F_GenText+'^0"';
+          1 : TempStr1 := '^0"^1'+F_ACS+'^0"';
+          2 : TempStr1 := '^1'+IntToStr(F_SL1)+'^0 - ^1'+IntToStr(F_SL2)+'^0 SL';
+          3 : TempStr1 := '^1'+IntToStr(F_DSL1)+'^0 - ^1'+IntToStr(F_DSL2)+'^0 DSL';
+          4 : TempStr1 := '^1'+DisplayARFlags(F_AR,'1','0');
+          5 : TempStr1 := '^1'+DisplayACFlags(F_AC,'1','0');
+          6 : TempStr1 := '^1'+Find_FS;
+          7 : TempStr1 := '^1'+PD2Date(F_LastOn1)+'^0 - ^1'+PD2Date(F_LastOn2);
+          8 : TempStr1 := '^1'+PD2Date(F_FirstOn1)+'^0 - ^1'+PD2Date(F_FirstOn2);
+          9 : TempStr1 := '^1'+IntToStr(F_NumCalls1)+'^0 - ^1'+IntToStr(F_NumCalls2)+'^0 Calls';
+         10 : TempStr1 := '^1'+IntToStr(F_Age1)+'^0 - ^1'+IntToStr(F_Age2)+'^0 Years Old';
+         11 : Begin
+				Case F_Gender Of
+				'M' : TempStr1 := '^0Male';
+				'F' : TempStr1 := '^0Female';
+				'O' : TempStr1 := '^0Other';
+				End;
+		      End;
+         12 : TempStr1 := '^1'+IntToStr(F_PostRatio1)+'^0 - ^1'+IntToStr(F_PostRatio2);
+         13 : TempStr1 := '^1'+IntToStr(F_DLKRatio1)+'^0 - ^1'+IntToStr(F_DLKRatio2);
+         14 : TempStr1 := '^1'+IntToStr(F_DLRatio1)+'^0 - ^1'+IntToStr(F_DLRatio2);
         END;
-        UserColor(3);
+        {UserColor(3);}
       END;
       Print(TempStr1);
       WKey;
@@ -342,9 +358,9 @@ VAR
                                         Ok1 := FALSE;
                       FS_ChatBuffer : IF NOT (ChatAuto IN User1.SFlags) THEN
                                         Ok1 := FALSE;
-                      FS_LockedOut  : IF NOT (LockedOut IN User1.SFlags) THEN
+                      FS_LockedOut  : IF NOT (LockedOut IN User1.SFlags) THEN { LeeW: Why user 1? }
                                         Ok1 := FALSE;
-                      FS_Alert      : IF NOT ((Alert IN Flags)) THEN
+                      FS_Alert      : IF NOT ((Alert IN SFlags)) THEN
                                         Ok1 := FALSE;
                       FS_SLogging   : IF NOT (SLogSeparate IN User1.SFlags) THEN
                                         Ok1 := FALSE;
@@ -398,7 +414,7 @@ VAR
     n,
     TempMaxUsers: Integer;
   BEGIN
-    Prompt('Searching ... ');
+    Prompt('^0Searching ... ');
     Reset(UserFile);
     TempMaxUsers := (MaxUsers - 1);
     n := UNum;
@@ -455,11 +471,11 @@ VAR
     UserCount: Integer;
     Changed1: Boolean;
   BEGIN
-    DisplaySearchOptions;
     REPEAT
+	  DisplaySearchOptions;
       NL;
-      Prt('Change [^5?^4=^5Help^4]: ');
-      OneK(Cmd1,'Q0123456789AGPKNCLTU?'^M,TRUE,TRUE);
+      Prt('^0Enter Selection [(^1?^0'#242'Help,(^1Q^0'#242'uit]: ');
+      OneK(Cmd1,'Q0123456789AGPKNCLTU?',TRUE,TRUE);
       NL;
       CASE Cmd1 OF
         '0'..'9' :
@@ -474,23 +490,22 @@ VAR
       END;
       IF (SType <> -1) THEN
       BEGIN
-        Prompt('^5[>^0 ');
+        {Prompt('^3[> ^1');}
         IF (F_State[SType]) THEN
-          Print(SearchType(SType)+'^1')
+          {Print(SearchType(SType))}
         ELSE
         BEGIN
           F_State[SType] := TRUE;
-          Print(SearchType(SType)+' is now *ON*^1');
+          {Print(SearchType(SType)+' is now enabled');}
         END;
-        NL;
       END;
       CASE Cmd1 OF
         '0' : BEGIN
-                Print('General text ["'+F_GenText+'"]');
-                Prt(': ');
+                Print('^0Enter the text that you would like to search for: '); {["'+F_GenText+'"]}
+                {Prt('^1: ');}
                 MPL(40);
                 Input(TempStr1,40);
-                IF (TempStr1 <> '') THEN
+                IF Length(TempStr1)<>0 THEN
                   F_GenText := TempStr1;
               END;
         '1' : BEGIN
@@ -502,16 +517,18 @@ VAR
                   F_ACS := TempStr1;
               END;
         '2' : BEGIN
+				Print('SL');
                 InputByteWOC('Lower limit',F_SL1,[DisplayValue,NumbersOnly],0,255);
                 InputByteWOC('%LFUpper limit',F_SL2,[DisplayValue,NumbersOnly],(0 + F_SL1),255);
               END;
         '3' : BEGIN
+				Print('DSL');
                 InputByteWOC('Lower limit',F_DSL1,[DisplayValue,NumbersOnly],0,255);
                 InputByteWOC('%LFUpper limit',F_DSL2,[DisplayValue,NumbersOnly],(0 + F_DSL1),255);
               END;
         '4' : BEGIN
                 REPEAT
-                  Prt('Toggle which AR flag? ('+DisplayArFlags(F_AR,'5','4')+'^4) [^5?^4=^5Help^4,^5<CR>^4=^5Quit^4]: ');
+                  Prt('^0Toggle Which AR Flag? ['+DisplayArFlags(F_AR,'0','1')+'^0] [(^1?^0)Help,<^1CR^0>Quit]: ');
                   OneK(Cmd1,^M'ABCDEFGHIJKLMNOPQRSTUVWXYZ?',TRUE,TRUE);
                   IF (Cmd1 = '?') THEN
                     PrintF('ARFLAGS')
@@ -533,10 +550,11 @@ VAR
               END;
         '6' : BEGIN
                 REPEAT
-                  Print('^4Current flags: ^3'+Find_FS);
+				  NL;
+                  Print('^1Current Flags: ^3'+Find_FS);
                   NL;
-                  Prt('Toggle which status flag? (^5?^4=^5Help^4): ');
-                  OneK(Cmd1,'QACDLST? '^M,TRUE,TRUE);
+                  Prt('^1Select Flags, or (^3?^1) Help, or (^3Q^1) Quit: ');
+                  OneK(Cmd1,'QACDLST?',TRUE,TRUE);
                   CASE Cmd1 OF
                     'A' : FSF := FS_Alert;
                     'C' : FSF := FS_ChatBuffer;
@@ -546,9 +564,9 @@ VAR
                     'T' : FSF := FS_Trapping;
                     '?' : BEGIN
                             NL;
-                            LCmds(15,3,'Alert','Chat-buffering');
-                            LCmds(15,3,'Deleted','Locked-out');
-                            LCmds(15,3,'Separate SysOp logging','Trapping');
+                            LCmds3(24,1,'A Alert',		'C Chat Buffering',		'D Deleted');
+                            LCmds3(24,1,'L Locked Out',	'S Separate SysOp Log',	'T Trapping');
+							{NL;}
                           END;
                     END;
                     IF (Cmd1 IN ['A','C','D','L','S','T']) THEN
@@ -582,17 +600,22 @@ VAR
                 F_FirstOn2 := Date2PD(TempStr1);
               END;
         '9' : BEGIN
-                InputLongIntWOC('%LFLower limit',F_NumCalls1,[DisplayValue,NumbersOnly],0,2147483647);
-                InputLongIntWOC('%LFUpper limit',F_NumCalls2,[DisplayValue,NumbersOnly],(0 + F_NumCalls1),2147483647);
+				NL;
+                InputLongIntWOC('Lower limit',F_NumCalls1,[DisplayValue,NumbersOnly],0,2147483647);
+				NL;
+                InputLongIntWOC('Upper limit',F_NumCalls2,[DisplayValue,NumbersOnly],(0 + F_NumCalls1),2147483647);
               END;
         'A' : BEGIN
+				NL;
                 InputByteWOC('Lower limit',F_Age1,[DisplayValue,NumbersOnly],0,255);
-                InputByteWOC('%LFUpper limit',F_Age2,[displayValue,NumbersOnly],(0 + F_Age1),255);
+				NL;
+                InputByteWOC('Upper limit',F_Age2,[displayValue,NumbersOnly],(0 + F_Age1),255);
               END;
         'G' : BEGIN
-                Prt('Gender ['+F_Gender+']: ');
-                OneK(Cmd1,^M'MF',TRUE,TRUE);
-                IF (Cmd1 IN ['F','M']) THEN
+                NL;
+				Prt('^1Gender? (^3M^1)ale/(^3F^1)emale/(^3O^1)ther: ');
+                OneK(Cmd1,'MFO',TRUE,TRUE);
+                IF (Cmd1 IN ['F','M','O']) THEN
                   F_Gender := Cmd1;
               END;
         'P' : BEGIN
@@ -609,8 +632,8 @@ VAR
               END;
         'C' : IF PYNQ('Are you sure? ',0,FALSE) THEN
                 Clear_F;
-        ^M,'L' :
-              DisplaySearchOptions;
+        {^M,'L' :
+              DisplaySearchOptions;}
         'T' : BEGIN
                 Prt('Which (0-9,A,G,P,K,N)? [Q]=Quit]: ');
                 OneK(Cmd1,'Q0123456789AGPKN'^M,TRUE,TRUE);
@@ -629,7 +652,7 @@ VAR
                 IF (SType <> -1) THEN
                 BEGIN
                   F_State[SType] := NOT F_State[SType];
-                  Prompt('^5[>^0 '+SearchType(SType)+' is now *'+AonOff(F_State[SType],'ON','OFF')+'*^1');
+                  Prompt('^8[>^0 '+SearchType(SType)+' is now *'+AonOff(F_State[SType],'ON','OFF')+'*^1');
                   NL;
                 END;
                 Cmd1 := #0;
@@ -646,23 +669,26 @@ VAR
                   IF (OKUser(UNum1)) THEN
                   BEGIN
                     LoadURec(User1,UNum1);
-                    PrintACR('^3'+Caps(User1.Name)+' #'+IntToStr(UNum1));
+                    PrintACR('^1'+Caps(User1.Name)+'^0 (#^1'+IntToStr(UNum1)+'^0'#242'');
                     Inc(UserCount);
                   END;
                   Inc(UNum1);
                 END;
+				{PauseScr(FALSE);}
                 Close(UserFile);
                 IF (NOT Abort) THEN
                 BEGIN
                   NL;
-                  Print('^7 ** ^5'+IntToStr(UserCount)+' Users.^1');
+                  Print('^0 - ^1'+IntToStr(UserCount)+'^0 User(s)');
                 END;
+			  PauseScr(FALSE);
               END;
         '?' : BEGIN
-                Print('^30-9,AGPKN^1: Change option');
-                LCmds(14,3,'List options','Toggle options on/off');
-                LCmds(14,3,'Clear options','User''s who match');
-                LCmds(14,3,'Quit','');
+                {Print('(^30^1-^39^1,^3AGPKN^1) Change Option');}
+                LCmds3(17,1,{'L List Options',}'T Toggle Options','C Clear Options','U User''s Who Match');
+                {LCmds3(17,1,'Q Quit','? Help','');}
+				NL;
+				PauseScr(False);
               END;
       END;
     UNTIL (Cmd1 = 'Q') OR (HangUp);
@@ -725,93 +751,153 @@ VAR
     OneKCmds: AStr;
     Cmd1: Char;
     TempL1: LongInt;
+	TempSchemeName: String; { LeeW: Added }
+	TempConfName: String; { LeeW }
+	RecNumToList: Integer; { LeeW }
+	
   BEGIN
     WITH User DO
       REPEAT
         NL;
         CASE on OF
           1 : BEGIN
-                Print('^5Call records:^1');
-                NL;
-                Print('^11. Total calls    : ^5'+IntToStr(LoggedOn));
-                Print('^12. Total time on  : ^5'+IntToStr(TTimeOn));
-                Print('^13. Calls today    : ^5'+IntToStr(OnToday));
-                Print('^14. Time left today: ^5'+IntToStr(TLToday));
-                Print('^15. Ill. logons    : ^5'+IntToStr(Illegal));
-                Print('^16. Time Bank      : ^5'+IntToStr(TimeBank));
-                NL;
-                Prt('Select: (1-6) [M]ail [F]ile [P]ref [S]ubs: ');
-                OneK(Cmd1,^M'123456MFPS',TRUE,TRUE);
+				ClrScr;
+				Print(PadLeftStr('^2 '#240' User Editor: Call Records ('+ Name+')',80));
+                Print('^0<^1A^0> Total Calls       : ^1'+IntToStr(LoggedOn));
+				Print('^0<^1B^0> Calls Today       : ^1'+IntToStr(OnToday));
+				Print('^0<^1C^0> Total Time Online : ^1'+IntToStr(TTimeOn));
+				Print('^0<^1D^0> Time Online Today : ^1'); { LeeW: Add this }
+				Print('^0<^1E^0> Time Left Today   : ^1'+IntToStr(TLToday));
+				Print('^0<^1F^0> Mins In Time Bank : ^1'+IntToStr(TimeBank));
+				Print('^0<^1G^0> Illegal Logons    : ^1'+IntToStr(Illegal));
+				NL;
+				Print('^0<^12^0> File Records');
+				Print('^0<^13^0> Mail Records');
+				Print('^0<^14^0> Preference Records');
+				Print('^0<^15^0> Subscription Records');
+				NL;
+                Prt('^0Records Editor [<^1CR^0>Quit]: ');
+                OneK(Cmd1,^M'ABCDEFG12345',TRUE,TRUE);
               END;
           2 : BEGIN
-                Print('^5Mail records:^1');
+				ClrScr;
+				Print(PadLeftStr('^2 '#240' User Editor: Mail Records ('+ Name+')',80));
+                Print('^0<^1A^0> Public Posts  : ^1'+PadLeftStr(IntToStr(MsgPost),6));
+				Print('^0<^1B^0> Private Posts : ^1'+PadLeftStr(IntToStr(EmailSent),6));
+				Print('^0<^1C^0> Feedback Sent : ^1'+PadLeftStr(IntToStr(FeedBack),6));
+				Print('^0<^1D^0> Mail Waiting  : ^1'+PadLeftStr(IntToStr(Waiting),6));
                 NL;
-                Print('^11. Pub. posts  : ^5'+IntToStr(MsgPost));
-                Print('^12. Priv. posts : ^5'+IntToStr(EmailSent));
-                Print('^13. Fback sent  : ^5'+IntToStr(FeedBack));
-                Print('^14. Mail Waiting: ^5'+IntToStr(Waiting));
-                NL;
-                Prt('Select: (1-4) [C]all [F]ile [P]ref [S]ubs: ');
-                OneK(Cmd1,^M'1234CFPS',TRUE,TRUE);
+				Print('^0<^11^0> Call Records');
+				Print('^0<^13^0> File Records');
+				Print('^0<^14^0> Preference Records');
+				Print('^0<^15^0> Subscription Records');
+				NL;
+                Prt('^0Records Editor [<^1CR^0>Quit]: ');
+                OneK(Cmd1,^M'ABCD12345',TRUE,TRUE);
               END;
           3 : BEGIN
-                Print('^5File records:^1');
+				ClrScr;
+				Print(PadLeftStr('^2 '#240' User Editor: File Records ('+ Name+')',80));
+                Print('^0<^1A^0> Downloads           : ^1'+IntToStr(Downloads));
+                Print('^0<^1B^0> Downloaded Kb       : ^1'+FormatNumber(DK)+'k');
+                Print('^0<^1C^0> Uploads             : ^1'+IntToStr(Uploads));
+                Print('^0<^1D^0> Uploaded Kb         : ^1'+FormatNumber(UK)+'k');
+                Print('^0<^1E^0> Downloads Today     : ^1'+IntToStr(DLToday));
+                Print('^0<^1F^0> Downloaded Kb Today : ^1'+FormatNumber(DLKToday)+'k');
+(*				Print('^0<^1X^0> Uploads Today       : ^1'+IntToStr(ULToday)); { LeeW: Add this }
+				Print('^0<^1X^0> Uploaded Kb Today   : ^1'+FormatNumber(ULKToday)+'k'); { LeeW: Add this } *)
+                Print('^0<^1G^0> File Points         : ^1'+FormatNumBer(FilePoints));
                 NL;
-                Print('^11. # of DLs   : ^5'+IntToStr(Downloads));
-                Print('^12. DL K       : ^5'+FormatNumber(DK)+'k');
-                Print('^13. # of ULs   : ^5'+IntToStr(Uploads));
-                Print('^14. UL K       : ^5'+FormatNumber(UK)+'k');
-                Print('^15. # DLs today: ^5'+IntToStr(DLToday));
-                Print('^16. DL K today : ^5'+FormatNumber(DLKToday)+'k');
-                Print('^17. File Points: ^5'+FormatNumBer(FilePoints));
-                NL;
-                Prt('Select: (1-7) [C]all [M]ail [P]ref [S]ubs: ');
-                OneK(Cmd1,^M'1234567CMPS',TRUE,TRUE);
+				Print('^0<^11^0> Call Records');
+				Print('^0<^12^0> Mail Records');
+				Print('^0<^14^0> Preference Records');
+				Print('^0<^15^0> Subscription Records');
+				NL;
+                Prt('^0Records Editor [<^1CR^0>Quit]: ');
+                OneK(Cmd1,^M'ABCDEFG12345',TRUE,TRUE);
               END;
           4 : BEGIN
-                Print('^5Preference records:^1');
+				BEGIN { Get color scheme name }
+				  Reset(SchemeFile);
+				  Seek(SchemeFile,ThisUser.ColorScheme - 1);
+				  Read(SchemeFile,Scheme);
+				  TempSchemeName := Scheme.Description;
+				  Close(SchemeFile);
+				END;
+				BEGIN { Get Conference Name }
+				  Reset(ConferenceFile);
+				  RecNumToList := 1;
+				  WHILE (RecNumToList <= NumConfKeys) DO
+					BEGIN
+					  Seek(ConferenceFile,(RecNumToList - 1));
+					  Read(ConferenceFile,Conference);
+					  IF (LastConf = Conference.Key) THEN
+						TempConfName := Conference.Name;
+					  Inc(RecNumToList);
+					END;
+				  Close(ConferenceFile);
+				END;
+				
+				ClrScr;
+				Print(PadLeftStr('^2 '#240' User Editor: Preference Records ('+ Name+')',80));
+                
+                Print('^0<^0A^0> Emulation       : ^1'+DisplayTerminalStr(SFlags,Flags));
+				Print('^0<^1B^0> Color           : ^1'+AOnOff((Color IN Flags),'Enabled','Disabled'));
+				Print('^0<^1C^0> Screen Clearing : ^1'+AOnOff((CLSMsg IN Flags),'Enabled','Disabled'));
+				Print('^0<^1D^0> Screen Pausing  : ^1'+AOnOff((Pause IN Flags),'Enabled','Disabled'));
+				Print('^0<^1E^0> Editor          : ^1'+AOnOff((FSEditor IN Flags),'Fullscreen','Line'));						
+				Print('^0<^1F^0> LightBars       : ^1'+AOnOff((UseLightBars IN Flags),'Enabled','Disabled'));
+				Print('^0<^1G^0> Hot Keys        : ^1'+AOnOff((HotKey IN Flags),'Enabled','Disabled'));
+				Print('^0<^1H^0> Expert Mode     : ^1'+AOnOff((Novice IN Flags),'Disabled','Enabled'));
+				Print('^0<^1I^0> Screen Size     : ^1'+IntToStr(LineLen)+'^0 Columns ^1'+IntToStr(PageLen)+'^0 Lines');
+				Print('^0<^1J^0> Color Scheme    : ^1'+IntToStr(ColorScheme)+'^0 [^1'+TempSchemeName+'^0]');
+				Print('^0<^1K^0> Conference      : ^1'+LastConf+'^0 [^1'+TempConfName+'^0]');
+				NL;
+				Print('^0<^11^0> Call Records');
+				Print('^0<^12^0> File Records');
+				Print('^0<^13^0> Mail Records');
+				Print('^0<^15^0> Subscription Records');
                 NL;
-                Print('^11. Emulation: ^5'+DisplayTerminalStr(SFlags,Flags));
-                Print('^12. Clr Scrn : ^5'+AOnOff((CLSMsg IN SFlags),'On','Off'));
-                Print('^13. Pause    : ^5'+AOnOff((Pause IN Flags),'On','Off'));
-                Print('^14. Color    : ^5'+AOnOff((Color IN Flags),'On','Off'));
-                Print('^15. Editor   : ^5'+AOnOff((FSEditor IN SFlags),'F/S','Reg'));
-                NL;
-                Prt('Select (1-5) [C]all [M]ail [F]ile [S]ubs: ');
-                OneK(Cmd1,^M'12345CMFS',TRUE,TRUE);
+                Prt('^0Records Editor [<^1CR^0>Quit]: ');
+                OneK(Cmd1,^M'ABCDEFGHIJK12345',TRUE,TRUE);
               END;
           5 : BEGIN
-                Print('^5Subscription records:^1');
+				ClrScr;
+				Print(PadLeftStr('^2 '#240' User Editor: Subscription Records ('+ Name+')',80));
+                Print('^0<^1A^0> Credit  : ^1'+IntToStr(lCredit));
+                Print('^0<^1B^0> Debit   : ^1'+IntToStr(Debit));
+                Print('^0<^1C^0> Expires : ^1'+AOnOff(Expiration = 0,'Never',ToDate8(PD2Date(Expiration)))+
+				'^0 > ^1'+AOnOff(ExpireTo = ' ','None',ExpireTo) );
                 NL;
-                Print('^11. Credit   : ^5'+IntToStr(lCredit));
-                Print('^12. Debit    : ^5'+IntToStr(Debit));
-                Print('^13. Expires  : ^5'+AOnOff(Expiration = 0,'Never',ToDate8(PD2Date(Expiration))));
-                Print('^1   Expire to: ^5'+AOnOff(ExpireTo = ' ','None',ExpireTo));
-                NL;
-                Prt('Select: (1-3) [C]all [M]ail [P]ref [F]ile: ');
-                OneK(Cmd1,^M'123CMPF',TRUE,TRUE);
+				Print('^0<^11^0> Call Records');
+				Print('^0<^12^0> File Records');
+				Print('^0<^13^0> Mail Records');
+				Print('^0<^14^0> Preference Records');
+				NL;
+                Prt('^0Records Editor [<^1CR^0>Quit]: ');
+                OneK(Cmd1,^M'ABC12345',TRUE,TRUE);
               END;
         END;
         CASE Cmd1 OF
-          'C' : on := 1;
-          'M' : on := 2;
-          'F' : on := 3;
-          'P' : on := 4;
-          'S' : on := 5;
-          '1'..'7' :
+          '1' : ON := 1;
+		  '2' : ON := 2;
+          '3' : ON := 3;
+          '4' : ON := 4;
+          '5' : ON := 5;
+          'A'..'Z' :
                 BEGIN
                   NL;
                   IF (on <> 4) THEN
                   BEGIN
-                    IF (on <> 5) OR NOT (StrToInt(Cmd1) IN [3..4]) THEN
+                    IF (on <> 5) OR NOT (Cmd1 IN ['C'..'D']) THEN
                     BEGIN
-                      Prt('New value: ');
+                      Prt('^0New Value: ');
                       Input(TempStr,10);
                       TempL1 := StrToInt(TempStr);
                     END
                     ELSE
-                      CASE StrToInt(Cmd1) OF
-                        3 : IF (PYNQ('Reset expiration date & level? ',0,FALSE)) THEN
+                      CASE Cmd1 OF
+                        'C' : IF (PYNQ('^0Reset Expiration Date & Level? ',0,FALSE)) THEN
                             BEGIN
                               TempL1 := 0;
                               TempStr := ' ';
@@ -819,7 +905,7 @@ VAR
                             ELSE
                             BEGIN
                               NL;
-                              Prt('New expiration date: ');
+                              Prt('^0New Expiration Date: ');
                               MPL(10);
                               InputFormatted('',TempStr,'##/##/####',TRUE);
                               IF (TempStr <> '') THEN
@@ -831,7 +917,7 @@ VAR
                                 IF (Cmd1 IN ValKeys) THEN
                                     OneKCmds := OneKCmds + Cmd1;
                               NL;
-                              Prt('Level to expire to (!-~) [Space=No Change]: ');
+                              Prt('^0Expire To Which Level? [^1!^0-^1~^0] [^1Space^0=No Change]: ');
                               OneK1(Cmd1,^M' '+OneKCmds,TRUE,TRUE);
                               TempStr := Cmd1;
                               IF (TempL1 = 0) OR (TempStr = ' ') THEN
@@ -839,38 +925,39 @@ VAR
                                 TempL1 := 0;
                                 TempStr := ' ';
                               END;
-                              Cmd1 := '3';
+                              Cmd1 := 'C';
                             END;
                       END;
                       IF (TempStr <> '') THEN
                         CASE on OF
-                          1 : CASE StrToInt(Cmd1) OF
-                                1 : LoggedOn := TempL1;
-                                2 : TTimeOn := TempL1;
-                                3 : OnToday := TempL1;
-                                4 : TLToday := TempL1;
-                                5 : Illegal := TempL1;
-                                6 : TimeBank := TempL1;
+                          1 : CASE Cmd1 OF
+                                'A' : LoggedOn := TempL1;
+                                'C' : TTimeOn := TempL1;
+                                'B' : OnToday := TempL1;
+                                'E' : TLToday := TempL1;
+                                'G' : Illegal := TempL1;
+                                'F' : TimeBank := TempL1;
+								'D' : ;
                               END;
-                          2 : CASE StrToInt(Cmd1) OF
-                                1 : MsgPost := TempL1;
-                                2 : EmailSent := TempL1;
-                                3 : FeedBack := TempL1;
-                                4 : Waiting := TempL1;
+                          2 : CASE Cmd1 OF
+                                'A' : MsgPost := TempL1;
+                                'B' : EmailSent := TempL1;
+                                'C' : FeedBack := TempL1;
+                                'D' : Waiting := TempL1;
                               END;
-                          3 : CASE StrToInt(Cmd1) OF
-                                1 : Downloads := TempL1;
-                                2 : DK := TempL1;
-                                3 : Uploads := TempL1;
-                                4 : UK := TempL1;
-                                5 : DLToday := TempL1;
-                                6 : DLKToday := TempL1;
-                                7 : FilePoints := TempL1;
+                          3 : CASE Cmd1 OF
+                                'A' : Downloads := TempL1;
+                                'B' : DK := TempL1;
+                                'C' : Uploads := TempL1;
+                                'D' : UK := TempL1;
+                                'E' : DLToday := TempL1;
+                                'F' : DLKToday := TempL1;
+                                'G' : FilePoints := TempL1;
                               END;
-                          5 : CASE StrToInt(Cmd1) OF
-                                1 : lCredit := TempL1;
-                                2 : Debit := TempL1;
-                                3 : BEGIN
+                          5 : CASE Cmd1 OF
+                                'A' : lCredit := TempL1;	{ Credits }
+                                'B' : Debit := TempL1;		{ Debits }
+                                'C' : BEGIN					{ Expiration Date / Level }
                                       Expiration := TempL1;
                                       IF (TempStr[1] IN [' ','!'..'~']) THEN
                                         ExpireTo := TempStr[1];
@@ -879,12 +966,19 @@ VAR
                         END;
                       END
                       ELSE
-                        CASE StrToInt(Cmd1) OF
-                          1 : CStuff(13,3,User); { Emulation }
-                          2 : ToggleStatusFlag(CLSMsg,SFlags);
-                          3 : ToggleACFlag(Pause,Flags);
-                          4 : ToggleACFlag(Color,Flags);
-                          5 : ToggleStatusFlag(FSEditor,SFlags);
+                        CASE Cmd1 OF
+                          'A' : CStuff(13,3,User); 					{ Emulation }
+						  'B' : ToggleACFlag(Color,Flags);			{ Color }
+                          'C' : ToggleACFlag(CLSMsg,Flags);			{ Screen Clearing }
+                          'D' : ToggleACFlag(Pause,Flags);			{ Screen Pausing }
+                          'E' : ToggleACFlag(FSEditor,Flags);		{ Editor Type }
+						  'F' : ToggleACFlag(UseLightBars,Flags);	{ LightBars }
+						  'G' : ToggleACFlag(HotKey,Flags);			{ HotKeys }
+						  'H' : ToggleACFlag(Novice,Flags);			{ Expert Mode }
+						  'I' : CStuff(16,3,User);					{ Screen Size }
+						  'J' : CStuff(15,3,User);					{ Color Scheme }
+						  'K' : ChangeConference('');				{ Conference }
+						  (*LeeW changeconfernce needs to be a cstuff cmd / not applying to right usr *)
                         END;
                 END;
         END;
@@ -910,22 +1004,23 @@ BEGIN
       ShowUserInfo(UserInfoTyp,UNum,User);
       SaveUNum := UNum;
     END;
-    NL;
-    Prt('User editor [^5?^4=^5Help^4]: ');
-    OneK(Cmd,'Q?[]=${}*ABCDEFGHIJKLMNOPRSTUVWXYZ12345-+_;:\/^'^M,TRUE,TRUE);
-    IF (Cmd IN ['A','F','L'..'O','S'..'X','Z','/','{','}','-',';','^','?','<','\','=','_']) THEN
-      NL;
+    Nl;
+    Prt('^0User Editor: ');
+    OneK(Cmd,'Q?[]=${}*ABCDEFGHIJKLMNOPRSTUVWXYZ12345-+_;:\/^%',True,True);
+    
+	IF (Cmd IN ['A','F','L'..'O','S'..'X','Z','/','{','}','-',';','^','?','<','\','=','_']) THEN
+	  NL;
+
     CASE Cmd OF
       '?' : BEGIN
               Abort := FALSE;
-              PrintACR('^5Editor Help');
-              NL;
-              LCmds3(21,3,';New list mode',':AutoList toggle','\Show sysop log');
-              LCmds3(21,3,'[Back one user',']Forward one user','=Reload old data');
-              LCmds3(21,3,'{Search backward','}Search forward','*Validate user');
-              LCmds3(21,3,'+Mailbox','UGoto user name/#','Search options');
-              LCmds3(21,3,'-New user answers','_Other Q. answers','^Delete user');
-              LCmds3(21,3,'/New user config','$Clear fields','');
+              {PrintACR('^3User Editor Help');}
+              LCmds3(20,1,'; List Mode',		': AutoList Toggle',	'\ Show SysOp Log');
+              LCmds3(20,1,'[ Previous User',	'] Next User',			'= Reload Old Data');
+              LCmds3(20,1,'{ Search Backward',	'} Search Forward',		'* Validate User');
+              LCmds3(20,1,'+ Mailbox Config',	'U Go To User Name/#',	'S Search Options');
+              LCmds3(20,1,'- New User Answers',	'_ Other Q. Answers',	'% .QWK Config');
+              LCmds3(20,1,'^ Delete User', 		'/ New User Config',	'$ Clear Fields');
               NL;
               PauseScr(FALSE);
               Save := FALSE;
@@ -1007,11 +1102,11 @@ BEGIN
                         PrintF(TempStr);
                         IF (NoFile) THEN
                           Print('"'+TempStr+'": File not found.');
-                        PauseScr(FALSE);
+                        PauseScr(True);
                       END;
               END;
             END;
-      '$','*','+','A','B','C','D','E','F','G','H','I','J','K','L','M',
+      '$','*','+','A','B','C','D','E','F','G','H','I','J','K','%','L','M',
       'N','O','P','R','T','V','W','X','Y','Z','1','2','3','4','5','^' :
             BEGIN
               IF (((ThisUser.SL <= User.SL) OR (ThisUser.DSL <= User.DSL)) AND
@@ -1046,11 +1141,11 @@ BEGIN
                              'I' : User.UsrDefStr[3] := User_String_Ask;
                              'J' : User.ForgotPWAnswer := User_String_Ask;
                              '?' : BEGIN
-                                     LCmds(20,3,'AReal Name','BStreet');
-                                     LCmds(20,3,'CCity/State','DZip Code');
-                                     LCmds(20,3,'EBirth Date','FPhone');
-                                     LCmds(20,3,'GString 1','HString 2');
-                                     LCmds(20,3,'IString 3','JPW Answer');
+                                     LCmds(20,1,'AReal Name','BStreet');
+                                     LCmds(20,1,'CCity/State','DZip Code');
+                                     LCmds(20,1,'EBirth Date','FPhone');
+                                     LCmds(20,1,'GString 1','HString 2');
+                                     LCmds(20,1,'IString 3','JPW Answer');
                                    END;
                             END;
                           UNTIL (Cmd = 'Q') OR (HangUp);
@@ -1094,30 +1189,30 @@ BEGIN
                         END;
                   'C' : CStuff(5,3,User); { Address }
                   'D' : CStuff(4,3,User); { City/State }
-                  'E' : CStuff(14,3,User); { Zip Code }
-                  'F' : InputWN1('^1New SysOp note:%LF^4: ',User.Note,(SizeOf(User.Note) - 1),[ColorsAllowed],Next);
+                  'E' : CStuff(6,3,User); { Zip Code }
+                  'F' : InputWN1('^1New SysOp Note:%LF^4: ',User.Note,(SizeOf(User.Note) - 1),[ColorsAllowed],Next);
                   'G' : CStuff(10,3,User); { SysOp Question #1 }
                   'H' : CStuff(11,3,User); { SysOp Question #2 }
                   'I' : CStuff(12,3,User); { SysOp Question #3 }
                   'J' : BEGIN
                           REPEAT
                             NL;
-                            Print('^11. Trapping status: '+AOnOff((TrapActivity IN User.SFlags),
-                                                         '^7'+AOnOff((TrapSeparate IN User.SFlags),
-                                                         'Trapping to TRAP'+IntToStr(UNum)+'.LOG',
-                                                         'Trapping to TRAP.LOG'),
-                                                         'Off')+AOnOff(General.globaltrap,'^8 <GLOBAL>',''));
-                            Print('^12. Auto-chat state: '+AOnOff((ChatAuto IN User.SFlags),
+                            Print('^11^0> Trapping  : ^1'+AOnOff((TrapActivity IN User.SFlags),
+                                                         '^8'+AOnOff((TrapSeparate IN User.SFlags),
+                                                         'Trapping To TRAP'+IntToStr(UNum)+'.LOG',
+                                                         'Trapping To TRAP.LOG'),
+                                                         'Off')+AOnOff(General.GlobalTrap,'^8 <GLOBAL>',''));
+                            Print('^12^0> Chat Log  : ^1'+AOnOff((ChatAuto IN User.SFlags),
                                                          AOnOff((ChatSeparate IN User.SFlags),
-                                                         '^7Output to CHAT'+IntToStr(UNum)+'.LOG',
-                                                         '^7Output to CHAT.LOG'),'Off')+
-                                                         AOnOff(General.autochatopen,'^8 <GLOBAL>',''));
-                            Print('^13. SysOp Log state: '+AOnOff((SLogSeparate IN User.SFlags),
-                                                         '^7Logging to SLOG'+IntToStr(UNum)+'.LOG',
-                                                         '^3Normal output'));
-                            Print('^14. Alert          : '+AOnOff((Alert IN User.Flags),
-                                                         '^7Alert',
-                                                         '^3Normal'));
+                                                         '^8Output To CHAT'+IntToStr(UNum)+'.LOG',
+                                                         '^8Output To CHAT.LOG'),'Off')+
+                                                         AOnOff(General.AutoChatOpen,'^8 <GLOBAL>',''));
+                            Print('^13^0> SysOp Log : ^1'+AOnOff((SLogSeparate IN User.SFlags),
+                                                         '^8Logging To SLOG'+IntToStr(UNum)+'.LOG',
+                                                         '^1Normal Output'));
+                            Print('^14^0> Alert     : ^1'+AOnOff((Alert IN User.SFlags),
+                                                         '^8Alert',
+                                                         '^1Normal'));
                             NL;
                             Prt('Select (1-4): ');
                             OneK(Cmd,^M'1234',TRUE,TRUE);
@@ -1165,12 +1260,13 @@ BEGIN
                                       ELSE
                                         Exclude(User.SFlags,SLogSeparate);
                                     END;
-                              '4' : ToggleACFlag(Alert,User.Flags);
+                              '4' : ToggleStatusFlag(Alert,User.SFlags);
                             END;
                           UNTIL (Cmd = ^M) OR (HangUp);
                           Cmd := #0;
                         END;
-                  'K' : CStuff(20,3,User); { QWK }
+				  'K' : PauseScr(False);		
+                  '%' : CStuff(20,3,User); { QWK }
                   'L' : BEGIN
                           TempB := User.SL;
                           InputByteWOC('Enter new SL',TempB,[NumbersOnly],0,255);
@@ -1227,8 +1323,8 @@ BEGIN
                         END;
                   'N' : BEGIN
                           REPEAT
-                            Prt('Toggle which AR flag? ('+DisplayARFlags(User.AR,'5','4')+'^4)'+
-                                ' [^5*^4=^5All^4,^5?^4=^5Help^4,^5<CR>^4=^5Quit^4]: ');
+                            Prt('^0Toggle Which AR Flag? ['+DisplayARFlags(User.AR,'1','0')+'^0]'+
+                                ' [(^1*^0)All,(^1?^0)Help,<^1CR^0>Quit]: ');
                             OneK(Cmd,^M'ABCDEFGHIJKLMNOPQRSTUVWXYZ*?',TRUE,TRUE);
                             IF (Cmd = '?') THEN
                               PrintF('ARFLAGS')
@@ -1253,11 +1349,11 @@ BEGIN
                         END;
                   'O' : BEGIN
                           REPEAT
-                            Prt('Toggle which AC flag? ('+DisplayACFlags(User.Flags,'5','4')+'^4)'+
-                                ' [^5?^4=^5Help^4,^5<CR>^4=^5Quit^4]: ');
+                            Prt('^0Toggle Which AC Flag? ['+DisplayACFlags(User.Flags,'1','0')+'^0]'+
+                                ' [(^1?^0)Help,<^1CR^0>Quit]: ');
                             OneK(Cmd,^M'LCVUA*PEKM1234?',TRUE,TRUE);
                             IF (Cmd = '?') THEN
-                              PrintF('ACFLAGS')
+                              PrintF('ACFLAGS') { LeeW: Should be LCmds2 }
                             ELSE
                             BEGIN
                               IF (Cmd = '4') AND (NOT SysOp) THEN
@@ -1331,7 +1427,8 @@ BEGIN
                           IF (TempStr <> '') THEN
                             User.CallerID := TempStr;
                         END;
-                  'Y' : FindMenu('%LFEnter new start menu (^50^4=^5Default^4)',User.UserStartMenu,0,NumMenus,Changed);
+                  'Y' : PauseScr(False);
+				  {FindMenu('%LFEnter new start menu (^50^4=^5Default^4)',User.UserStartMenu,0,NumMenus,Changed)}
                   'Z' : BEGIN
                           Print('Question:');
                           NL;

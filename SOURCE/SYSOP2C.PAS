@@ -1,8 +1,13 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D-,E-,F+,I-,L-,N-,O+,R-,S+,V-}
+
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+
+  System ACS Settings
+  
+  -control length of strings on right so they dont mess up display
+}
 
 UNIT SysOp2C;
 
@@ -28,36 +33,36 @@ BEGIN
       Next := FALSE;
       MCIAllowed := FALSE;
       CLS;
-      PrintACR(PadLeftStr('|17|15 þ Renegade BBS Configuration : System AC Settings',80));
+      PrintACR(PadLeftStr('|17^1 þ Renegade BBS Configuration : System AC Settings',80));
       {NL;}
-      PrintACR('|07(|15A|07) Full SysOp       : |15'+PadLeftStr(SOp,17)+
-               '|07(|15B|07) Full Co-SysOp    : |15'+CSOp);
-      PrintACR('|07(|15C|07) Msg Area SysOp   : |15'+PadLeftStr(MSOp,17)+
-               '|07(|15D|07) File Area SysOp  : |15'+FSOp);
-      PrintACR('|07(|15E|07) Change A Vote    : |15'+PadLeftStr(ChangeVote,17)+
-               '|07(|15F|07) Add Voting Choice: |15'+AddChoice);
-      PrintACR('|07(|15G|07) Post public      : |15'+PadLeftStr(NormPubPost,17)+
-               '|07(|15H|07) Send e-mail      : |15'+NormPrivPost);
-      PrintACR('|07(|15I|07) See anon pub post: |15'+PadLeftStr(AnonPubRead,17)+
-               '|07(|15J|07) See anon E-mail  : |15'+AnonPrivRead);
-      PrintACR('|07(|15K|07) Global Anon post : |15'+PadLeftStr(AnonPubPost,17)+
-               '|07(|15L|07) E-mail anon      : |15'+AnonPrivPost);
-      PrintACR('|07(|15M|07) See unval. files : |15'+PadLeftStr(SeeUnVal,17)+
-               '|07(|15N|07) DL unval. files  : |15'+DLUnVal);
-      PrintACR('|07(|15O|07) No UL/DL ratio   : |15'+PadLeftStr(NoDLRatio,17)+
-               '|07(|15P|07) No PostCall ratio: |15'+NoPostRatio);
-      PrintACR('|07(|15R|07) No DL credits chk: |15'+PadLeftStr(NoFileCredits,17)+
-               '|07(|15S|07) ULs Auto-Credited: |15'+ULValReq);
-      PrintACR('|07(|15T|07) MCI In TeleConf  : |15'+PadLeftStr(TeleConfMCI,17)+
-               '|07(|15U|07) Chat At Any Hour : |15'+OverRideChat);
-      PrintACR('|07(|15V|07) Send Netmail     : |15'+PadLeftStr(NetMailACS,17)+
-               '|07(|15W|07) "Invisible" Mode : |15'+Invisible);
-      PrintACR('|07(|15X|07) Mail File Attach : |15'+PadLeftStr(FileAttachACS,17)+
-               '|07(|15Y|07) SysOp PW At logon: |15'+SPW);
-      PrintACR('|07(|15Z|07) Last On Add      : |15'+PadLeftStr(LastOnDatACS,17));
+      PrintACR('^0(^1A^0) Full SysOp            : ^1'+PadLeftStr(SOp,13)+
+               '^0(^1B^0) Full Co-SysOp         : ^1'+CSOp);
+      PrintACR('^0(^1C^0) Msg Area SysOp        : ^1'+PadLeftStr(MSOp,13)+
+               '^0(^1D^0) File Area SysOp       : ^1'+FSOp);
+      PrintACR('^0(^1E^0) Change A Vote         : ^1'+PadLeftStr(ChangeVote,13)+
+               '^0(^1F^0) Add Voting Choice     : ^1'+AddChoice);
+      PrintACR('^0(^1G^0) Post Public           : ^1'+PadLeftStr(NormPubPost,13)+
+               '^0(^1H^0) Post Private          : ^1'+NormPrivPost);
+      PrintACR('^0(^1I^0) See Anon Pub Post     : ^1'+PadLeftStr(AnonPubRead,13)+
+               '^0(^1J^0) See Anon E-Mail       : ^1'+AnonPrivRead);
+      PrintACR('^0(^1K^0) Post Public Anon      : ^1'+PadLeftStr(AnonPubPost,13)+
+               '^0(^1L^0) Post Private Anon     : ^1'+AnonPrivPost);
+      PrintACR('^0(^1M^0) See Unvalidated Files : ^1'+PadLeftStr(SeeUnVal,13)+
+               '^0(^1N^0) DL Unvalidated Files  : ^1'+DLUnVal);
+      PrintACR('^0(^1O^0) No UL/DL Ratio        : ^1'+PadLeftStr(NoDLRatio,13)+
+               '^0(^1P^0) No Post/Call Ratio    : ^1'+NoPostRatio);
+      PrintACR('^0(^1R^0) No DL Credits Chk     : ^1'+PadLeftStr(NoFileCredits,13)+
+               '^0(^1S^0) ULs Auto-Credited     : ^1'+ULValReq);
+      PrintACR('^0(^1T^0) MCI In TeleConf       : ^1'+PadLeftStr(TeleConfMCI,13)+
+               '^0(^1U^0) Chat At Any Hour      : ^1'+OverRideChat);
+      PrintACR('^0(^1V^0) Send NetMail          : ^1'+PadLeftStr(NetMailACS,13)+
+               '^0(^1W^0) "Invisible" Mode      : ^1'+Invisible);
+      PrintACR('^0(^1X^0) Mail File Attach      : ^1'+PadLeftStr(FileAttachACS,13)+
+               '^0(^1Y^0) SysOp PW At logon     : ^1'+SPW);
+      PrintACR('^0(^1Z^0) Last On Add           : ^1'+PadLeftStr(LastOnDatACS,13));
       MCIAllowed := TRUE;
       NL;
-      Prt('|07Enter Selection or (|15Q|07)uit: |15');
+      Prt('^0Enter Selection or (^1Q^0)uit: ^1');
       OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ',TRUE,TRUE);
       IF (Cmd IN ['A'..'P','R'..'Z']) THEN
       BEGIN

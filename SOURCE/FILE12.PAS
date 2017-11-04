@@ -746,7 +746,7 @@ BEGIN
             IF (InputStr = '?') THEN
               LFileAreaList(FArea,NumFAreas,5,FALSE);
 
-            FileAreaScanInput('%LFMove to which file area? (^5'+IntToStr(LowFileArea)+'^4-^5'+IntToStr(HighFileArea)+'^4)'+
+            FileAreaScanInput('^0%LFMove To Which File Area? [^1'+IntToStr(LowFileArea)+'^0-^1'+IntToStr(HighFileArea)+'^0]'+
                              ' [^5?^4=^5First^4,^5<CR>^4=^5Next^4]: ',Length(IntToStr(HighFileArea)),InputStr,'[]?',
                              LowFileArea,HighFileArea);
 
@@ -764,7 +764,7 @@ BEGIN
               InputStr := '?';
             END
             ELSE IF (InputStr = '?') THEN
-            BEGIN
+            BEGIN { LeeW: Should be LCmds? }
               NL;
               Print('^1(^3###^1)Manual entry selection  ^1(^3<CR>^1)Select current entry');
               Print('^1(^3<Home>^1)First entry on page  ^1(^3<End>^1)Last entry on page');
@@ -777,7 +777,7 @@ BEGIN
             ELSE IF (StrToInt(InputStr) < LowFileArea) OR (StrToInt(InputStr) > HighFileArea) THEN
             BEGIN
               NL;
-              Print('^7The range must be from '+IntToStr(LowFileArea)+' to '+IntToStr(HighFileArea)+'!^1');
+              Print('^8The range must be from '+IntToStr(LowFileArea)+' to '+IntToStr(HighFileArea)+'!^0');
               InputStr := '?';
               FArea := 1
             END
@@ -789,7 +789,7 @@ BEGIN
               IF (FArea <> FileArea) THEN
               BEGIN
                 NL;
-                Print('^7You do not have access to this file area.^1');
+                Print('^8You do not have access to this file area.^0');
                 InputStr := '?';
                 FArea := 1
               END
@@ -799,7 +799,7 @@ BEGIN
                 IF (NOT AACS(MemFileArea.ULACS)) THEN
                 BEGIN
                   NL;
-                  Print('^7You do not have the required upload access for this file area.^1');
+                  Print('^8You do not have the required upload access for this file area.^0');
                   InputStr := '?';
                   FArea := 1
                 END
@@ -807,14 +807,14 @@ BEGIN
                      (Exist(MemFileArea.DLPath+FileInfo.FileName))) THEN
                 BEGIN
                   NL;
-                  Print('^7The file already exists in the upload or download path.^1');
+                  Print('^8The file already exists in the upload or download path.^0');
                   InputStr := '?';
                   FArea := 1
                 END
                 ELSE IF (FileSize(FileInfoFile) >= MemFileArea.MaxFiles) THEN
                 BEGIN
                   NL;
-                  Print('^7This file area is full.^1');
+                  Print('^8This file area is full.^0');
                   InputStr := '?';
                   FArea := 1
                 END;
@@ -841,7 +841,7 @@ BEGIN
 
   Dec(FreeTime,TakeAwayRefundTime);
 
-  SysOpLog('^3 - Totals:'+
+  SysOpLog(' - Totals:'+
            ' '+FormatNumber(Totals.FilesUL)+' '+Plural('file',Totals.FilesUL)+
            ', '+ConvertBytes(Totals.BytesUL,FALSE)+
            ', '+FormattedTime(TransferTime)+' tt'+
@@ -861,12 +861,12 @@ BEGIN
   LIL := 0;
 
   NL;
-  Print('^5Batch upload (Credits):^1');
+  Print('^0Batch Upload (Credits):');
   NL;
-  Star('^1Total file(s)     : ^5'+FormatNumber(Totals.FilesULCredit));
-  Star('^1Total size        : ^5'+ConvertBytes(Totals.BytesULCredit,FALSE));
-  Star('^1Total file points : ^5'+FormatNumber(Totals.PointsULCredit));
-  Star('^1Time refund       : ^5'+FormattedTime(RefundTime)+'^1');
+  Star('^0Total File(s)     : ^1'+FormatNumber(Totals.FilesULCredit));
+  Star('^0Total Size        : ^1'+ConvertBytes(Totals.BytesULCredit,FALSE));
+  Star('^0Total File Points : ^1'+FormatNumber(Totals.PointsULCredit));
+  Star('^0Time Refund       : ^1'+FormattedTime(RefundTime)+'^0');
 
   IF (AACS(General.ULValReq)) OR (General.ValidateAllFiles) THEN
   BEGIN
@@ -890,7 +890,7 @@ BEGIN
   ELSE
   BEGIN
     NL;
-    Print('^5You will receive upload credit after the SysOp validates the '+Plural('file',Totals.FilesULCredit)+'!');
+    Print('^0You will receive upload credit after the SysOp validates the '+Plural('file',Totals.FilesULCredit)+'!');
     Totals.FilesULCredit := 0;
     Totals.BytesULCredit := 0;
     Totals.PointsULCredit := 0;
@@ -915,10 +915,10 @@ BEGIN
   BEGIN
     LIL := 0;
     NL;
-    Print('^5Batch upload (Not Transferred):^1');
+    Print('^0Batch upload (Not Transferred):');
     NL;
-    Star('^1Total file(s)     : ^5'+FormatNumber(NumBatchULFiles));
-    SysOpLog('^3 - Not uploaded:'+
+    Star('^0Total File(s)     : ^1'+FormatNumber(NumBatchULFiles));
+    SysOpLog(' - Not uploaded:'+
              ' '+FormatNumber(NumBatchULFiles)+' '+Plural('file',NumBatchULFiles));
   END;
 
@@ -948,13 +948,13 @@ BEGIN
   IF (NumBatchDLFiles <> 0) THEN
   BEGIN
     NL;
-    Print('^9>> ^3You have ^5'+FormatNumber(NumBatchDLFiles)+'^3 '+Plural('file',NumBatchDLFiles)+
+    Print('^9[> ^0You have ^1'+FormatNumber(NumBatchDLFiles)+'^0 '+Plural('file',NumBatchDLFiles)+
           ' left in your batch download queue.^1');
   END;
   IF (NumBatchULFiles <> 0) THEN
   BEGIN
     NL;
-    Print('^9>> ^3You have ^5'+FormatNumber(NumBatchULFiles)+'^3 '+Plural('file',NumBatchULFiles)+
+    Print('^9[> ^0You have ^1'+FormatNumber(NumBatchULFiles)+'^0 '+Plural('file',NumBatchULFiles)+
           ' left in your batch upload queue.^1');
   END;
 END;

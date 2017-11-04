@@ -1,8 +1,11 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
+
+{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
+  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
+  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
+  ----------------------------------------------------------------------
+  HISTORY EDITOR
+}
 
 UNIT SysOp5;
 
@@ -58,7 +61,7 @@ VAR
     RecNum: Integer;
   BEGIN
     RecNum1 := -1;
-    InputFormatted(DisplayStr,DateToLocate,'##-##-####',TRUE);
+    InputFormatted(DisplayStr,DateToLocate,'##/##/####',TRUE);
     IF (DateToLocate <> '') AND (Length(DateToLocate) = 10) THEN
     BEGIN
       IF (Searching) THEN
@@ -91,7 +94,7 @@ VAR
       Messages(4,0,'history dates')
     ELSE
     BEGIN
-      LocateHistoryDate('%LFHistory date to delete: ',TempHistory1,DateToDelete,RecNumToDelete,TRUE,TRUE);
+      LocateHistoryDate('^0%LFHistory Date To Delete: ',TempHistory1,DateToDelete,RecNumToDelete,TRUE,TRUE);
       IF (RecNumToDelete >= 1) AND (RecNumToDelete <= NumHistoryDates) THEN
       BEGIN
         Reset(HistoryFile);
@@ -101,15 +104,15 @@ VAR
         LastError := IOResult;
         IF (PD2Date(TempHistory1.Date) = DateStr) THEN
         BEGIN
-          Print('%LF^7The current history date can not be deleted!^1');
+          Print('^8%LFThe current history date can not be deleted!^0');
           PauseScr(FALSE);
         END
         ELSE
         BEGIN
-          Print('%LFHistory date: ^5'+PD2Date(TempHistory1.Date));
-          IF PYNQ('%LFAre you sure you want to delete it? ',0,FALSE) THEN
+          Print('^0%LFHistory Date: '+PD2Date(TempHistory1.Date));
+          IF PYNQ('^0%LFAre you sure you want to delete it? ',0,FALSE) THEN
           BEGIN
-            Print('%LF[> Deleting history record ...');
+            Print('^9%LF[> Deleting History Record ...');
             Dec(RecNumToDelete);
             Reset(HistoryFile);
             IF (RecNumToDelete >= 0) AND (RecNumToDelete <= (FileSize(HistoryFile) - 2)) THEN
@@ -125,7 +128,7 @@ VAR
             Close(HistoryFile);
             LastError := IOResult;
             Dec(NumHistoryDates);
-            SysOpLog('* Deleted history date: ^5'+Pd2Date(TempHistory1.Date));
+            SysOpLog('* Deleted history date: '+Pd2Date(TempHistory1.Date));
           END;
         END;
       END;
@@ -159,41 +162,41 @@ VAR
           Next := FALSE;
           CLS;
           IF (Editing) THEN
-            PrintACR('^5Editing history record #'+IntToStr((NumHistoryDates  + 1) - RecNumToEdit)+
-                     ' of '+IntToStr(NumHistoryDates))
+            PrintACR('^0Editing History Record #'+IntToStr((NumHistoryDates  + 1) - RecNumToEdit)+
+                     ' Of '+IntToStr(NumHistoryDates))
           ELSE
-            PrintACR('^5Inserting history record #'+IntToStr((NumHistoryDates + 1) - RecNumToEdit)+
-                     ' of '+IntToStr(NumHistoryDates + 1));
+            PrintACR('^0Inserting History Record #'+IntToStr((NumHistoryDates + 1) - RecNumToEdit)+
+                     ' Of '+IntToStr(NumHistoryDates + 1));
           NL;
           IF (Callers > 0) THEN
             TempStr1 := IntToStr(Active DIV Callers)
           ELSE
             TempStr1 := '0';
-          PrintACR('^1A. Date          : ^5'+PD2Date(Date)+AOnOff(RecNumToEdit = NumHistoryDates,' (Today)',''));
-          PrintACR('^1B. Minutes Active: ^5'+FormatNumber(Active));
-          PrintACR('^1C. Calls         : ^5'+FormatNumber(Callers));
-          PrintACR('^1D. Percent Active: ^5'+SQOutSp(CTP(Active,1440)));
-          PrintACR('^1E. New Users     : ^5'+FormatNumber(NewUsers));
-          PrintACR('^1G. Time/User     : ^5'+TempStr1);
-          PrintACR('^1H. Public Posts  : ^5'+FormatNumber(Posts));
-          PrintACR('^1I. Private Posts : ^5'+FormatNumber(EMail));
-          PrintACR('^1K. SysOp FeedBack: ^5'+FormatNumber(FeedBack));
-          PrintACR('^1M. Errors        : ^5'+FormatNumber(Errors));
-          PrintACR('^1N. Uploads       : ^5'+FormatNumber(Uploads));
-          PrintACR('^1O. Upload K      : ^5'+FormatNumber(UK));
-          PrintACR('^1P. DownLoads     : ^5'+FormatNumber(DownLoads));
-          PrintACR('^1R. Download K    : ^5'+FormatNumber(DK));
-          PrintACR('^1S. Baud Rates');
+          PrintACR('^1A^0> Date           : ^1'+PD2Date(Date)+AOnOff(RecNumToEdit = NumHistoryDates,'^0 (Today)',''));
+          PrintACR('^1B^0> Minutes Active : ^1'+FormatNumber(Active));
+          PrintACR('^1C^0> Calls          : ^1'+FormatNumber(Callers));
+          PrintACR('^1D^0> Percent Active : ^1'+SQOutSp(CTP(Active,1440))+'^0%');
+          PrintACR('^1E^0> New Users      : ^1'+FormatNumber(NewUsers));
+          PrintACR('^1G^0> Time/User      : ^1'+TempStr1);
+          PrintACR('^1H^0> Public Posts   : ^1'+FormatNumber(Posts));
+          PrintACR('^1I^0> Private Posts  : ^1'+FormatNumber(EMail));
+          PrintACR('^1K^0> SysOp FeedBack : ^1'+FormatNumber(FeedBack));
+          PrintACR('^1M^0> Errors         : ^1'+FormatNumber(Errors));
+          PrintACR('^1N^0> Uploads        : ^1'+FormatNumber(Uploads));
+          PrintACR('^1O^0> Upload K       : ^1'+FormatNumber(UK));
+          PrintACR('^1P^0> Downloads      : ^1'+FormatNumber(DownLoads));
+          PrintACR('^1R^0> Download K     : ^1'+FormatNumber(DK));
+          PrintACR('^1S^0> Baud Rates');
         END;
         IF (NOT Editing) THEN
           CmdStr := 'ABCDEGHIKMNOPRS'
         ELSE
           CmdStr := 'ABCDEGHIKMNOPRS[]FJL';
-        LOneK('%LFModify menu [^5?^4=^5Help^4]: ',Cmd1,'Q?'+CmdStr+^M,TRUE,TRUE);
+        LOneK('^0%LFModify Menu [^1?^0=^0Help]: ',Cmd1,'Q?'+CmdStr+^M,TRUE,TRUE);
         CASE Cmd1 OF
           'A' : IF (PD2Date(Date) = DateStr) THEN
                 BEGIN
-                  Print('%LF^7The current history date can not be changed!^1');
+                  Print('%LF^8The current history date can not be changed!^0');
                   PauseScr(FALSE);
                 END
                 ELSE
@@ -305,7 +308,7 @@ VAR
                 END;
           'J' : BEGIN
                   RecNumToEdit := -1;
-                  InputIntegerWOC('%LFJump to entry?',RecNumToEdit,[NumbersOnly],1,NumHistoryDates);
+                  InputIntegerWOC('^0%LFJump To Entry?',RecNumToEdit,[NumbersOnly],1,NumHistoryDates);
                   IF (RecNumToEdit < 1) OR (RecNumToEdit > NumHistoryDates) THEN
                   BEGIN
                     RecNumToEdit := SaveRecNumToEdit;
@@ -322,15 +325,16 @@ VAR
                   Cmd1 := #0;
                 END;
           '?' : BEGIN
-                  Print('%LF^1<^3CR^1>Redisplay current screen');
-                  Print('^3A^1-^3E^1,^3G^1-^3I^1,^3K^1,^3M^1-^3P^1,^3R^1-^3S^1:Modify item');
+				  NL;
+                  {Print('%LF^1<^3CR^1>Redisplay current screen');
+                  Print('^3A^1-^3E^1,^3G^1-^3I^1,^3K^1,^3M^1-^3P^1,^3R^1-^3S^1:Modify item');} {LeeW}
                   IF (NOT Editing) THEN
-                    LCmds(20,3,'Quit and save','')
+                    LCmds(17,1,'Q Quit','')
                   ELSE
                   BEGIN
-                    LCmds(20,3,'[Back entry',']Forward entry');
-                    LCmds(20,3,'First entry in list','Jump to entry');
-                    LCmds(20,3,'Last entry in list','Quit and save');
+                    LCmds(17,1,'[ Previous Entry','] Next Entry');
+                    LCmds(17,1,'F First Entry','L Last Entry');
+                    LCmds(17,1,'J Jump To Entry','Q Quit');
                   END;
                 END;
         END;
@@ -425,7 +429,7 @@ VAR
       Messages(4,0,'history dates')
     ELSE
     BEGIN
-      LocateHistoryDate('%LFHistory date to modify: ',TempHistory1,DateToEdit,RecNumToEdit,TRUE,TRUE);
+      LocateHistoryDate('^0%LFHistory date to modify: ',TempHistory1,DateToEdit,RecNumToEdit,TRUE,TRUE);
       IF (RecNumToEdit >= 1) AND (RecNumToEdit <= NumHistoryDates) THEN
       BEGIN
         SaveRecNumToEdit := -1;
@@ -456,7 +460,7 @@ VAR
             Seek(HistoryFile,(SaveRecNumToEdit - 1));
             Write(HistoryFile,History);
             Changed := FALSE;
-            SysOpLog('* Modified history date: ^5'+PD2Date(History.Date));
+            SysOpLog('* Modified history date: '+PD2Date(History.Date));
           END;
         END;
         Close(HistoryFile);
@@ -475,11 +479,12 @@ VAR
     Abort := FALSE;
     Next := FALSE;
     CLS;
-    PrintACR('^3        ^4:^3Mins ^4:^3    ^4:^3      ^4:^3#New^4:^3Tim/^4:^3Pub ^4:^3Priv^4:^3Feed^4:^3    ^4:^3'+
-             '    ^4:^3     ^4:^3    ^4:^3');
-    PrintACR('^3  Date  ^4:^3Activ^4:^3Call^4:^3%Activ^4:^3User^4:^3User^4:^3Post^4:^3Post'+
-             '^4:^3Back^4:^3Errs^4:^3#ULs^4:^3UL-k ^4:^3#DLs^4:^3DL-k');
-    PrintACR('^4========:=====:====:======:====:====:====:====:====:====:====:=====:====:=====');
+    PrintACR('^4+-------+-----+----+------+----+----+----+----+----+----+----+-----+----+-----+');
+    PrintACR('^4|       ^4|^3Mins ^4|    ^4|^3%     ^4|^3#New^4|^3Tim/^4|^3Pub ^4|'+
+			 '^3Priv^4|^3Feed^4|    |    |     |    |     |');
+    PrintACR('^4| ^3Date  ^4|^3Activ^4|^3Call^4|^3Active^4|^3User^4|^3User^4|^3Post^4|'+
+			 '^3Post^4|^3Back^4|^3Errs^4|^3#ULs^4|^3UL-k ^4|^3#DLs|^3DL-k ^4|');
+    PrintACR('^4+-------+-----+----+------+----+----+----+----+----+----+----+-----+----+-----+');
     Reset(HistoryFile);
     NumDone := 0;
     WHILE (NumDone < (PageLength - 6)) AND (RecNumToList1 >= 1) AND (RecNumToList1 <= NumHistoryDates)
@@ -490,23 +495,23 @@ VAR
       WITH History DO
       BEGIN
         IF (Callers > 0) THEN
-          TempStr := PadRightInt(Active DIV Callers,4)
+          TempStr := PadLeftInt(Active DIV Callers,4)
         ELSE
-          TempStr := '    ';
+          TempStr := '0';
         PrintACR('^1'+AOnOff((RecNumToList1 = NumHistoryDates),'Today''s ',ToDate8(PD2Date(Date)))+
-                 ' '+PadRightInt(Active,5)+
-                 ' '+PadRightInt(Callers,4)+
-                 ' '+CTP(Active,1440)+
-                 ' '+PadRightInt(NewUsers,4)+
-                 ' '+TempStr+
-                 ' '+PadRightInt(Posts,4)+
-                 ' '+PadRightInt(EMail,4)+
-                 ' '+PadRightInt(FeedBack,4)+
-                 ' '+PadRightInt(Errors,4)+
-                 ' '+PadRightInt(Uploads,4)+
-                 ' '+PadRightInt(UK,5)+
-                 ' '+PadRightInt(DownLoads,4)+
-                 ' '+PadRightInt(DK,5));
+                 ' ^0'+PadLeftInt(Active,5)+
+                 ' ^0'+PadLeftInt(Callers,4)+
+                 ' ^0'+PadLeftStr(CTP(Active,1440),6)+
+                 ' ^0'+PadLeftInt(NewUsers,4)+
+                 ' ^0'+PadLeftStr(TempStr,4)+
+                 ' ^0'+PadLeftInt(Posts,4)+
+                 ' ^0'+PadLeftInt(EMail,4)+
+                 ' ^0'+PadLeftInt(FeedBack,4)+
+                 ' ^0'+PadLeftInt(Errors,4)+
+                 ' ^0'+PadLeftInt(Uploads,4)+
+                 ' ^0'+PadLeftInt(UK,5)+
+                 ' ^0'+PadLeftInt(DownLoads,4)+
+                 ' ^0'+PadLeftInt(DK,5));
       END;
       Dec(RecNumToList1);
       Inc(NumDone);
@@ -529,7 +534,7 @@ BEGIN
   REPEAT
     IF (Cmd <> '?') THEN
       ListHistoryDates(RecNumToList);
-    LOneK('%LFHistory editor [^5?^4=^5Help^4]: ',Cmd,'QDIM?'^M,TRUE,TRUE);
+    LOneK('^0%LFHistory Editor: ',Cmd,'QDIM?'^M,TRUE,TRUE);
     CASE Cmd OF
       ^M  : IF (RecNumToList < 1) OR (RecNumToList > NumHistoryDates) THEN
               RecNumToList := NumHistoryDates;
@@ -537,10 +542,10 @@ BEGIN
       'I' : InsertHistoryRecord(TempHistory,Cmd,RecNumToList);
       'M' : ModifyHistoryRecord(TempHistory,Cmd,RecNumToList);
       '?' : BEGIN
-              Print('%LF^1<^3CR^1>Next screen or redisplay current screen');
-              Print('^1(^3?^1)Help/First history date');
-              LCmds(20,3,'Delete history date','Insert history date');
-              LCmds(20,3,'Modify history date','Quit');
+              Print('%LF^0<^1CR^0> Next Page / Refresh');
+              {Print('^1(^3?^1)Help/First history date');}
+              LCmds(22,1,'D Delete History Date','I Insert History Date');
+              LCmds(22,1,'M Modify History Date','Q Quit');
             END;
     END;
     IF (Cmd <> ^M) THEN

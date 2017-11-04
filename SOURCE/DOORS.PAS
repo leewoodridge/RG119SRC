@@ -369,7 +369,7 @@ BEGIN
   WriteLn(DoorFile,Copy(ShowYesNo(WantOut),1,1));
   WriteLn(DoorFile,'N');
   WriteLn(DoorFile,Copy(ShowYesNo(SysOpAvailable),1,1));
-  WriteLn(DoorFile,Copy(ShowYesNo(Alert IN ThisUser.Flags),1,1));
+  WriteLn(DoorFile,Copy(ShowYesNo(Alert IN ThisUser.SFlags),1,1));
   WriteLn(DoorFile,AOnOff(RName,ThisUser.RealName,Caps(ThisUser.Name)));  (* ThisUser.Name Was All Caps *)
   WriteLn(DoorFile,ThisUser.CityState);
   WriteLn(DoorFile,Copy(ThisUser.Ph,1,3)+' '+Copy(ThisUser.Ph,5,8));

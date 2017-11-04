@@ -1,7 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
 
 UNIT Mail0;
@@ -612,31 +608,32 @@ BEGIN
             LastAuthor := 0;
 
           IF ((MHeader.From.Anon = 0) OR (SeeAnon)) THEN
-            S := PDT2Dat(MHeader.Date,MHeader.DayOfWeek)
+            S := PDToDateTime(MHeader.Date,MHeader.DayOfWeek)
           ELSE
             S := '[Unknown]';
 
-          S := '^1Date: ^9'+S;
+          S := '^0Date: ^1'+S;
 
-          S := PadLeftStr(S,39)+'^1Number : ^9'+IntToStr(MNum)+'^1 of ^9'+IntToStr(TNum);
+          S := PadLeftStr(S,39)+'^0Number : ^1'+IntToStr(MNum)+'^0 Of ^1'+IntToStr(TNum);
         END;
     2 : BEGIN
           IF (Pub) AND (MARealName IN MemMsgArea.MAFlags) THEN
             S1 := MHeader.From.Real
           ELSE
             S1 := MHeader.From.A1S;
-          S := '^1From: ^5'+Caps(UseName(MHeader.From.Anon,S1));
+          S := '^0From: ^1'+Caps(UseName(MHeader.From.Anon,S1));
 
           FileOwner := Caps(UseName(MHeader.From.Anon,S1));
 
           IF (NOT Pub) AND (Netmail IN MHeader.Status) THEN
           BEGIN
-            S := S + '^2 ('+IntToStr(MHeader.From.Zone)+':'+IntToStr(MHeader.From.Net)+'/'+IntToStr(MHeader.From.Node);
+            S := S + '^0 (^1'+IntToStr(MHeader.From.Zone)+'^0:^1'+
+			IntToStr(MHeader.From.Net)+'^0/^1'+IntToStr(MHeader.From.Node);
             IF (MHeader.From.Point > 0) THEN
-               S := S + '.'+IntToStr(MHeader.From.Point);
-            S := S + ')';
+               S := S + '^0.^1'+IntToStr(MHeader.From.Point);
+            S := S + '^0)';
           END;
-          S := PadLeftStr(S,38)+'^1 Area   : ^5';
+          S := PadLeftStr(S,38)+'^0 Area   : ^1';
 
           IF (LennMCI(MemMsgArea.Name) > 30) THEN
             S := S + PadLeftStr(MemMsgArea.Name,30)
@@ -648,52 +645,52 @@ BEGIN
             S1 := Caps(MHeader.MTO.Real)
           ELSE
             S1 := Caps(MHeader.MTO.A1S);
-          S := '^1To  : ^5'+UseName(MHeader.MTO.Anon,S1);
+          S := '^0To  : ^1'+UseName(MHeader.MTO.Anon,S1);
           IF (NOT Pub) AND (Netmail IN MHeader.Status) THEN
           BEGIN
-            S := S + '^2 ('+IntToStr(MHeader.MTO.Zone)+':'+IntToStr(MHeader.MTO.Net)+'/'+IntToStr(MHeader.MTO.Node);
+            S := S + '^0 (^1'+IntToStr(MHeader.MTO.Zone)+'^0:^1'+IntToStr(MHeader.MTO.Net)+'^0/^1'+IntToStr(MHeader.MTO.Node);
             IF (MHeader.MTO.Point > 0) THEN
-              S := S + '.'+IntToStr(MHeader.MTO.Point);
-            S := S + ')';
+              S := S + '^0.^1'+IntToStr(MHeader.MTO.Point);
+            S := S + '^0)';
           END;
-          S := PadLeftStr(S,38)+'^1 Refer #: ^5';
+          S := PadLeftStr(S,38)+'^0 Refer #: ^1';
           IF (MHeader.Replyto > 0) AND (MHeader.Replyto < MNum) THEN
             S := S + IntToStr(MNum - MHeader.Replyto)
           ELSE
             S := S + 'None';
        END;
    4 : BEGIN
-         S := '^1Subj: ';
+         S := '^0Subj: ^1';
          IF (MHeader.FileAttached = 0) THEN
-           S := S + '^5'+MHeader.Subject
+           S := S + MHeader.Subject
          ELSE
-           S := S + '^8'+StripName(MHeader.Subject);
-         S := PadLeftStr(S,38)+'^1 Replies: ^5';
+           S := S + StripName(MHeader.Subject);
+         S := PadLeftStr(S,38)+'^0 Replies: ^1';
          IF (MHeader.Replies <> 0) THEN
            S := S + IntToStr(MHeader.Replies)
          ELSE
            S := S + 'None';
        END;
    5 : BEGIN
-         S := '^1Stat: ^';
+         S := '^0Stat: ';
          IF (MDeleted IN MHeader.Status) THEN
-           S := S + '8Deleted'
+           S := S + '^8Deleted'
          ELSE IF (Prvt IN MHeader.Status) THEN
-           S := S + '8Private'
+           S := S + '^8Private'
          ELSE IF (Pub) AND (UnValidated IN MHeader.Status) THEN
-           S := S + '8Unvalidated'
+           S := S + '^8Unvalidated'
          ELSE IF (Pub) AND (Permanent IN MHeader.Status) THEN
-           S := S + '5Permanent'
+           S := S + '^9Permanent'
          ELSE IF (MemMsgArea.MAType <> 0) THEN
            IF (Sent IN MHeader.Status) THEN
-             S := S + '5Sent'
+             S := S + '^9Sent'
            ELSE
-             S := S + '5Unsent'
+             S := S + '^9Unsent'
            ELSE
-             S := S + '5Normal';
+             S := S + '^9Normal';
          IF (NOT Pub) AND (Netmail IN MHeader.Status) THEN
            S := S + ' Netmail';
-         S := PadLeftStr(S,39) + '^1Origin : ^5';
+         S := PadLeftStr(S,39) + '^0Origin : ^1';
          IF (MHeader.Origindate <> '') THEN
            S := S + MHeader.Origindate
          ELSE
@@ -701,12 +698,12 @@ BEGIN
        END;
    6 : IF ((SeeAnon) AND ((MHeader.MTO.Anon + MHeader.From.Anon) > 0) AND (MemMsgArea.MAType = 0)) THEN
        BEGIN
-         S := '^1Real: ^5';
+         S := '^0Real: ^1';
          IF (MARealName IN MemMsgArea.MAFlags) THEN
            S := S + Caps(Mheader.From.Real)
          ELSE
            S := S + Caps(MHeader.From.Name);
-         S := S + '^1 to ^5';
+         S := S + '^0 to ^1';
          IF (MARealName IN MemMsgArea.MAFlags) THEN
            S := S + Caps(MHeader.MTO.Real)
          ELSE
@@ -855,11 +852,11 @@ VAR
   FSize: LongInt;
 BEGIN
   TagLine := '';
-  IF (NOT Exist(General.lMultPath+'TAGLINE.PTR')) OR (NOT Exist(General.LMultPath+'TAGLINE.DAT')) THEN
+  IF (NOT Exist(General.DataPath+'TAGLINE.PTR')) OR (NOT Exist(General.DataPath+'TAGLINE.DAT')) THEN
     SL1('* TAGLINE.PTR or TAGLINE.DAT file(s) do not exist!')
   ELSE
   BEGIN
-    Assign(StrPointerFile,General.LMultPath+'TAGLINE.PTR');
+    Assign(StrPointerFile,General.DataPath+'TAGLINE.PTR');
     Reset(StrPointerFile);
     FSize := FileSize(StrPointerFile);
     IF (FSize < 1) THEN
@@ -877,7 +874,7 @@ BEGIN
     Read(StrPointerFile,StrPointer);
     Close(StrPointerFile);
     LastError := IOResult;
-    Assign(RGStrFile,General.LMultPath+'TAGLINE.DAT');
+    Assign(RGStrFile,General.DataPath+'TAGLINE.DAT');
     Reset(RGStrFile,1);
     Seek(RGStrFile,(StrPointer.Pointer - 1));
     TempTextSize := 0;

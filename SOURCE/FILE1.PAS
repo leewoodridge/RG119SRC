@@ -1429,19 +1429,9 @@ BEGIN
   FillChar(LightBarArray,SizeOf(LightBarArray),0);
   LightBarCounter := 0;
 
-  {
-  $New_Scan_Char_File
-  Ч
-  $
-  }
   IF (ShowScan) THEN
-    ScanChar := lRGLngStr(55,TRUE);
-  {
-  %CL-здддддбддддддддддддддддддддддддддддддддбдддддбдддддддддддддддддддддддддддддддд©
-  -Ё. Num -Ё/ Name                           -Ё. Num -Ё/ Name                           -Ё
-  -юдддддаддддддддддддддддддддддддддддддддадддддадддддддддддддддддддддддддддддддды
-  }
-  lRGLngStr(59,FALSE);
+    ScanChar := lRGLngStr(55,TRUE); { New Scan Char File }
+  lRGLngStr(59,FALSE); { File Areas Header }
   Reset(FileAreaFile);
   NumDone := 0;
   WHILE (NumDone < (PageLength - AdjPageLen)) AND (FArea >= 1) AND (FArea <= NumFileAreas) AND (NOT Abort) AND (NOT HangUp) DO
@@ -1452,7 +1442,7 @@ BEGIN
     IF AACS(MemFileArea.ACS) OR (FAUnHidden IN MemFileArea.FAFlags) THEN
     BEGIN
 
-      IF (General.UseFileAreaLightBar) AND (FileAreaLightBar IN ThisUser.SFlags) THEN
+      IF (General.UseLightBars) AND (UseLightBars IN ThisUser.Flags) THEN
       BEGIN
         Inc(LightBarCounter);
         LightBarArray[LightBarCounter].CmdToExec := CompFileArea(FArea,0);
@@ -1469,9 +1459,9 @@ BEGIN
         END;
       END;
 
-      TempStr := TempStr + AOnOff(ShowScan AND NewScanFileArea,'0'+ScanChar[1],' ')+
-                           PadLeftStr(PadRightStr('1'+IntToStr(CompFileArea(FArea,0)),5)+
-                           +'2 '+MemFileArea.AreaName,37)+' ';
+      TempStr := TempStr + '^9'+PadLeftStr(AOnOff(ShowScan AND NewScanFileArea,''+ScanChar[1],''),1)+
+                           '^0 '+PadLeftStr(IntToStr(CompFileArea(FArea,0)),4)+
+                           '^1  '+PadLeftStr(MemFileArea.AreaName,31);
       Inc(NumOnline);
       IF (NumOnLine = 2) THEN
       BEGIN

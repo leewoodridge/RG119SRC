@@ -4,40 +4,51 @@
   | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
   |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
 
-  COLOR SCHEME EDITOR
-  
-  just the very top header needs work, mostly done
-  
-  have "yes"/"no" prompts be in ^1
+  LIGHTBAR TEST MENU
+
 }
 
-UNIT SysOp2J;
+UNIT SysOp2N;
 
 INTERFACE
 
-PROCEDURE ColorConfiguration;
+PROCEDURE LightBarTest;
 
 IMPLEMENTATION
 
 USES
+  CRT,
   Common,
 (*File11,
   File1,
   Mail4,*)
   TimeFunc;
 
-PROCEDURE ColorConfiguration;
-CONST
-  ColorName: ARRAY[0..7] OF STRING[7] = ('Black','Blue','Green','Cyan','Red','Magenta','Yellow','White');
-  ColorDesc: ARRAY[0..9] OF STRING[20] = ('Normal Text','Bright Text','Input Field','Header Text','Header Border',
-										  'Lightbar Normal','Lightbar Selected','UNUSED','Warning / Error','Notification');
-VAR
-  TempScheme: SchemeRec;
-  Cmd: Char;
-  RecNumToList: Integer;
-  SaveTempPause: Boolean;
+PROCEDURE LightBarTest;
 
-  FUNCTION DisplayColorStr(Color: Byte): AStr;
+TYPE
+LBCommands = Record
+		Text : String;					{ Name Of Field }
+		XY: Array [0..1] Of Integer;	{ X & Y Position }
+		CmdKey: Char;					{ Command Key }
+		CmdRun: String					{ Command To Run }
+END;
+
+
+CONST
+(*
+Text | X | Y | CmdKey | CmdToRun
+*)
+  Cmd1: ARRAY[0..4] OF STRING = ('Cmd1','X','Y','A','CmdK1');
+  Cmd2: ARRAY[0..4] OF STRING = ('Cmd2','X','Y','B','CmdK2');
+  Cmd3: ARRAY[0..4] OF STRING = ('Cmd3','X','Y','C','CmdK3');
+  
+VAR
+  B: Array[1..3] of LBCommands;
+  Cmd: Char;
+  CmdCounter: SmallInt;
+  Counter: SmallInt;
+(*  FUNCTION DisplayColorStr(Color: Byte): AStr;
   VAR
     TempStr: AStr;
   BEGIN
@@ -69,7 +80,7 @@ VAR
       SetC(Counter + 8);
       Print(PadLeftStr(ColorName[Counter]+'!',9));
     END;
-    InputByteWOC('%LF^0Foreground',TempColor,[Numbersonly],0,15); (* Suppress Error *)
+    InputByteWOC('%LF^0Foreground',TempColor,[Numbersonly],0,15);
     IF (TempColor IN [0..15]) THEN
       NewColor := TempColor
     ELSE
@@ -82,7 +93,7 @@ VAR
       SetC(Counter);
       Print(PadLeftStr(ColorName[Counter],12));
     END;
-    InputByteWOC('%LF^0Background',TempColor,[NumbersOnly],0,7);  (* Suppress Error *)
+    InputByteWOC('%LF^0Background',TempColor,[NumbersOnly],0,7);
     IF (TempColor IN [0..7]) THEN
       NewColor := NewColor OR TempColor SHL 4;
     IF PYNQ('%LF^0Blinking? ',0,FALSE) THEN
@@ -124,7 +135,7 @@ VAR
       END;
     UNTIL (Cmd1 = 'Q') OR (HangUp);
   END;
-(*
+
   PROCEDURE FileColors(VAR TempScheme1: SchemeRec; Cmd1: Char; VAR Changed: Boolean);
   VAR
     F: FileInfoRecordType;
@@ -362,7 +373,7 @@ VAR
       END;
     UNTIL (Cmd1 = ^M) OR (HangUp);
   END;
-*)
+
   PROCEDURE InitSchemeVars(VAR Scheme: SchemeRec);
   BEGIN
     WITH Scheme DO
@@ -810,40 +821,63 @@ VAR
       Print('^8  [ NO COLOR SCHEMES DEFINED ]');
   END;
 
+  { it begins }
+*)  
+
+
 BEGIN
-  SaveTempPause := TempPause;
-  TempPause := FALSE;
-  RecNumToList := 1;
-  Cmd := #0;
-  REPEAT
-    IF (Cmd <> '?') THEN
-      ListSchemes(RecNumToList);
-    LOneK('%LF^0Color Scheme Editor: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
+{ Define the menu }
+b[1].Text := 'SomeText'; b[1].XY[0] := 5; b[1].XY[1] := 10; b[1].CmdKey := 'A'; b[1].CmdRun := 'PauseScr(FALSE)';
+b[2].Text := 'MoreText'; b[2].XY[0] := 6; b[2].XY[1] := 11; b[2].CmdKey := 'B'; b[2].CmdRun := 'PauseScr(FALSE)';
+b[3].Text := 'Yay!Text'; b[3].XY[0] := 7; b[3].XY[1] := 12; b[3].CmdKey := 'C'; b[3].CmdRun := 'PauseScr(FALSE)';
+
+ClrScr;
+FOR Counter := 1 TO 3 DO { Print the menu }
+  BEGIN
+	GoToXY(b[Counter].XY[0], b[Counter].XY[1]);
+    print(b[Counter].text);
+  END;
+  CmdCounter := 1; { Select the first field }
+  REPEAT    
+    GoToXY(b[CmdCounter].XY[0], b[CmdCounter].XY[1]);	{^}
+	Print('^6'+b[CmdCounter].Text+'^0');				{^}
+ 
+    GoToXY(1,20); { Position the menu prompt }
+    LOneK('%LF^0Lightbar Test Menu: ',Cmd,'WSQ'^M,TRUE,TRUE);
     CASE Cmd OF
-      ^M  : IF (RecNumToList < 1) OR (RecNumToList > NumSchemes) THEN
-              RecNumToList := 1;
-      'D' : DeleteScheme(TempScheme,RecNumToList);
-      'I' : InsertScheme(TempScheme,Cmd,RecNumToList);
-      'M' : ModifyScheme(TempScheme,Cmd,RecNumToList);
-      'P' : PositionScheme(TempScheme);
-      '?' : BEGIN
-              Print('%LF^0<^1CR^0> Next Page / Refresh');
-              LCmds(22,1,'D Delete Color Scheme','I Insert Color Scheme');
-              LCmds(22,1,'M Modify Color Scheme','P Position Color Scheme');
-              LCmds(22,1,'? Help','Q Quit');
-            END;
+	 'W' : IF Low(b) <> CmdCounter THEN BEGIN
+	         GoToXY(b[CmdCounter].XY[0], b[CmdCounter].XY[1]);
+			 Print('^0'+b[CmdCounter].Text+'^0');
+	         Dec(CmdCounter);
+			 GoToXY(b[CmdCounter].XY[0], b[CmdCounter].XY[1]);
+			 Print('^6'+b[CmdCounter].Text+'^0');
+	       END;
+	 'S' : IF High(b) <> CmdCounter THEN BEGIN
+	         GoToXY(b[CmdCounter].XY[0], b[CmdCounter].XY[1]);
+			 Print('^0'+b[CmdCounter].Text+'^0');
+	         Inc(CmdCounter);
+			 GoToXY(b[CmdCounter].XY[0], b[CmdCounter].XY[1]);
+			 Print('^6'+b[CmdCounter].Text+'^0');
+	       END;
+      ^M : BEGIN
+             CASE CmdCounter OF
+			   1 : Print('1');
+			   2 : Print('2');
+			   3 : Print('3');
+             END;
+		   END;
     END;
-    IF (CMD <> ^M) THEN
-      RecNumToList := 1;
+   { IF (CMD <> ^M) THEN
+      RecNumToList := 1;*)}
   UNTIL (Cmd = 'Q') OR (HangUp);
-  TempPause := SaveTempPause;
+  (*TempPause := SaveTempPause;
   IF (ThisUser.ColorScheme < 1) OR (ThisUser.ColorScheme > FileSize(SchemeFile)) THEN
     ThisUser.ColorScheme := 1;
   Reset(SchemeFile);
   Seek(SchemeFile,(ThisUser.ColorScheme - 1));
   Read(SchemeFile,Scheme);
   Close(SchemeFile);
-  LastError := IOResult;
+  LastError := IOResult;*)
 END;
 
 END.

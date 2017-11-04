@@ -54,22 +54,25 @@ BEGIN
       PrintACR('|07(|15T|07) Chat Call Paging          : |15'+ShowOnOff(ChatCall));
       PrintACR('|07(|15U|07) Time Limits Are Per Call  : |15'+ShowOnOff(PerCall));
       PrintACR('|07(|15V|07) SysOp Password Checking   : |15'+ShowOnOff(SysOpPWord));
-      PrintACR('|07(|15Y|07) Use Message Area Lightbar : |15'+ShowOnOff(UseMsgAreaLightBar));
-      PrintACR('|07(|15Z|07) Use File Area Lightbar    : |15'+ShowOnOff(UseFileAreaLightBar));
+      PrintACR('|07(|15Y|07) Use Lightbars             : |15'+ShowOnOff(UseLightBars));
+	  PrintACR('^0(^1Z^0) Can Unval''d Users Log In From Shuttle: ^1'+ShowYesNo(ShuttleUnvalLogin));
+	  PrintACR('^0(^1!^0) Refuse New Users: ^1'+ShowYesNo(ClosedSystem));
 	  Nl;	  
-      PrintACR('|07(|152|07) Mins Before Timeout Bell : |15'+AOnOff((TimeOutBell = -1),'Off',PadLeftInt(TimeOutBell,3)));
+(*      PrintACR('|07(|152|07) Mins Before Timeout Bell : |15'+AOnOff((TimeOutBell = -1),'Off',PadLeftInt(TimeOutBell,3)));
       PrintACR('|07(|153|07) Mins Before Timeout      : |15'+AOnOff((TimeOut = -1),'Off',PadLeftInt(TimeOut,3)));
-      Nl;
+      Nl; *)
       Prt('|07Enter Selection Or (|15Q|07) To Quit: |15');
-      OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ123',TRUE,TRUE);
+      OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ123!',TRUE,TRUE);
       CASE Cmd OF
-        'A' : AllowAlias := NOT AllowAlias;
+	    '!' : ClosedSystem := NOT ClosedSystem;
+	    'Z' : ShuttleUnvalLogin := NOT ShuttleUnvalLogin;
+        'A' : {AllowAlias := NOT AllowAlias};
         'B' : BEGIN
                 PhonePW := NOT PhonePW;
                 IF (PhonePW) THEN
                  Begin
                  { If we`re going to verify phone numbers, users will need to provide them, so we`ll also ask
-                                   for phone numbers in new user application. }
+                   for phone numbers in new user application. }
                   NewUserToggles[7] := True;
                   Print('Also Enabling Phone Number In New User Application.');
                   PauseScr(False);
@@ -94,14 +97,14 @@ BEGIN
         'M' : BEGIN
                 CompressBases := NOT CompressBases;
                 IF (CompressBases) THEN
-                  Print('%LFCompressing file/message areas ...')
+                  Print('^0%LFCompressing File & Message Areas ...')
                 ELSE
-                  Print('%LFDe-compressing file/message areas ...');
+                  Print('^0%LFDe-Compressing File & Message Areas ...');
                 NewCompTables;
               END;
         'N' : BEGIN
                 UseBIOS := NOT UseBIOS;
-                DirectVideo := NOT UseBIOS;
+                DirectVideo := NOT UseBIOS; { LeeW: Is this right? }
               END;
         'O' : UseIEMSI := NOT UseIEMSI;
         'P' : ClosedSystem := NOT ClosedSystem;
@@ -112,46 +115,8 @@ BEGIN
         'V' : SysOpPWord := NOT SysOpPWord;
         'W' : LogonQuote := NOT LogonQuote;
         'X' : UserAddQuote := NOT UserAddQuote;
-        'Y' : UseMsgAreaLightBar := NOT UseMsgAreaLightBar;
-        'Z' : UseFileAreaLightBar := NOT UseFileAreaLightBar;
-        '1'..'3' :
-              BEGIN
-			  Nl;
-                Prt('|07Select (|15E|07)nable (|15D|07)isable or [|15ENTER|07] To Quit: |15');
-                OneK(Cmd1,^M'ED',TRUE,TRUE);
-                IF (Cmd1 IN ['E','D']) THEN
-                BEGIN
-                  CASE Cmd1 OF
-                    'E' : BEGIN
-                            CASE Cmd OF
-                              '1' : BEGIN
-                                      LowNum := 1;
-                                      HiNum := (MaxUsers - 1);
-                                      TempInt := NewApp;
-                                    END;
-                              '2' : BEGIN
-                                      LowNum := 1;
-                                      HiNum := 20;
-                                      TempInt := TimeOutBell;
-                                    END;
-                              '3' : BEGIN
-                                      LowNum := 1;
-                                      HiNum := 20;
-                                      TempInt := TimeOut;
-                                    END;
-                            END;
-                            InputIntegerWOC('%LFEnter value for this function',TempInt,[NumbersOnly],LowNum,HiNum);
-                          END;
-                    'D' : TempInt := -1;
-                  END;
-                  CASE Cmd OF
-                    '1' : NewApp := TempInt;
-                    '2' : TimeOutBell := TempInt;
-                    '3' : TimeOut := TempInt;
-                  END;
-                  Cmd := #0;
-                END;
-          END;
+        'Y' : UseLightBars := NOT UseLightBars;
+        'Z' : PauseScr(False); {LeeW: Unused}
       END;
     END;
   UNTIL (Cmd = 'Q') OR (HangUp);

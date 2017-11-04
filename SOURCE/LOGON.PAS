@@ -164,7 +164,7 @@ BEGIN
           LoadURec(User,1);
           Isi := '{Renegade,'+General.Version+'}{'+General.BBSName+'}{'+User.CityState+
                  '}{'+General.SysOpName+'}{'+Hex(GetPackDateTime,8)+
-                 '}{Live free or die!}{}{Everything!}';
+                 '}{Live free or die!}{}{Everything!}'; { LeeW: What is this? }
           Isi := 'EMSI_ISI'+ Hex(Length(Isi),4) + Isi;
           Isi := Isi + Hex(UpdateCRC32($Ffffffff,Isi[1],Length(Isi)),8);
           Isi := '**' + Isi + ^M;
@@ -296,7 +296,7 @@ BEGIN
   Exclude(ThisUser.Flags,Avatar);
   Exclude(ThisUser.Flags,Ansi);
   Exclude(ThisUser.Flags,Vt100);
-  Exclude(ThisUser.SFlags,Rip);
+  Exclude(ThisUser.Flags,Rip);
   IF (ComPortSpeed = 0) THEN
   BEGIN
     Include(ThisUser.Flags,Ansi);
@@ -321,7 +321,7 @@ BEGIN
       C := Com_Recv;
       IF (C = 'P') THEN
       BEGIN
-        Include(ThisUser.SFlags,Rip);
+        Include(ThisUser.Flags,Rip);
         S := RGNoteStr(25,TRUE); {'RIP'}
       END;
     END;
@@ -873,9 +873,17 @@ BEGIN
   IEMSI;
   GotName := FALSE;
   IF ((General.ShuttleLog) AND (NOT FastLogon) AND (NOT HangUp)) THEN
-    DoShuttle;
-  SetC(7);
-  CLS;
+    DoShuttle;	
+  SetC(0);
+  ClrScr;{ClrScr;}
+  
+PrintACR('^8* * * * * * * * * * *');
+PrintACR('^8* SUCCESSFUL LOGON  *');
+PrintACR('^8* * * * * * * * * * *');
+PrintACR('GeneralCallerNum: '+IntToStr(General.CallerNum));
+PrintACR('GeneralDaysOnline: '+IntToStr(General.DaysOnline));
+PauseScr(FALSE); { LeeW }
+
   Print(Centre(VerLine(1))); { Version & Copyright Information }
   Print(Centre(VerLine(2)));
 { Print(Centre(VerLine(3))); }
@@ -884,10 +892,7 @@ BEGIN
   BEGIN
     PrintF('ACSEA'+IntToStr(EventNum));
     IF (NoFile) THEN
-      (*
-      Print('Restricted: Only certain users allowed online at this time.');
-      *)
-      RGNoteStr(6,FALSE);
+      RGNoteStr(6,FALSE);(*Print('Restricted: Only certain users allowed online at this time.');*)
   END;
   IF (NOT GotName) THEN
     TryIEMSILogon;
@@ -968,12 +973,12 @@ BEGIN
         NewFileDate := ThisUser.LastOn;
         MsgArea := ThisUser.LastMsgArea;
         FileArea := ThisUser.LastFileArea;
-        IF (AutoDetect IN ThisUser.SFlags) THEN
+        IF (AutoDetect IN ThisUser.Flags) THEN
         BEGIN
-          IF (Rip IN OldUser.SFlags) THEN
-            Include(ThisUser.SFlags,Rip)
+          IF (Rip IN OldUser.Flags) THEN
+            Include(ThisUser.Flags,Rip)
           ELSE
-            Exclude(ThisUser.SFlags,Rip);
+            Exclude(ThisUser.Flags,Rip);
           IF (Ansi IN OldUser.Flags) THEN
             Include(ThisUser.Flags,Ansi)
           ELSE
@@ -1042,10 +1047,7 @@ BEGIN
   BEGIN
     PrintF('NONODE');
     IF (NoFile) THEN
-      (*
-      Print('You don''t have the required ACS to logon to this node!');
-      *)
-      RGNoteStr(10,FALSE);
+      RGNoteStr(10,FALSE); (*Print('You don''t have the required ACS to logon to this node!');*)
     SysOpLog(ThisUser.Name+': Attempt to logon node '+IntToStr(ThisNode)+' without access.');
     HangUp := TRUE;
   END;
@@ -1178,7 +1180,7 @@ BEGIN
     *)
     InitTrapFile;
     UserOn := FALSE;
-    CLS;
+    ClrScr;
   END;
   IF (HangUp) THEN
     GetUser := FALSE;

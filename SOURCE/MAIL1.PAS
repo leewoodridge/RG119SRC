@@ -11,13 +11,8 @@ INTERFACE
 USES
   Common;
 
-FUNCTION Inputmessage(Pub,
-                      IsReply: Boolean;
-                      CONST MsgTitle: Str40;
-                      VAR MHeader: MHeaderRec;
-                      CONST ReadInMsg: AStr;
-                      MaxLineLen: Byte;
-                      MaxMsgLines: Integer): Boolean;
+FUNCTION Inputmessage(Pub, IsReply: Boolean; CONST MsgTitle: Str40; VAR MHeader: MHeaderRec; CONST ReadInMsg: AStr;
+                      MaxLineLen: Byte; MaxMsgLines: Integer): Boolean;
 PROCEDURE Anonymous(Offline: Boolean; VAR MHeader: MHeaderRec);
 
 IMPLEMENTATION
@@ -373,7 +368,7 @@ VAR
   PROCEDURE DoLines;
   BEGIN
     IF (OkANSI OR OkAvatar) THEN
-      Print('^4旼컴:컴컴:컴컴:컴컴:컴컴:컴컴:컴컴:컴컴쩡컴�:컴컴:컴컴:컴컴:컴컴:컴컴:컴컴:컴커^1')
+      Print('^4旼컴:컴컴:컴컴:컴컴:컴컴:컴컴:컴컴:컴컴쩡컴?컴컴:컴컴:컴컴:컴컴:컴컴:컴컴:컴커^1')
     ELSE
       Print('[---:----:----:----:----:----:----:----|----:----:----:----:----:----:----:---]');
   END;
@@ -1237,69 +1232,48 @@ VAR
                  Delete_Char;
                END;
              END;
-         F_CTRLLEFT,1 :
-             Cursor_WordLeft;  { ^A }
-         2 : Reformat;      { ^B }
-         F_PGDN,3 :
-             Page_Down;        { ^C }
-         F_RIGHT,4 :
-             Cursor_Right;     { ^D }
-         F_UP,5 :
-             Cursor_Up;        { ^E }
-         F_CTRLRIGHT,6 :
-             Cursor_WordRight; { ^F }
-         F_DEL,7 :
-             Delete_Char;      { ^G }
-         9 : REPEAT
-               Insert_Char(' ');
-             UNTIL ((CCol MOD 5) = 0);  { ^I }
-         10 :
-             Join_Lines;       { ^J }
-         F_END,11 :
-             Cursor_EndLine;   { ^K }
-         12 :
-             Redisplay;        { ^L }
-         13 :
-             Cursor_NewLine;   { ^M }
-         14 :
-             BEGIN
-               Split_Line;
-               Reposition(TRUE);
-             END;              { ^N }
-         16 :
-             BEGIN             { ^P }
-               GKey := GetKey;
-               IF (GKey IN [0..9,Ord('0')..Ord('9')]) THEN
-               BEGIN
-                 Insert_Char('^');
-                 Insert_Char(Char(GKey));
-               END
-               ELSE
-                 Buf := Char(GKey);
-               GKey := 0;
-             END;
-         17 :
-             DoQuote(TRUE);   { ^Q }
-         F_PGUP,18 :
-             Page_Up;         { ^R }
-         F_LEFT,19 :
-             Cursor_Left;     { ^S }
-         20 :
-             Delete_WordRight;{ ^T }
-         F_INS,22 :
-             BEGIN            { ^V }
-               Insert_Mode := NOT Insert_Mode;
-               Display_Insert_Status;
-               Reposition(TRUE);
-             END;
-         F_HOME,23 :
-             Cursor_StartLine; { ^W }
-         F_DOWN,24 :
-             Cursor_Down;      { ^X }
-         25 :
-             FS_Delete_Line;   { ^Y }
-         26 :
-             FS_Help;          { ^Z }
+         F_CTRLLEFT,1 : Cursor_WordLeft;	{ ^A }
+					2 : Reformat;			{ ^B }
+         F_PGDN,	3 : Page_Down;			{ ^C }
+         F_RIGHT,	4 : Cursor_Right;		{ ^D }
+         F_UP,		5 : Cursor_Up;			{ ^E }
+         F_CTRLRIGHT,6 : Cursor_WordRight;	{ ^F }
+         F_DEL,		7 : Delete_Char;		{ ^G }
+					9 : REPEAT				{ ^I }
+					     Insert_Char(' ');
+						UNTIL ((CCol MOD 5) = 0);
+					10 : Join_Lines;		{ ^J }
+         F_END,		11 : Cursor_EndLine;	{ ^K }
+					12 : Redisplay;			{ ^L }
+					13 : Cursor_NewLine;	{ ^M }
+					14 : BEGIN				{ ^N }
+						  Split_Line;
+						  Reposition(TRUE);
+						 END;              
+					16 : BEGIN				{ ^P }
+						  GKey := GetKey;
+						  IF (GKey IN [0..9,Ord('0')..Ord('9')]) THEN
+							BEGIN
+							  Insert_Char('^');
+							  Insert_Char(Char(GKey));
+							END
+						  ELSE
+							Buf := Char(GKey);
+							GKey := 0;
+						  END;
+					17 : DoQuote(TRUE);		{ ^Q }
+         F_PGUP,	18 : Page_Up;			{ ^R }
+         F_LEFT,	19 : Cursor_Left;		{ ^S }
+					20 : Delete_WordRight;	{ ^T }
+         F_INS,		22 : BEGIN				{ ^V }
+						   Insert_Mode := NOT Insert_Mode;
+						   Display_Insert_Status;
+						   Reposition(TRUE);
+						 END;
+         F_HOME,	23 : Cursor_StartLine;	{ ^W }
+         F_DOWN,	24 : Cursor_Down;		{ ^X }
+					25 : FS_Delete_Line;	{ ^Y }
+					26 : FS_Help;			{ ^Z }
       END;
     UNTIL ((GKey = 27) AND (NOT InportFileOpen)) OR (HangUp);
     IF (InportFileOpen) THEN
@@ -1313,16 +1287,10 @@ VAR
 
   PROCEDURE PrintMsgTitle;
   BEGIN
-    NL;
-    (*
-    Print(FString.lentermsg1);
-    *)
-    lRGLngStr(6,FALSE);
-    (*
-    Print(FString.lentermsg2);
-    *)
-    lRGLNGStr(7,FALSE);
-    DoLines;
+	NL;
+	lRGLngStr(6,FALSE);(*Print(FString.lentermsg1);*)
+	lRGLngStr(7,FALSE);(*Print(FString.lentermsg2);*)
+	DoLines;
   END;
 
   PROCEDURE InputTheMessage(CantAbort1: Boolean; VAR DisableMCI1,SaveMsg1: Boolean);
@@ -1345,16 +1313,18 @@ VAR
     AbortMsg: Boolean;
 
     PROCEDURE EditMsgTo(VAR MsgTo1: Str36);
+	{ LeeW: I think the best solution here is to display no 'to:' info here and find out how to remove
+	the clearscreen just before this, ugh. }
     VAR
       User: UserRecordType;
       TempMsgTo: Str36;
       UNum: Integer;
     BEGIN
-      { Print(FString.default + ^M^J); }
-      lRGLngStr(34,FALSE);
+	  {print('1353');}
+      lRGLngStr(34,FALSE); { LeeW: Default_Msg_To }
       IF (Pub) AND (NOT (MAInternet IN MemMsgArea.MAFlags)) THEN
       BEGIN
-        Prt('To: ');
+        Prt('^0To: ');
         IF (MsgTo1 <> '') THEN
           InputDefault(TempMsgTo,MsgTo1,36,[NoLineFeed,CapWords],FALSE)
         ELSE
@@ -1388,7 +1358,7 @@ VAR
         END;
       END
       ELSE IF (NOT (MAInternet IN MemMsgArea.MAFlags)) THEN
-        Print(PadLeftStr('^4To: ^6'+Caps(MsgTo1),40));
+        {Print(PadLeftStr('^0To: ^2'+Caps(MsgTo1),40));} { LeeW: For prv msg this is just repetitive }
     END;
 
     PROCEDURE EditMsgSubj(VAR MsgSubj1: Str40; CantAbort2: Boolean);
@@ -1397,7 +1367,7 @@ VAR
     BEGIN
       IF (MHeader.FileAttached = 0) AND (NOT CantAbort2) THEN
       BEGIN
-        Prt('Subject: ');
+        Prt('^0Subject: ');
         IF (MsgSubj1 <> '') THEN
           InputDefault(TempMsgSubj,MsgSubj1,40,[NoLineFeed],FALSE)
         ELSE
@@ -1410,7 +1380,7 @@ VAR
         ELSE
         BEGIN
           IF (MsgSubj1 <> '') THEN
-            Prompt('^6'+MsgSubj1+'^1');
+            Prompt('^2'+MsgSubj1+'^0');
         END;
         NL;
       END
@@ -1594,7 +1564,7 @@ VAR
         Exit;
       END;
 
-    IF (FSEditor IN ThisUser.SFlags) THEN
+    IF (FSEditor IN ThisUser.Flags) THEN
     BEGIN
       REPEAT
         FS_Editor;
@@ -2345,7 +2315,7 @@ VAR
   END;
 
 BEGIN
-  CLS;
+  {CLS;} { LeeW }
   InputMessage := FALSE;
 
   MaxLines := ((MaxAvail DIV 120) - 20);

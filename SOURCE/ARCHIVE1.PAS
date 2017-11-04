@@ -167,22 +167,22 @@ BEGIN
     BEGIN
       Inc(RecNum1);
       IF (RecNum1 = 1) THEN
-        Prompt('^1Available archive formats: ')
+        Prompt('^0Available Archive Formats: ')
       ELSE
-        Prompt('^1,');
-      Prompt('^5'+General.FileArcInfo[RecNum].Ext+'^1');
+        Prompt('^0,');
+      Prompt('^1'+General.FileArcInfo[RecNum].Ext+'^0');
     END;
     Inc(RecNum);
   END;
   IF (RecNum1 = 0) THEN
-    Prompt('No archive formats available.');
+    Prompt('^8[ NO ARCHIVE FORMATS AVAILABLE ]');
   NL;
 END;
 
 PROCEDURE InvArc;
 BEGIN
   NL;
-  Print('Unsupported archive format.');
+  Print('^8Unsupported archive format.');
   NL;
   ListArcTypes;
 END;

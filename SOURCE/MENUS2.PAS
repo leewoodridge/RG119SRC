@@ -494,6 +494,8 @@ BEGIN
               PrintF(Substitute(TempStr,'@S',''));
           END;
           DisplayingMenu := FALSE;
+		(*  Print('497');
+		  PauseScr(FALSE); *)
         END;
     3 : BEGIN
           DisplayingMenu := TRUE;

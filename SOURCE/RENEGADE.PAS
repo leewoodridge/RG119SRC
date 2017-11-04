@@ -252,7 +252,11 @@ END;
 
 BEGIN
   ClrScr;
-  TextColor(Yellow);
+  TextColor(LightGray);
+  WriteLn(' ___   ____  _      ____  __     __    ___   ____      ___   ___   __ ');
+  WriteLn('| |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`');
+  WriteLn('|_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)');
+  WriteLn('');
 {$IFDEF MSDOS}
   GetIntVec($14,Interrupt14);
 {$ENDIF}
@@ -296,7 +300,7 @@ BEGIN
 
 {$IFDEF MSDOS}
   OvrFileMode := 0;
-  Write('Initializing RENEGADE.OVR ... ');
+  Write('Initializing RENEGADE.OVR ('+FormatNumber(OvrGetBuf)+' Bytes) ... ');
   OvrInit('RENEGADE.OVR');
   IF (OvrResult <> OvrOK) THEN
     OvrInit(General.DataPath+'RENEGADE.OVR');
@@ -309,44 +313,34 @@ BEGIN
     Halt;
   END
   ELSE
-    WriteLn('Done.');
+	BEGIN
+		TextColor(LightGreen);
+		WriteLn(#251);
+		TextColor(LightGray);
+	END;
 
   IF (General.UseEMS) AND (OvrUseEms) THEN
-  BEGIN
-
-    Write('Attempting to load overlays into XMS memory ... ');
-
-    {vrMovBufToUMB;}
-
-    IF (OvrResult <> OvrOK) THEN
     BEGIN
-      WriteLn('Failed.');
       Write('Attempting to load overlays into EMS memory ... ');
       OvrInitEMS;
       IF (OvrResult = OvrOK) THEN
-      BEGIN
-        WriteLn('Done.');
-        OverLayLocation := 1
-      END
+        BEGIN
+		  TextColor(LightGreen);
+	      WriteLn(#251);
+		  TextColor(LightGray);
+          OverLayLocation := 1
+        END
       ELSE
-      BEGIN
-        CASE OvrResult OF
-          OvrIOError     : WriteLn('Overlay file I/O error.');
-          OvrNoEMSDriver : WriteLn('EMS driver not installed.');
-          OvrNoEMSMemory : WriteLn('Not enough EMS memory.');
+        BEGIN
+          CASE OvrResult OF
+            OvrIOError     : WriteLn('Overlay File I/O Error.');
+            OvrNoEMSDriver : WriteLn('EMS Driver Not Installed.');
+            OvrNoEMSMemory : WriteLn('Not Enough EMS Memory.');
+          END;
+		Halt;
         END;
-        Halt;
-      END;
-    END
-    ELSE
-    BEGIN
-      WriteLn('Done.');
-      OverLayLocation := 2;
-    END;
-  END;
-  WriteLn('Initial size of the overlay buffer is '+FormatNumber(OvrGetBuf)+' bytes.');
+	END;
 {$ENDIF}
-
   Init;
 
   MaxDisplayRows := (Hi(WindMax) + 1);
@@ -356,41 +350,44 @@ BEGIN
     ScreenSize := 8000;
 
   IF (FileBBSOnly) OR (PackBasesOnly) OR (SortFilesOnly) OR (MakeQWKFor > 0) OR (UpQWKFor > 0) THEN
-  BEGIN
-    WFCMDefine;
-    TempPause := FALSE;
-    IF (MakeQWKFor > 0) THEN
     BEGIN
-      UserNum := MakeQWKFor;
-      LoadURec(ThisUser,MakeQWKFor);
-      NewFileDate := ThisUser.LastOn;
-      Downloadpacket;
-      SaveURec(ThisUser,MakeQWKFor);
+      WFCMDefine;
+      TempPause := FALSE;
+      IF (MakeQWKFor > 0) THEN
+        BEGIN
+          UserNum := MakeQWKFor;
+          LoadURec(ThisUser,MakeQWKFor);
+          NewFileDate := ThisUser.LastOn;
+          Downloadpacket;
+          SaveURec(ThisUser,MakeQWKFor);
+        END;
+      IF (UpQWKFor > 0) THEN
+        BEGIN
+          UserNum := UpQWKFor;
+          LoadURec(ThisUser,UpQWKFor);
+          Uploadpacket(TRUE);
+          SaveURec(ThisUser,UpQWKFor);
+        END;
+      IF (PackBasesOnly) THEN
+        BEGIN
+          DoShowPackMessageAreas;
+          NL;
+          Print('^9[> Message areas packed');
+        END;
+      IF (SortFilesOnly) THEN
+        BEGIN
+		  Sort;
+          NL;
+          Print('^9[> File areas sorted');
+		END;
+      IF (FileBBSOnly) THEN { LeeW: Is this even a thing? }
+	    BEGIN
+          CheckFilesBBS;
+          NL;
+          Print('^9[> FILES.BBS checked'); { LeeW: I think that's what it's doing }
+		END;
+      Halt(0);
     END;
-
-    IF (UpQWKFor > 0) THEN
-    BEGIN
-      UserNum := UpQWKFor;
-      LoadURec(ThisUser,UpQWKFor);
-      Uploadpacket(TRUE);
-      SaveURec(ThisUser,UpQWKFor);
-    END;
-
-    IF (PackBasesOnly) THEN
-    BEGIN
-      DoShowPackMessageAreas;
-      NL;
-      Print('^5Message areas packed.');
-    END;
-
-    IF (SortFilesOnly) THEN
-      Sort;
-
-    IF (FileBBSOnly) THEN
-      CheckFilesBBS;
-
-    Halt(0);
-  END;
 
   GetMem(MemCmd,MaxCmds * SizeOf(MemCmdRec));
 
@@ -585,15 +582,16 @@ BEGIN
 
   IF (NewEchoMail) AND (ExitErrorLevel = 0) THEN
     ExitErrorLevel := 2;
-
+	
   LoadNode(ThisNode);
   Noder.Status := [];
   SaveNode(ThisNode);
 
   PurgeDir(TempDir,FALSE);
-
   Com_DeInstall;
 
   WriteLn('Exiting with errorlevel ',ExitErrorLevel);
+
   Halt(ExitErrorLevel);
+  
 END.

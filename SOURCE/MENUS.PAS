@@ -568,9 +568,15 @@ BEGIN
     BEGIN
       NL;
       IF ((CmdNotHid) AND (CmdExists)) THEN
-        Print('Insufficient clearence for this command.')
+		BEGIN
+			Print('Insufficient clearence for this command.');
+			PauseScr(False); { LeeW: Added }
+		END
       ELSE
-        Print('Invalid command.');
+	    BEGIN
+			Print('Invalid command.');
+			PauseScr(False); { LeeW: Added }
+		END
     END;
 END;
 
@@ -847,14 +853,10 @@ BEGIN
                     Close(ValidationFile);
 				    If ThisUser.Sl < Validation.NewSL Then
 				      Begin
-				        {Print(IntToStr(Validation.NewSL)+' is what we`re looking for');
-						Print(IntToStr(ThisUser.Sl)+' is what we found');}
 			            RGNoteStr(31,False); { Account Not Validated }
 				      End;
 				    If ThisUser.Sl >= Validation.NewSL Then
 					  Begin
-					    {Print(Inttostr(Validation.NewSL)+' is what we`re looking for');
-					    Print(IntToStr(ThisUser.Sl)+' is what we found');}
 				        RGNoteStr(44,False); { Account Validated }
 					  End;
 			      End;				   
@@ -864,14 +866,7 @@ BEGIN
             'F' : ChangeARFlags(MenuOption);
             'G' : ChangeACFlags(MenuOption);
             'L' : BEGIN
-                    IF (Pos(';',MenuOption) > 0) THEN
-                    BEGIN
-                      MenuOption := Copy(MenuOption,Pos(';',MenuOption) + 1,(Length(MenuOption)) - (Pos(';',MenuOption)));
-                      TempStr := Copy(MenuOption,1,(Pos(';',MenuOption) - 1));
-                    END
-                    ELSE
-                      TempStr := '0';
-                    TodaysCallers(StrToInt(TempStr),MenuOption);
+                    TodaysCallers(StrToInt(MenuOption));
                   END;
             'P' : CStuff(StrToInt(MenuOption),2,ThisUser);
             'R' : ChangeConference(MenuOption);
@@ -1013,7 +1008,10 @@ BEGIN
                   END;
             'T' : IF (CheckPW) THEN
                    BEGIN
-                    mem[Seg0040:$0017] := mem[Seg0040:$0017] XOR 16;
+                    {$IFDEF MSDOS}
+					mem[Seg0040:$0017] := mem[Seg0040:$0017] XOR 16;
+					{$ENDIF}
+					
                      IF (SysOpAvailable) THEN
                        BEGIN
                        SysOpLog('* Turned on chat availablity');

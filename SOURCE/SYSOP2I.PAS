@@ -25,18 +25,18 @@ BEGIN
     BEGIN
       Abort := FALSE;
       Next := FALSE;
-      Print('%CL^5Offline Mail Configuration:');
+      Print('^0%CLOffline Mail Configuration:');
       NL;
-      PrintACR('^1A. QWK/REP Packet name : ^5'+PacketName);
-      PrintACR('^1B. Welcome screen name : ^5'+QWKWelcome);
-      PrintACR('^1C. News file name      : ^5'+QWKNews);
-      PrintACR('^1D. Goodbye file name   : ^5'+QWKGoodbye);
-      PrintACR('^1E. Local QWK/REP path  : ^5'+QWKLocalPath);
-      PrintACR('^1F. Ignore time for DL  : ^5'+ShowOnOff(QWKTimeIgnore));
-      PrintACR('^1G. Max total messages  : ^5'+IntToStr(MaxQWKTotal));
-      PrintACR('^1H. Max msgs per base   : ^5'+IntToStr(MaxQWKBase));
-      PrintACR('^1I. ACS for Network .REP: ^5'+QWKNetworkACS);
-      Prt('%LFEnter selection [^5A^4-^5I^4,^5Q^4=^5Quit^4]: ');
+      PrintACR('^1A^0'+#242+' QWK/REP Packet Name   : ^1'+PacketName);
+      PrintACR('^1B^0'+#242+' Welcome Filename      : ^1'+QWKWelcome);
+      PrintACR('^1C^0'+#242+' News Filename         : ^1'+QWKNews);
+      PrintACR('^1D^0'+#242+' Goodbye Filename      : ^1'+QWKGoodbye);
+      PrintACR('^1E^0'+#242+' Local QWK/REP Path    : ^1'+QWKLocalPath);
+      PrintACR('^1F^0'+#242+' Ignore Time For DL?   : ^1'+ShowOnOff(QWKTimeIgnore));
+      PrintACR('^1G^0'+#242+' Max Messages Total    : ^1'+IntToStr(MaxQWKTotal));
+      PrintACR('^1H^0'+#242+' Max Messages Per Base : ^1'+IntToStr(MaxQWKBase));
+      PrintACR('^1I^0'+#242+' ACS For Network .REP  : ^1'+QWKNetworkACS);
+      Prt('^0%LFEnter selection [^5A^4-^5I^4,^5Q^4=^5Quit^4]: ');
       OneK(Cmd,'QABCDEFGHI'^M,TRUE,TRUE);
       CASE Cmd OF
         'A' : InputWN1('%LFQWK Packet name: ',PacketName,(SizeOf(PacketName) - 1),[InterActiveEdit],Changed);

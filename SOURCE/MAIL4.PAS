@@ -39,20 +39,8 @@ BEGIN
   FillChar(LightBarArray,SizeOf(LightBarArray),0);
   LightBarCounter := 0;
 
-  {
-  $New_Scan_Char_Message
-  ş
-  $
-  }
   IF (ShowScan) THEN
     ScanChar := lRGLngStr(66,TRUE);
-  {
-  $Message_Area_Select_Header
-  %CL7ÚÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-  7³8 Num 7³9 Name                           7³8 Num 7³9 Name                           7³
-  7ÀÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-  $
-  }
   lRGLngStr(58,FALSE);
   Reset(MsgAreaFile);
   NumDone := 0;
@@ -64,7 +52,7 @@ BEGIN
     IF (AACS(MemMsgArea.ACS)) OR (MAUnHidden IN MemMsgArea.MAFlags) THEN
     BEGIN
 
-      IF (General.UseMsgAreaLightBar) AND (MsgAreaLightBar IN ThisUser.SFlags) THEN
+      IF (General.UseLightBars) AND (UseLightBars IN ThisUser.Flags) THEN
       BEGIN
         Inc(LightBarCounter);
         LightBarArray[LightBarCounter].CmdToExec := CompMsgArea(MArea,0);
@@ -81,9 +69,9 @@ BEGIN
         END;
       END;
 
-      TempStr := TempStr + AOnOff(ShowScan AND LastReadRecord.NewScan,':'+ScanChar[1],' ')+
-                           PadLeftStr(PadRightStr(';'+IntToStr(CompMsgArea(MArea,0)),5)+
-                           +'< '+MemMsgArea.Name,37)+' ';
+      TempStr := TempStr + '^9'+PadLeftStr(AOnOff(ShowScan AND LastReadRecord.NewScan,ScanChar[1],''),1)+
+						   '^0 '+PadLeftStr(IntToStr(CompMsgArea(MArea,0)),4)+
+                           '^1  '+PadLeftStr(MemMsgArea.Name,31);
       Inc(NumOnline);
       IF (NumOnline = 2) THEN
       BEGIN

@@ -42,9 +42,10 @@ BEGIN
   BEGIN
     IF (UserNum > (MaxUsers - 1)) THEN
     BEGIN
+	  UserNum := 0;
       NL;
-      Print('Unknown user.');
-      UserNum := 0
+      Print('^8Unknown User');
+	  PauseScr(FALSE);
     END
     ELSE
       LoadURec(User,UserNum);
@@ -52,7 +53,8 @@ BEGIN
   ELSE IF (UserName = '') THEN
   BEGIN
     NL;
-    Print('Aborted.');
+    Print('^8Aborted');
+	PauseScr(FALSE);
   END
   ELSE
   BEGIN
@@ -78,7 +80,7 @@ BEGIN
             NL;
             Asked := TRUE;
           END;
-          Prompt('^1Did you mean ^3'+Caps(UserIDX.Name)+'^1? ');
+          Prompt('^0Did You Mean ^1'+Caps(UserIDX.Name)+'^0? ');
           OneK(Cmd,'QYN'^M,TRUE,TRUE);
           Done := TRUE;
           CASE Cmd OF
@@ -93,7 +95,8 @@ BEGIN
     IF (UserNum = 0) THEN
     BEGIN
       NL;
-      Print('User not found.');
+      Print('^8User Not Found');
+	  PauseScr(FALSE);
     END;
     IF (UserNum = -1) THEN
       UserNum := 0;

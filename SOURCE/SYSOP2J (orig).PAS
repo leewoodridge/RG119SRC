@@ -1,15 +1,8 @@
+{$IFDEF WIN32}
+{$I DEFINES.INC}
+{$ENDIF}
+
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
-
-{  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
-  | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
-  |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
-
-  COLOR SCHEME EDITOR
-  
-  just the very top header needs work, mostly done
-  
-  have "yes"/"no" prompts be in ^1
-}
 
 UNIT SysOp2J;
 
@@ -21,16 +14,14 @@ IMPLEMENTATION
 
 USES
   Common,
-(*File11,
+  File11,
   File1,
-  Mail4,*)
+  Mail4,
   TimeFunc;
 
 PROCEDURE ColorConfiguration;
 CONST
   ColorName: ARRAY[0..7] OF STRING[7] = ('Black','Blue','Green','Cyan','Red','Magenta','Yellow','White');
-  ColorDesc: ARRAY[0..9] OF STRING[20] = ('Normal Text','Bright Text','Input Field','Header Text','Header Border',
-										  'Lightbar Normal','Lightbar Selected','UNUSED','Warning / Error','Notification');
 VAR
   TempScheme: SchemeRec;
   Cmd: Char;
@@ -69,7 +60,7 @@ VAR
       SetC(Counter + 8);
       Print(PadLeftStr(ColorName[Counter]+'!',9));
     END;
-    InputByteWOC('%LF^0Foreground',TempColor,[Numbersonly],0,15); (* Suppress Error *)
+    InputByteWOC('%LFForeground',TempColor,[Numbersonly],0,15); (* Suppress Error *)
     IF (TempColor IN [0..15]) THEN
       NewColor := TempColor
     ELSE
@@ -82,13 +73,13 @@ VAR
       SetC(Counter);
       Print(PadLeftStr(ColorName[Counter],12));
     END;
-    InputByteWOC('%LF^0Background',TempColor,[NumbersOnly],0,7);  (* Suppress Error *)
+    InputByteWOC('%LFBackground',TempColor,[NumbersOnly],0,7);  (* Suppress Error *)
     IF (TempColor IN [0..7]) THEN
       NewColor := NewColor OR TempColor SHL 4;
-    IF PYNQ('%LF^0Blinking? ',0,FALSE) THEN
+    IF PYNQ('%LFBlinking? ',0,FALSE) THEN
       NewColor := NewColor OR 128;
     SetC(7);
-    Prompt('%LF^0Example: ');
+    Prompt('%LFExample: ');
     SetC(NewColor);
     Print(DisplayColorStr(NewColor));
     SetC(7);
@@ -101,30 +92,28 @@ VAR
     NewColor: Byte;
   BEGIN
     REPEAT
-      Cls;
-	  Print(PadLeftStr('^2 '+#254+' Color Scheme Editor',80));
+      CLS;
+      NL;
       FOR Counter := 1 TO 10 DO
       BEGIN
         SetC(7);
-        Prompt(PadRightInt((Counter - 1),1)+#242+' '+PadLeftStr(ColorDesc[Counter - 1],18)+': ');
+        Prompt(PadRightInt((Counter - 1),2)+'. System color '+PadRightInt((Counter - 1),2)+': ');
         SetC(TempScheme1.Color[Counter]);
         Print(DisplayColorStr(Scheme.Color[Counter]));
       END;
-
-	    Print('%LF^0Q'+#242+' Quit');
-      LOneK('%LF^0Change Which Color? [^10^0-^19^0,^1Q^0]: ',Cmd1,'0123456789Q',TRUE,TRUE);
+      LOneK('%LFSystem color to change [^50^4-^59^4,^5<CR>^4=^5Quit^4]: ',Cmd1,^M'0123456789',TRUE,TRUE);
       IF (Cmd1 IN ['0'..'9']) THEN
       BEGIN
         NewColor := GetColor;
-        IF PYNQ('%LF^0Is This Correct? ',0,FALSE) THEN
+        IF PYNQ('%LFIs this correct? ',0,FALSE) THEN
         BEGIN
           TempScheme1.Color[Ord(Cmd1) - Ord('0') + 1] := NewColor;
           Changed := TRUE;
         END;
       END;
-    UNTIL (Cmd1 = 'Q') OR (HangUp);
+    UNTIL (Cmd1 = ^M) OR (HangUp);
   END;
-(*
+
   PROCEDURE FileColors(VAR TempScheme1: SchemeRec; Cmd1: Char; VAR Changed: Boolean);
   VAR
     F: FileInfoRecordType;
@@ -197,10 +186,10 @@ VAR
       Abort := FALSE;
       Next := FALSE;
       CLS; { starts at color 28 }
-      PrintACR('æ—¼ì»´ì»´ì»´ì©¡ì»´ì»´ì»´ì»¤');
-      PrintACR('? Msg# ? Sender            ? Receiver           ?  '+
-               'Subject           ?! Posted ?');
-      PrintACR('ì•ì»´ì»´ì»¨ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì¢”ì»´ì»´ì»´ì¼¸');
+      PrintACR('ÚÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄ¿');
+      PrintACR('³ Msg# ³ Sender            ³ Receiver           ³  '+
+               'Subject           ³! Posted ³');
+      PrintACR('ÀÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÙ');
       PrintACR('''* "2#      Exodus              $Nuclear              %Re: Renegade       &01/01/93');
       PrintACR('''> "3#      Nuclear             $Exodus               %RG Update          &01/01/93');
       NL;
@@ -295,15 +284,15 @@ VAR
       Abort := FALSE;
       Next := FALSE;
       CLS;  { starts at 115 }
-      Print(Centre('|The QWKï£«System is now gathering mail.'));
+      Print(Centre('|The QWKÿSystem is now gathering mail.'));
       NL;
-      PrintACR('sæ—¼ì»´ì»´ì©¡ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì©¡ì»´ì»´ì»´ì»´ì»´ì»´ì©¡ì»´ì»´ì»¤');
-      PrintACR('s?t Num s?u Message base name     s?v  Short  s?w Echo s?x  Total  '+
-               's?y New s?z Your s?{ Size s?');
-      PrintACR('sì•ì»´ì»´ì¢”ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì¢”ì»´ì»´ì»´ì»´ì»´ì»´ì¢”ì»´ì»´ì¼¸');
-      PrintACR('   }1    ~General                 GENERAL    Â€No      Â530     Â‚328    Âƒ13    Â„103k');
-      PrintACR('   }2    ~Not so general          NSGEN      Â€No      Â854     Â‚ 86    Âƒ15     Â„43k');
-      PrintACR('   }3    ~Vague                   VAGUE      Â€No      Â985     Â‚148     Âƒ8     Â„74k');
+      PrintACR('sÚÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄ¿');
+      PrintACR('s³t Num s³u Message base name     s³v  Short  s³w Echo s³x  Total  '+
+               's³y New s³z Your s³{ Size s³');
+      PrintACR('sÀÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÙ');
+      PrintACR('   }1    ~General                 GENERAL    €No      530     ‚328    ƒ13    „103k');
+      PrintACR('   }2    ~Not so general          NSGEN      €No      854     ‚ 86    ƒ15     „43k');
+      PrintACR('   }3    ~Vague                   VAGUE      €No      985     ‚148     ƒ8     „74k');
       NL;
       LCmds3(20,3,'A Border','B Base num field','C Base name field');
       LCmds3(20,3,'D Short field','E Echo field','F Total field');
@@ -339,11 +328,11 @@ VAR
       Abort := FALSE;
       Next := FALSE;
       CLS;   { starts at 135 }
-      PrintACR('Â‡æ—¼ì»´ì»´ì©¡ì»´ì»´ì»´ì»´ì»´ì»´ì»«ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´?');
-      PrintACR('Â‡?Âˆ Num Â‡?Â‰ Date/Time         Â‡?ÂŠ Sender                 Â‡?Â‹ Subject                  Â‡?');
-      PrintACR('Â‡ì•ì»´ì»´ì¢”ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»¨ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´ì»´?');
-      PrintACR('    ÂŒ1  Â01 Jan 1993  01:00a ÂExodus                   ÂRenegade');
-      PrintACR('    ÂŒ1  Â01 Jan 1993  01:00a ÂNuclear                  ÂUpgrades');
+      PrintACR('‡ÚÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿');
+      PrintACR('‡³ˆ Num ‡³‰ Date/Time         ‡³Š Sender                 ‡³‹ Subject                  ‡³');
+      PrintACR('‡ÀÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ');
+      PrintACR('    Œ1  01 Jan 1993  01:00a Exodus                   Renegade');
+      PrintACR('    Œ1  01 Jan 1993  01:00a Nuclear                  Upgrades');
       NL;
       LCmds3(20,3,'A Border','B Number field','C Date/Time field');
       LCmds(20,3,'D Sender field','E Subject field');
@@ -362,22 +351,22 @@ VAR
       END;
     UNTIL (Cmd1 = ^M) OR (HangUp);
   END;
-*)
+
   PROCEDURE InitSchemeVars(VAR Scheme: SchemeRec);
   BEGIN
     WITH Scheme DO
     BEGIN
       Description := '<< New Color Scheme >>';
       FillChar(Color,SizeOf(Color),7);
-      Color[1] := 7;
-      Color[2] := 15;
-      Color[3] := 31;
-      Color[4] := 7;
-      Color[5] := 8;
-      Color[6] := 7;
-      Color[7] := 127;
-      Color[8] := 93;
-      Color[9] := 12;
+      Color[1] := 15;
+      Color[2] := 3;
+      Color[3] := 13;
+      Color[4] := 11;
+      Color[5] := 9;
+      Color[6] := 14;
+      Color[7] := 31;
+      Color[8] := 4;
+      Color[9] := 132;
       Color[10] := 10;
     END;
   END;
@@ -454,7 +443,7 @@ VAR
       CASE Counter OF
         1 : IF (Scheme.Description = '') OR (Scheme.Description = '<< New Color Scheme >>') THEN
             BEGIN
-              Print('%LF^8ERROR: Invalid Description!^0');
+              Print('%LF^7The description is invalid!^1');
               OK := FALSE;
             END;
       END;
@@ -474,54 +463,41 @@ VAR
           Next := FALSE;
           CLS;
           IF (Editing) THEN
-            Print(PadLeftStr('^2 '+#254+' Editing Color Scheme #'+IntToStr(RecNumToEdit),80)) {IntToStr(NumSchemes)}
+            PrintACR('^5Editing color scheme #'+IntToStr(RecNumToEdit)+' of '+IntToStr(NumSchemes))
           ELSE
-            Print(PadLeftStr('^2 '+#254+' Inserting Color Scheme #'+IntToStr(RecNumToEdit),80)); {IntToStr(NumSchemes+1)}
-          {NL;}
-          PrintACR('^01'+#242+' Description : ^1'+Scheme.Description);
-            Prompt('^02'+#242+' Colors      : ');
+            PrintACR('^5Inserting color scheme #'+IntToStr(RecNumToEdit)+' of '+IntToStr(NumSchemes + 1));
+          NL;
+          PrintACR('^11. Description   : ^5'+Scheme.Description);
+          Prompt('^12. System colors : ');
           ShowColors;
-		  {
-		  print(inttostr(Scheme.Color[1]));
-		  print(inttostr(Scheme.Color[2]));
-		  print(inttostr(Scheme.Color[3]));
-		  print(inttostr(Scheme.Color[4]));
-		  print(inttostr(Scheme.Color[5]));
-		  print(inttostr(Scheme.Color[6]));
-		  print(inttostr(Scheme.Color[7]));
-		  print(inttostr(Scheme.Color[8]));
-		  print(inttostr(Scheme.Color[9]));
-		  print(inttostr(Scheme.Color[10]));
-		  }
-		  
-          {PrintACR('^13. File listings');
+          PrintACR('^13. File listings');
           PrintACR('^14. Message listings');
           PrintACR('^15. File area listings');
           PrintACR('^16. Message area listings');
           PrintACR('^17. Offline mail screen');
-          PrintACR('^18. Private mail listing');}
+          PrintACR('^18. Private mail listing');
         END;
         IF (NOT Editing) THEN
           CmdStr := '12345678'
         ELSE
           CmdStr := '12345678[]FJL';
-        LOneK('%LF^0Color Scheme Editor: ',Cmd1,'Q?'+CmdStr++^M,TRUE,TRUE);
+        LOneK('%LFModify menu [^5?^4=^5Help^4]: ',Cmd1,'Q?'+CmdStr++^M,TRUE,TRUE);
         CASE Cmd1 OF
           '1' : REPEAT
                   TempScheme1.Description := Description;
                   Ok := TRUE;
-                  InputWN1('%LF^0New Description: ',Description,(SizeOf(Description) - 1),[InterActiveEdit],Changed);
+                  InputWN1('%LFNew description: ',Description,(SizeOf(Description) - 1),[InterActiveEdit],Changed);
                   CheckScheme(Scheme,1,1,Ok);
                   IF (NOT Ok) THEN
                     Description := TempScheme1.Description;
                 UNTIL (Ok) OR (HangUp);
           '2' : SystemColors(Scheme,Cmd1,Changed);
-          {'3' : FileColors(Scheme,Cmd1,Changed);
+          '3' : FileColors(Scheme,Cmd1,Changed);
           '4' : MsgColors(Scheme,Cmd1,Changed);
           '5' : FileAreaColors(Scheme,Cmd1,Changed);
           '6' : MsgAreaColors(Scheme,Cmd1,Changed);
           '7' : QWKColors(Scheme,Cmd1,Changed);
-          '8' : EmailColors(Scheme,Cmd1,Changed);}
+          '8' : EmailColors(Scheme,Cmd1,Changed);
           '[' : IF (RecNumToEdit > 1) THEN
                   Dec(RecNumToEdit)
                 ELSE
@@ -544,7 +520,7 @@ VAR
                   Cmd1 := #0;
                 END;
           'J' : BEGIN
-                  InputIntegerWOC('%LF^0Jump To Which Entry?',RecNumToEdit,[NumbersOnly],1,NumSchemes);
+                  InputIntegerWOC('%LFJump to entry?',RecNumToEdit,[NumbersOnly],1,NumSchemes);
                   IF (RecNumToEdit < 1) OR (RecNumToEdit > NumSchemes) THEN
                     Cmd1 := #0;
                 END;
@@ -556,15 +532,15 @@ VAR
                   Cmd1 := #0;
                 END;
           '?' : BEGIN
-				  NL;
-                  Print('%LF^0<^1CR^0> Refresh Screen');
+                  Print('%LF^1<^3CR^1>Redisplay current screen');
+                  Print('^31^1-^38^1:Modify item');
                   IF (NOT Editing) THEN
-                    LCmds(22,1,'? Help','Q Quit')
+                    LCmds(20,3,'Quit and save','')
                   ELSE
                   BEGIN
-                    LCmds(22,1,'[ Previous Entry','] Next Entry');
-                    LCmds(22,1,'F First Entry In List','J Jump To Entry');
-                    LCmds(22,1,'L Last Entry In List','Q Quit');
+                    LCmds(20,3,'[Back entry',']Forward entry');
+                    LCmds(20,3,'First entry in list','Jump to entry');
+                    LCmds(20,3,'Last entry in list','Quit and save');
                   END;
                 END;
         END;
@@ -584,7 +560,7 @@ VAR
     ELSE
     BEGIN
       RecNumToInsertBefore := -1;
-      InputIntegerWOC('%LF^0Insert Before Which Color Scheme?',RecNumToInsertBefore,[NumbersOnly],1,(NumSchemes + 1));
+      InputIntegerWOC('%LFColor scheme to insert before',RecNumToInsertBefore,[NumbersOnly],1,(NumSchemes + 1));
       IF (RecNumToInsertBefore >= 1) AND (RecNumToInsertBefore <= (NumSchemes + 1)) THEN
       BEGIN
         Reset(SchemeFile);
@@ -600,12 +576,12 @@ VAR
           EditScheme(TempScheme1,TempScheme1,Cmd1,RecNumToEdit,Changed,FALSE);
           CheckScheme(TempScheme1,1,1,Ok);
           IF (NOT OK) THEN
-            IF (NOT PYNQ('%LF^0Continue Inserting Color Scheme? ',0,TRUE)) THEN
+            IF (NOT PYNQ('%LFContinue inserting color scheme? ',0,TRUE)) THEN
               Abort := TRUE;
         UNTIL (OK) OR (Abort) OR (HangUp);
-        IF (NOT Abort) AND (PYNQ('%LF^0Save This Color Scheme? ',0,FALSE)) THEN
+        IF (NOT Abort) AND (PYNQ('%LFIs this what you want? ',0,FALSE)) THEN
         BEGIN
-          Print('%LF^9[> Saving ...');
+          Print('%LF[> Inserting color scheme record ...');
           Seek(SchemeFile,FileSize(SchemeFile));
           Write(SchemeFile,Scheme);
           Dec(RecNumToInsertBefore);
@@ -621,13 +597,13 @@ VAR
             Seek(SchemeFile,RecNum);
             Write(SchemeFile,TempScheme1);
             Inc(NumSchemes);
-            SysOpLog('* Added Color Scheme: '+TempScheme1.Description);
+            SysOpLog('* Inserted color scheme: ^5'+TempScheme1.Description);
           END;
         END;
         Close(SchemeFile);
         LastError := IOResult;
         Inc(RecNumToInsertBefore);
-        Print('%LF^9[> Updating User Records ...');
+        Print('%LFUpdating user records ...');
         Reset(UserFile);
         RecNum := 1;
         WHILE (RecNum < FileSize(UserFile)) DO
@@ -657,7 +633,7 @@ VAR
     ELSE
     BEGIN
       RecNumToEdit := -1;
-      InputIntegerWOC('%LF^0Modify Which Color Scheme?',RecNumToEdit,[NumbersOnly],1,NumSchemes);
+      InputIntegerWOC('%LFColor scheme to modify',RecNumToEdit,[NumbersOnly],1,NumSchemes);
       IF (RecNumToEdit >= 1) AND (RecNumToEdit <= NumSchemes) THEN
       BEGIN
         SaveRecNumToEdit := -1;
@@ -711,15 +687,16 @@ VAR
     ELSE
     BEGIN
       RecNumToPosition := -1;
-      InputIntegerWOC('%LF^0Position Which Color Scheme?',RecNumToPosition,[NumbersOnly],1,NumSchemes);
+      InputIntegerWOC('%LFPosition which color scheme',RecNumToPosition,[NumbersOnly],1,NumSchemes);
       IF (RecNumToPosition >= 1) AND (RecNumToPosition <= NumSchemes) THEN
       BEGIN
+        Print('%LFAccording to the current numbering system.');
         RecNumToPositionBefore := -1;
-        InputIntegerWOC('%LF^0Position Before Which Color Scheme?',RecNumToPositionBefore,[NumbersOnly],1,(NumSchemes + 1));
+        InputIntegerWOC('%LFPosition before which color scheme',RecNumToPositionBefore,[NumbersOnly],1,(NumSchemes + 1));
         IF (RecNumToPositionBefore >= 1) AND (RecNumToPositionBefore <= (NumSchemes + 1)) AND
            (RecNumToPositionBefore <> RecNumToPosition) AND (RecNumToPositionBefore <> (RecNumToPosition + 1)) THEN
         BEGIN
-          Print('%LF^9[> Positioning ...');
+          Print('%LF[> Positioning color scheme record ...');
           Reset(SchemeFile);
           IF (RecNumToPositionBefore > RecNumToPosition) THEN
             Dec(RecNumToPositionBefore);
@@ -749,7 +726,7 @@ VAR
           LastError := IOResult;
           Inc(RecNumToPosition);
           Inc(RecNumToPositionBefore);
-          Print('%LF^9 [> Updating User Records ...');
+          Print('%LFUpdating user records ...');
           Reset(UserFile);
           RecNum1 := 1;
           WHILE (RecNum1 < FileSize(UserFile)) DO
@@ -783,10 +760,8 @@ VAR
     Abort := FALSE;
     Next := FALSE;
     CLS;
-	Print(PadLeftStr('^2 '+#254+' Color Scheme Editor',80));
-    PrintACR('^4+----+--------------------------------------------------+---------------------+');
-	PrintACR('^4| ^3## ^4| ^3Description                                      ^4| ^3Colors              ^4|');
-    PrintACR('^4+----+--------------------------------------------------+---------------------+');
+    PrintACR('^0###^4:^3'+PadLeftStr('Description',30)+'^4:^3Colors');
+    PrintACR('^4===:==============================:============================');
     Reset(SchemeFile);
     NumDone := 0;
     WHILE (NumDone < (PageLength - 5)) AND (RecNumToList1 >= 1) AND (RecNumToList1 <= NumSchemes)
@@ -795,19 +770,17 @@ VAR
       Seek(SchemeFile,(RecNumToList1 - 1));
       Read(SchemeFile,Scheme);
       WITH Scheme DO
-        Prompt('  ^0'+PadLeftInt(RecNumToList1,3)+
-               '  ^1'+PadLeftStr(Description,49)+
-               '  ^0');
+        Prompt('^0'+PadRightInt(RecNumToList1,3)+
+               ' ^5'+PadLeftStr(Description,30)+
+               ' ');
       ShowColors;
       Inc(RecNumToList1);
       Inc(NumDone);
-	  
-	  { LeeW: this is loading each scheme to show the desc, colors, thereby affecting how each one displays }
     END;
     Close(SchemeFile);
     LastError := IOResult;
     IF (NumSchemes = 0) THEN
-      Print('^8  [ NO COLOR SCHEMES DEFINED ]');
+      Print('*** No color schemes defined ***');
   END;
 
 BEGIN
@@ -818,7 +791,7 @@ BEGIN
   REPEAT
     IF (Cmd <> '?') THEN
       ListSchemes(RecNumToList);
-    LOneK('%LF^0Color Scheme Editor: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
+    LOneK('%LFColor scheme editor [^5?^4=^5Help^4]: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
     CASE Cmd OF
       ^M  : IF (RecNumToList < 1) OR (RecNumToList > NumSchemes) THEN
               RecNumToList := 1;
@@ -827,10 +800,11 @@ BEGIN
       'M' : ModifyScheme(TempScheme,Cmd,RecNumToList);
       'P' : PositionScheme(TempScheme);
       '?' : BEGIN
-              Print('%LF^0<^1CR^0> Next Page / Refresh');
-              LCmds(22,1,'D Delete Color Scheme','I Insert Color Scheme');
-              LCmds(22,1,'M Modify Color Scheme','P Position Color Scheme');
-              LCmds(22,1,'? Help','Q Quit');
+              Print('%LF^1<^3CR^1>Next screen or redisplay current screen');
+              Print('^1(^3?^1)Help/First color scheme');
+              LCmds(20,3,'Delete color scheme','Insert color scheme');
+              LCmds(20,3,'Modify color scheme','Position color scheme');
+              LCmds(20,3,'Quit','');
             END;
     END;
     IF (CMD <> ^M) THEN
