@@ -258,7 +258,7 @@ VAR
   VAR
     MaxCodes: Byte;
   BEGIN
-    MaxCodes := MaxResultCodes;    { NOTE!  Done backwards to avoid CONNECT 1200 / CONNECT 12000 confusion!! }
+    MaxCodes := MaxResultCodes; { NOTE: Done backwards to avoid CONNECT 1200 / CONNECT 12000 confusion! }
     Reliable := (Pos(Liner.Reliable,ResultCode) > 0);
     WITH Liner DO
     REPEAT
@@ -306,7 +306,7 @@ BEGIN
     Exit;
   END;
 
-  Reliable := FALSE;    { Could've been set in boot - don't move }
+  Reliable := FALSE; { Could've been set in boot - don't move }
 
   Com_Flush_Recv;
   IF (Liner.Answer <> '') THEN
@@ -655,7 +655,7 @@ VAR
         GoToXY(1,17);
         ClrEOL;
         GoToXY(31,17);
-        Write('Initializing modem ...');
+        Write('Initializing Modem ...');
        END;
        rl := Timer;
 
@@ -723,7 +723,7 @@ VAR
     BEGIN
       DoPhoneOffHook(ShowIt);
       PhoneOffHook := TRUE;
-      WFCMessage := 'Modem off hook';
+      WFCMessage := 'Modem Off-Hook';
     END;
   END;
 
@@ -888,7 +888,7 @@ BEGIN
   IF (NOT General.LocalSec) OR (General.NetworkMode) THEN
     SysOpOn := TRUE;
   IF (BeepEnd) THEN
-    WFCMessage := 'Modem off hook - paging SysOp';
+    WFCMessage := 'Modem Off-Hook - Paging SysOp';
   Randomize;
   TextAttr := CurrentColor;
   CursorOn(FALSE);
@@ -1059,7 +1059,7 @@ BEGIN
                   InBox := TRUE;
                   TextAttr := 31;
                   GoToXY(32,17);
-                  Write('Talking to modem ...');
+                  Write('Talking To Modem ...');
                   RedrawWFC := FALSE;
                 END;
 
@@ -1069,7 +1069,7 @@ BEGIN
                   RedrawWFC := FALSE;
           'B' : IF (CPW) THEN
                   MessageAreaEditor;
-          'C' : TodaysCallers(0,'');
+          'C' : TodaysCallers(0);
           'D' : SysOpShell;
           'E' : IF (CPW) THEN
                   EventEditor;
@@ -1105,7 +1105,7 @@ BEGIN
                 END;
           'P' : BEGIN
                   ClrScr;
-                  IF (PYNQ('Pack the message areas? ',0,FALSE)) THEN
+                  IF (PYNQ('^0Pack The Message Areas? ',0,FALSE)) THEN
                     DoShowPackMessageAreas;
                 END;
           'Q' : BEGIN
@@ -1117,15 +1117,16 @@ BEGIN
           'R' : IF (CPW) THEN
                 BEGIN
                   ClrScr;
-                  Print('^5User''s private messages to read (1-'+IntToStr(MaxUsers - 1)+')?^1');
+                  Print('^0Read users private messages ...');
                   NL;
-                  Print('Enter User Number, Name, or Partial Search String.');
-                  Prt(': ');
+                  Print('^0Enter User Number [^11^0-^1'+IntToStr(MaxUsers - 1)+'^0], Name, Or Partial Search String.');
+				  NL;
+                  Prt('^0User: ');
                   lFindUserWS(UNum);
                   IF (UNum < 1) THEN
                   BEGIN
-                    NL;
-                    PauseScr(FALSE);
+                  {  NL;
+                    PauseScr(FALSE); }
                   END
                   ELSE
                   BEGIN
@@ -1141,20 +1142,18 @@ BEGIN
           'S' : IF (CPW) THEN
                   SystemConfigurationEditor;
           'U' : IF (CPW) THEN
-                BEGIN
-                  ClrScr;
                   UserEditor(UserNum);
-                END;
           'V' : IF (CPW) THEN
                   VotingEditor;
           'W' : IF (CPW) THEN
                 BEGIN
                   ClrScr;
-                  Print('^5User to send private message from (1-'+IntToStr(MaxUsers - 1)+')?^1');
+				  Print('^0Private Messaging ...');
                   NL;
-                  Print('Enter User Number, Name, or Partial Search String.');
-                  Prt(': ');
-                  lFindUserWS(UNum);
+				  Print('^0Enter User Number [^11^0-^1'+IntToStr(MaxUsers - 1)+'^0], Name, Or Partial Search String.');
+				  NL;
+				  Prt('^0From: ');
+				  lFindUserWS(UNum);
                   IF (UNum < 1) THEN
                   BEGIN
                     NL;
@@ -1165,7 +1164,7 @@ BEGIN
                     LoadURec(ThisUser,UNum);
                     UserNum := UNum;
                     NL;
-                    SMail(PYNQ('Send mass mail? ',0,FALSE));
+                    SMail(PYNQ('^0Send Mass-Mail? ',0,FALSE));
                     LoadURec(ThisUser,1);
                     UserNum := 1;
                   END;
@@ -1174,7 +1173,6 @@ BEGIN
                   ProtocolEditor;
           'Z' : IF (CPW) THEN
                   HistoryEditor;
-
           '$' : IF (CPW) THEN
                   ConferenceEditor;
           '!' : BEGIN
@@ -1188,7 +1186,7 @@ BEGIN
                     TakeOffHook(TRUE);
                   GoToXY(32,17);
                   TextAttr := 31;
-                  Write('Log on? (Y/N');
+                  Write('Log On? (Y/N');
                   IF (NOT General.LocalSec) THEN
                     Write('/Fast): ')
                   ELSE
