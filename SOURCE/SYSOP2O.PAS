@@ -3,7 +3,10 @@
 {  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
   | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
   |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
-  TIME PER CALL / MAX CALLS DAILY / FILE RATIO / KB RATIO / POST/CALL RATIO / MAX # DL DAILY / MAX KB DL DAILY
+  ----------------------------------------------------------------------
+  MAX TIME DAILY / MAX CALLS DAILY / FILE RATIO / KB RATIO / 
+  POST/CALL RATIO / MAX # DL DAILY / MAX KB DL DAILY
+  ----------------------------------------------------------------------
 }
 
 UNIT SysOp2O;
@@ -56,7 +59,7 @@ VAR
       END;
       PrintACR(TempStr);
       Inc(LineNum);
-    UNTIL (LineNum > 16) OR (Abort) OR (HangUp); { LeeW: Should use PAGELEN, no? will be hard}
+    UNTIL (LineNum > 16) OR (Abort) OR (HangUp); { LeeW: Should use PAGELEN, no? }
   END;
 
 BEGIN
@@ -68,15 +71,16 @@ BEGIN
     CASE DisplayType OF
       1 : Print('^1Daily Time Limit');
       2 : Print('^1Daily Call Limit');
-      3 : Print('^1UL/DL # files ratio (# files can DL per UL)');
-      4 : Print('^1UL/DL K-bytes ratio (#k can DL per 1k UL)');
-      5 : Print('^1Post/Call ratio (posts per 100 calls) to have Z ACS flag set');
-      6 : Print('^1Maximum number of downloads per day');
-      7 : Print('^1Maximum amount of downloads (in kbytes) per day');
+      3 : Print('^1UL/DL Ratio (Number Of Files Can DL Per 1 File UL)');
+      4 : Print('^1UL/DL Ratio (Number Of Kb Can DL Per 1Kb UL)');
+      5 : Print('^1Post/Call Ratio (Posts Per 100 Calls To Have Z ACS Flag Set)');
+      6 : Print('^1Daily Download Limit (Number Of Files)');
+      7 : Print('^1Daily Download Limit (Kb)');
     END;
     NL;
     ShowSecRange(DisplayValue);
-    LOneK('^0%LF: ',Cmd,'QS?'^M,TRUE,TRUE);
+	NL;
+    LOneK('^0[(^1?^0)Help]: ',Cmd,'QS?'^M,TRUE,TRUE);
     CASE Cmd OF
       'S' : BEGIN
               FromValue := 0;

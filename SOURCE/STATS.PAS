@@ -9,7 +9,7 @@
   [ISSUES]
 	- needs better styling, customizable styling-- custo header mid and tail
 	- top 20 files: needs more info than just filename? users wont be able to tell
-	what they ara
+	what they are
 }
 
 UNIT STATS;
@@ -39,6 +39,7 @@ VAR
   Top20File: Top20FileArray;
 
 PROCEDURE GetUserStats(MenuOption: Str50);
+FUNCTION Center(S: AStr; Len: Byte; TF: Boolean): AStr; { LeeW: move this to common? }
 
 IMPLEMENTATION
 

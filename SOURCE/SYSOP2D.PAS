@@ -145,8 +145,8 @@ BEGIN
                '^0(^1Y^0) TB Max Daily Deposit       : ^1'+PadLeftInt(MaxDepositPerDay,6));
       PrintACR('^0(^1Z^0) TB Max Daily Withdraw      : ^1'+PadLeftInt(MaxWithDrawalPerDay,6)+
 	           '^0(^1!^0) New User Message Sent To   : ^1'+AOnOff((NewApp = -1),'Off',PadLeftInt(NewApp,5)));
-	  PrintACR('|07(|15@|07) Mins Before Timeout Bell : |15'+AOnOff((TimeOutBell = -1),'Off',PadLeftInt(TimeOutBell,3)));
-      PrintACR('|07(|15#|07) Mins Before Timeout      : |15'+AOnOff((TimeOut = -1),'Off',PadLeftInt(TimeOut,3)));
+	  PrintACR('^0(^1@^0) Mins Before Timeout Bell : ^1'+AOnOff((TimeOutBell = -1),'Off',PadLeftInt(TimeOutBell,3)));
+      PrintACR('^0(^1#^0) Mins Before Timeout      : ^1'+AOnOff((TimeOut = -1),'Off',PadLeftInt(TimeOut,3)));
       NL;
       FOR TempB := 0 TO 9 DO
       BEGIN
@@ -161,11 +161,11 @@ BEGIN
       Prt('^0Enter Selection or (^1Q^0) to Quit: ^1');
       OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ1234567890!@#',TRUE,TRUE);
       CASE Cmd OF
-	          '@','#' :
-              BEGIN
-			  Nl;
-                Prt('|07Select (|15E|07)nable (|15D|07)isable or [|15ENTER|07] To Quit: |15');
-                OneK(Cmd1,^M'ED',TRUE,TRUE);
+	    '@','#' :
+		  BEGIN
+			NL;
+			Prt('^0Select (^1E^0)nable, (^1D^0)isable, Or [^1ENTER^0] To Abort: ^1');
+			OneK(Cmd1,^M'ED',TRUE,TRUE);
                 IF (Cmd1 IN ['E','D']) THEN
                 BEGIN
                   CASE Cmd1 OF

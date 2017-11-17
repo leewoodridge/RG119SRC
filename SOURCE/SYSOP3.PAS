@@ -749,12 +749,12 @@ VAR
   PROCEDURE ChangeRecords(On: Byte);
   VAR
     OneKCmds: AStr;
+	Cmd,
     Cmd1: Char;
     TempL1: LongInt;
 	TempSchemeName: String; { LeeW: Added }
 	TempConfName: String; { LeeW }
-	RecNumToList: Integer; { LeeW }
-	
+	RecNumToList: Integer; { LeeW }	
   BEGIN
     WITH User DO
       REPEAT
@@ -977,7 +977,7 @@ VAR
 						  'H' : ToggleACFlag(Novice,Flags);			{ Expert Mode }
 						  'I' : CStuff(16,3,User);					{ Screen Size }
 						  'J' : CStuff(15,3,User);					{ Color Scheme }
-						  'K' : ChangeConference('');				{ Conference }
+						  'K' : ;									{ Conference }
 						  (*LeeW changeconfernce needs to be a cstuff cmd / not applying to right usr *)
                         END;
                 END;

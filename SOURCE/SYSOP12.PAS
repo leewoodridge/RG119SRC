@@ -20,6 +20,7 @@ USES
 
 FUNCTION FindConference(Key: Char; VAR Conference: ConferenceRecordType): Boolean;
 FUNCTION ShowConferences: AStr;
+PROCEDURE DisplayConferenceRecords(RecNumToList: Integer; DisplayListNum: Boolean); {LeeW}
 PROCEDURE ChangeConference(MenuOption: Str50);
 PROCEDURE ConferenceEditor;
 

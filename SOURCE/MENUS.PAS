@@ -869,7 +869,7 @@ BEGIN
                     TodaysCallers(StrToInt(MenuOption));
                   END;
             'P' : CStuff(StrToInt(MenuOption),2,ThisUser);
-            'R' : ChangeConference(MenuOption);
+            {'R' : ChangeConference(MenuOption);}
             'S' : Bulletins(MenuOption);
             'U' : UList(MenuOption);
           ELSE

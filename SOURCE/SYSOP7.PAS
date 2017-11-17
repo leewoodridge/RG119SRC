@@ -1,6 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
 
 {$A+,B+,D+,E+,F+,I+,L+,N-,O+,R-,S+,V-}
 
@@ -38,14 +35,15 @@ BEGIN
   AllowContinue := TRUE;
   MCIAllowed := FALSE;
   CLS;
-  IF (DisplayListNum) THEN
+(*  IF (DisplayListNum) THEN
   BEGIN
 	PrintACR('^4+-----+--------+--------------------------------------------------------------+');
     PrintACR('^4| ^3### ^4| ^3Menu # ^4| ^3Menu Name                                                    ^4|');
     PrintACR('^4+-----+--------+--------------------------------------------------------------+');
   END
-  ELSE
+  ELSE*)
   BEGIN
+	{PrintACR('^1                                                                               ')}
 	PrintACR('^4+-----+-----------------------------------------------------------------------+');
 	PrintACR('^4| ^3### ^4| ^3Menu Name                                                             ^4|');
 	PrintACR('^4+-----+-----------------------------------------------------------------------+');
@@ -76,7 +74,6 @@ BEGIN
   AllowContinue := FALSE;
   IF (NumMenus = 0) THEN
     Print('^8[ NO MENUS DEFINED ]');
-
 	
 	{  IF (DisplayListNum) THEN
     PrintACR('%LF^1[Users start at menu number: ^5'+IntToStr(General.AllStartMenu)+'^1]');} { LeeW: Redundant Information }

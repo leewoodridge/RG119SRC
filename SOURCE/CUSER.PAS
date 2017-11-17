@@ -18,7 +18,8 @@ USES
   Dos,
   Archive1,
   TimeFunc,
-  MiscUser;
+  MiscUser,
+  SysOp12;
 
 VAR
   CountryNum: Integer;
@@ -426,8 +427,8 @@ VAR
     END;
     REPEAT
       REPEAT
-        Print('Enter your desired password for future access.');
-        Print('It should be 4 to 20 characters in length.');
+        Print('Enter your desired password for access.');
+        Print('It must be between 4 and 20 characters in length.');
         NL;
         Prompt('Password: ');
         MPL(20);
@@ -544,7 +545,7 @@ VAR
       BEGIN
         Done1 := FALSE;
         NL;
-        Print('^8That name is in use.^1');
+        Print('^8That name is already in use^0');
       END;
     END;
     IF (Done1) THEN
@@ -614,7 +615,7 @@ VAR
           END;
       2 : BEGIN
             {Print('Enter your postal code (LNLNLN format)');}
-            Prt('Enter your postal code (A#A#A#): ');
+            Prt('Enter your postal code (LNLNLN): ');
             InputFormatted('',TempZipCode,'@#@#@#',(How = 3));
             IF (TempZipCode <> '') THEN
               User.ZipCode := TempZipCode;
@@ -640,8 +641,8 @@ VAR
     Unum: Integer;
   BEGIN
     NL;
-    Print('^0If you forward your mail, all email sent to your account^1');
-    Print('^0will be redirected to that person.^1');
+    Print('^0If you forward your mail, all email sent to your account');
+    Print('^0will be redirected to that person.');
     NL;
     Print('^0Enter User Number, Name, or Partial Search String.');
     Prt(': ');
@@ -699,7 +700,7 @@ VAR
         {SysOpLog('Your Mailbox is closed');}
       END
       ELSE
-      BEGIN
+      BEGIN { LeeW: Should this only prompt if you say no to close mailbox? }
         NL;
         IF PYNQ('^0Do you want to forward your mail? ',0,FALSE) THEN
           ForwardMail;
@@ -777,7 +778,7 @@ VAR
         Else
           Exclude(User.Flags,Color);
         Done1 := TRUE;
-{ Text color bug happening if select no -- investigate }
+{ LeeW: Text color bug happening if select no -- investigate }
       End
   End;
 
@@ -840,6 +841,9 @@ VAR
     Next := FALSE;
     PrintACR('^0Available Color Schemes:');
     NL;
+	PrintACR('^4+----+------------------------------------+');
+	PrintACR('^4| ^3## ^4| ^3Description                        ^4|');
+	PrintACR('^4+----+------------------------------------+');
     i := 1;
     Onlin := 0;
     Seek(SchemeFile,0);
@@ -847,7 +851,7 @@ VAR
     BEGIN
       Read(SchemeFile,AScheme);
       Inc(Onlin);
-      Prompt('('+PadLeftInt(i,2)+') '+PadLeftStr(AScheme.Description,35));
+      Prompt('^1  '+PadLeftInt(i,3)+'^0  '+PadLeftStr(AScheme.Description,35));
       IF (OnLin = 2) THEN
       BEGIN
         NL;
@@ -859,7 +863,8 @@ VAR
     Abort := FALSE;
     Next := FALSE;
     NL;
-    InputIntegerWOC('^0%LFSelect a color scheme',i,[NumbersOnly],1,FileSize(SchemeFile));
+    InputIntegerWOC('^0%LFSelect A Color Scheme',i,[NumbersOnly,InterActiveEdit],1,FileSize(SchemeFile));
+	{ LeeW: "2" is default choice -- fix }
     IF (i >= 1) AND (i <= FileSize(SchemeFile)) THEN
     BEGIN
       ThisUser.ColorScheme := i;
@@ -980,7 +985,72 @@ VAR
           Done1 := True;
         End
     End;
-  
+(*
+PROCEDURE ChangeConference(MenuOption: Str50);
+VAR
+  OneKCmds: AStr;
+  Cmd: Char;
+  RecNumToList: Integer;
+BEGIN
+  MenuOption := AllCaps(SQOutSp(MenuOption));
+  IF (MenuOption <> '') THEN
+    Cmd := MenuOption[1]
+  ELSE
+    Cmd := #0;
+  IF (Cmd <> #0) AND (Cmd <> '?') AND (NOT (Cmd IN ConfKeys)) THEN
+  BEGIN
+    Print('%NLCommand error, operation aborted!');
+    SysOpLog('^7Change conference cmd error, invalid options: "'+Cmd+'".');
+    Exit;
+  END;
+  IF (Cmd = '?') THEN
+  BEGIN
+    PrintF('CONFLIST');
+    IF (NoFile) THEN
+      DisplayConferenceRecords(RecNumToList,FALSE);
+  END
+  ELSE IF (Cmd IN ConfKeys) AND FindConference(Cmd,Conference) THEN
+  BEGIN
+    IF ((AACS(Conference.ACS))) THEN
+    BEGIN
+      CurrentConf := Cmd;
+      {This}User.LastConf := CurrentConf;
+    END;
+  END
+  ELSE
+  BEGIN
+    OneKCmds := '';
+    FOR Cmd := '@' TO 'Z' DO
+      IF (Cmd IN ConfKeys) THEN
+        OneKCmds := OneKCmds + Cmd;
+    Print('%LFCurrent conference: '+User.LastConf+' - %CN');
+    REPEAT
+      LOneK('%LFJoin which conference? (^5?^4=^5List^4,<^5CR^4>=^5Quit^4): ',Cmd,^M'?'+OneKCmds,TRUE,TRUE);
+      IF (Cmd = '?') THEN
+      BEGIN
+        PrintF('CONFLIST');
+        IF (NoFile) THEN
+          DisplayConferenceRecords(RecNumToList,FALSE);
+      END
+      ELSE IF (Cmd IN ConfKeys) AND FindConference(Cmd,Conference) THEN
+        IF (NOT AACS(Conference.ACS)) THEN
+          Print('%LF^7You do not have the required access level for this conference!^1')
+        ELSE
+        BEGIN
+          CurrentConf := Cmd;
+          {This}User.LastConf := Cmd;
+          PrintF('CONF'+Cmd);
+          IF (NoFile) THEN
+            Print('%LFJoined conference: ^5%CT - %CN');
+          Cmd := ^M;
+        END;
+    UNTIL (Cmd = ^M) OR (HangUp);
+  END;
+  NewCompTables;
+  Done1 := True;
+END;
+*)
+	
   Procedure WW(www: Byte);
   Begin
     Nl;
@@ -1004,7 +1074,7 @@ VAR
         17 : Toggle_Clear;      { (P) Screen Clearing }
         18 : Toggle_Pause;      { (R) Screen Pause }
         19 : Toggle_HotKey;     { (S) Use Hot Keys? }
-        20 : ConfigureQWK;      { (T) QWK Configuration } { Is This Relevent Anymore? }
+        20 : ConfigureQWK;      { (T) QWK Configuration }
         21 : Toggle_Expert;     { (U) Use Expert Mode? }
         22 : DoPW;              { (!) Password *MANDATORY* }
         23 : DoForgotPW;        { (V) Forgot Password Answer }
@@ -1015,6 +1085,7 @@ VAR
         24 : Mailbox;			{ Mailbox / Mail Forwarding }
         25 : Toggle_Editor;		{ Fullscreen Or Line Editor }
         26 : Toggle_LightBars;	{ Use LightBars? }
+		27 : ChangeConference('');  { Conference }
     End;
   End;
 

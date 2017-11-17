@@ -15,6 +15,7 @@ PROCEDURE ModemConfiguration;
 IMPLEMENTATION
 
 USES
+  CRT,
   Common;
 
 PROCEDURE ModemConfiguration;
@@ -92,7 +93,9 @@ BEGIN
     BEGIN
       Abort := FALSE;
       Next := FALSE;
-      Print('%CL^0Modem/Node Configuration:');
+      ClrScr;
+	  PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : Modem / Node '+IntToStr(ThisNode)+' Configuration',80));
+	  Print('Here you can configure...');
       NL;
       PrintACR('^11^0> Maximum Baud Rate : ^1'+PadLeftInt(InitBaud,20)+
                '^12^0> Port Number       : ^1'+IntToStr(ComPort));
@@ -101,8 +104,8 @@ BEGIN
       PrintACR('^15^0> Modem Hang Up     : ^1'+PadLeftStr(HangUp,20)+
                '^16^0> Modem Off Hook    : ^1'+Offhook);
       PrintACR('^17^0> COM Port Locking  : ^1'+PadLeftStr(ShowOnOff(LockedPort IN MFlags),20)+
-               '^18^0> XON/XOFF Flow     : ^1'+ShowOnOff(XONXOFF IN MFlags));
-      PrintACR('^19^0> CTS/RTS Flow      : ^1'+PadLeftStr(ShowOnOff(CTSRTS IN MFlags),20)+
+               '^18^0> XON/XOFF (SW) Flow: ^1'+ShowOnOff(XONXOFF IN MFlags));
+      PrintACR('^19^0> CTS/RTS (HW) Flow : ^1'+PadLeftStr(ShowOnOff(CTSRTS IN MFlags),20)+
                '^1A^0> ACS For This Node : ^1'+LogonACS);
       PrintACR('^1B^0> Drop File Path    : ^1'+PadLeftStr(DoorPath,20)+
                '^1C^0> Answer On Ring    : ^1'+IntToStr(AnswerOnRing));

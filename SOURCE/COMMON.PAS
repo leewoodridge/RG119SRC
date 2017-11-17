@@ -4711,14 +4711,14 @@ BEGIN
                   'D' : Add := AOnOff(General.PerCall,'call','day ');
                   'L' : Add := ^L;
                   'M' : Add := IntToStr(Msg_On);
-                  'N' : IF FindConference(CurrentConf,Conference) THEN
+                  'N' : IF FindConference(LastConf,Conference) THEN { Conference Name }
                           Add := Conference.Name
                         ELSE
-                          Add:= '';
+                          Add:= '*None*';
 				(*  'O' : Add := ThisUser.Country; { LeeW: Country } *)
                   'R' : Add := FormatNumber(lCredit);
                   'S' : Add := PHours('Always allowed',General.lLowTime,General.HiTime);
-                  'T' : Add := CurrentConf;
+                  'T' : Add := LastConf; { Conference Key }
                   '+' : BEGIN
                           Add := '';
                           CursorOn(TRUE);
@@ -4748,7 +4748,7 @@ BEGIN
                         END;
                 END;
           'E' : CASE UpCase(S[Index + 2]) OF
-		          'C' : Add := ''; { Add ANSI Escape Character }
+		          'C' : Add := ''; { LeeW: ANSI Escape Character }
                   'D' : Add := AOnOff((Expiration = 0),'Never',ToDate8(PD2Date(Expiration)));
                   'S' : Add := FormatNumber(EmailSent);
                   'T' : Add := IntToStr(General.EventWarningTime);

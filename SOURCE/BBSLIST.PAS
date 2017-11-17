@@ -358,8 +358,8 @@ END;
 PROCEDURE DisplayError(FName: ASTR; VAR FExists: Boolean);
 BEGIN
   NL;
-  PrintACR('|12ú |09The '+FName+'.*  File is missing.');
-  PrintACR('|12ú |09Please, inform the Sysop!');
+  PrintACR('^8ú ^0The '+FName+'.*  File is missing.');
+  PrintACR('^8ú ^0Please, inform the Sysop!');
   SysOpLog('The '+FName+'.* file is missing.');
   FExists := FALSE;
 END;
@@ -573,8 +573,8 @@ BEGIN
     IF (NOT Found) THEN
     BEGIN
       NL;
-      Print(' You may only delete BBS Listing''s that you have entered.');
-      SysOpLog('Tried to delete a BBS Listing.');
+      Print('You may only delete BBS Listing''s that you have entered.');
+      SysOpLog('Tried to delete someone elses BBS listing');
     END;
   END;
 END;
