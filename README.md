@@ -1,3 +1,30 @@
+Updates
+=======
+
+- MCI %EC inserts ANSI escape character
+- MCI %BT for telnet URL
+- Menu Command “O3” for checking validation status from shuttle logon menu
+- Added “Other/Non-Binary” gender option
+- Added help (“Renegade /?”) for command-line parameters 
+- Fixed new user application question toggles, they now work, and there's a sys config menu to toggle them
+- Aesthetic redesign of system configuration menus (incomplete)
+- Added date of AUTO.ASC to automessage title (“Automessage posted by USERNAME on MM/DD/YYYY”)
+- Copyright banner displays current year, also condensed it to 2 lines
+- Added "Your account has been validated" string to RgMain string file
+- AutoMessage header (AUTOH.*) and footer (AUTOT.*)
+- SysOp can toggle if unvalidated users can log ohrough shuttle menu or not
+- Fixed error where after applying through shuttle menu, it would return you to the menu but not exec firstcmd
+- Trying to page/message your own node now returns error message
+- Standardizing default headers – work in progress
+- Voting editor now displays the 2nd line of answer
+- combined file area and message area lightbars into single toggle, either you're using them or not
+- Added: PDToTime to return “1:00 PM”-formatted-date from packeddate, used in today's callers
+- Fixed date entry error in history editor – now you can use  it
+- Show  fallback menu name in addition to the number in menu editor
+- Put flags and sflags in their proper places. Most new flags should go in flags NOT sflags
+- Revamped records editor menus in user editor, added more fields
+- Missing directories during init now allows you to create the dir rather than just showing error
+
 Renegade v1.19
 ==============
 
