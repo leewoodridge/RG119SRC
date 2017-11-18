@@ -12,7 +12,7 @@ Updates
 - Copyright banner displays current year, also condensed it to 2 lines
 - Added "Your account has been validated" string to RgMain string file
 - AutoMessage header (AUTOH.*) and footer (AUTOT.*)
-- SysOp can toggle if unvalidated users can log ohrough shuttle menu or not
+- SysOp can toggle if unvalidated users can log in through shuttle menu or not
 - Fixed error where after applying through shuttle menu, it would return you to the menu but not exec firstcmd
 - Trying to page/message your own node now returns error message
 - Standardizing default headers – work in progress
