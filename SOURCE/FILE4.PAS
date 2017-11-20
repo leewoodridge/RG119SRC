@@ -39,11 +39,8 @@ BEGIN
   FindReturnCode := Found;
 END;
 
-PROCEDURE ExecProtocol(TextFN,
-                       Dir,
-                       BatLine: AStr;
-                       OKLevel: Integer;
-                       VAR ReturnCode: Integer;
+PROCEDURE ExecProtocol(TextFN,Dir,BatLine: AStr;OKLevel: Integer;
+VAR ReturnCode: Integer;
                        VAR TransferTime: LongInt);
 VAR
   SaveSwapShell,
@@ -79,11 +76,7 @@ BEGIN
   BEGIN
     SaveSwapShell := General.SwapShell;
     General.SwapShell := FALSE;
-    ExecWindow(ResultOK,
-               Dir,
-               BatLine,
-               OKLevel,
-               ReturnCode);
+    ExecWindow(ResultOK,Dir,BatLine,OKLevel,ReturnCode);
     General.SwapShell := SaveSwapShell;
   END;
 

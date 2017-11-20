@@ -114,7 +114,6 @@ TYPE
     FSEditor,		{ If Full Screen Editor }
     AutoDetect,		{ If Emulation Is Auto Detected }
     UseLightBars);	{ If LightBars Are Enabled }
-
 	
   FlagSet = SET OF FlagType;
 
@@ -131,6 +130,7 @@ TYPE
     UnUsedStatusFlag1,	{  }
     UnUsedStatusFlag2,	{  }
     UnUsedStatusFlag3);	{  }
+	
   StatusFlagSet = SET OF StatusFlagType;
 
   ANonTyp =

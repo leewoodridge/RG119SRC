@@ -47,8 +47,8 @@ BEGIN
   ELSE IF (Avatar IN Flags) THEN
     TempS := 'Avatar'
   ELSE IF (ANSI IN Flags) THEN
-    TempS := 'Ansi'
-  ELSE IF (OKVT100) THEN
+    TempS := 'ANSI'
+  ELSE IF (VT100 IN Flags) THEN {Lee: Was using OKVT100 }
     TempS := 'VT-100'
   ELSE
     TempS := 'None';
@@ -752,8 +752,8 @@ VAR
 	Cmd,
     Cmd1: Char;
     TempL1: LongInt;
-	TempSchemeName: String; { LeeW: Added }
-	TempConfName: String; { LeeW }
+	TempSchemeName: STRING[30]; { LeeW: Added }
+	TempConfName: STRING[30]; { LeeW }
 	RecNumToList: Integer; { LeeW }	
   BEGIN
     WITH User DO
@@ -823,7 +823,7 @@ VAR
 				  Read(SchemeFile,Scheme);
 				  TempSchemeName := Scheme.Description;
 				  Close(SchemeFile);
-				END;
+				END;				
 				BEGIN { Get Conference Name }
 				  Reset(ConferenceFile);
 				  RecNumToList := 1;
@@ -836,8 +836,7 @@ VAR
 					  Inc(RecNumToList);
 					END;
 				  Close(ConferenceFile);
-				END;
-				
+				END;				
 				ClrScr;
 				Print(PadLeftStr('^2 '#240' User Editor: Preference Records ('+ Name+')',80));
                 
@@ -977,8 +976,8 @@ VAR
 						  'H' : ToggleACFlag(Novice,Flags);			{ Expert Mode }
 						  'I' : CStuff(16,3,User);					{ Screen Size }
 						  'J' : CStuff(15,3,User);					{ Color Scheme }
-						  'K' : ;									{ Conference }
-						  (*LeeW changeconfernce needs to be a cstuff cmd / not applying to right usr *)
+						  'K' : ChangeConference('');				{ Conference }
+						  { ChangeConference('') doesn't work in user editor -- ? not applying to right user }
                         END;
                 END;
         END;

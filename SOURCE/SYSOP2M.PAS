@@ -37,7 +37,8 @@ BEGIN
       Print(PadLeftStr('^2 '#240' Renegade BBS Configuration : New User Application Toggles',80));
       Print('^0Here you can configure which questions and options you`d like new users to be');
       Print('^0prompted on during their application.');
-      Nl;
+      NL; 
+	  PrintACR('^0(^1W^0) Handle/Alias    : ^1'+ShowYesNo(AllowAlias));
       PrintACR('^0(^1A^0) Real Name       : ^1'+ShowYesNo(NewUserToggles[2])+' |08³ '+
 			   '^0(^1S^0) Hotkeys         : ^1'+ShowYesNo(NewUserToggles[19]));
       PrintACR('^0(^1B^0) Country         : ^1'+ShowYesNo(NewUserToggles[3])+' |08³ '+
@@ -48,8 +49,9 @@ BEGIN
 			   '^0(^1V^0) Forgot Password : ^1'+ShowYesNo(NewUserToggles[23]));
       PrintACR('^0(^1E^0) Zip Code        : ^1'+ShowYesNo(NewUserToggles[6])+' |08³ ');
       PrintACR('^0(^1F^0) Phone Number    : ^1'+ShowYesNo(NewUserToggles[7])+' |08³ '+
-			   '^0(^1W^0) Allow Aliases?  : ^1'+ShowYesNo(AllowAlias));
-      PrintACR('^0(^1G^0) Birthdate       : ^1'+ShowYesNo(NewUserToggles[8])+' |08³ ');
+			   '');
+      PrintACR('^0(^1G^0) Birthdate       : ^1'+ShowYesNo(NewUserToggles[8])+' |08³ '+
+	  '');
       PrintACR('^0(^1H^0) Gender Identity : ^1'+ShowYesNo(NewUserToggles[9])+' |08³ ');
       PrintACR('^0(^1I^0) Question #1     : ^1'+ShowYesNo(NewUserToggles[10])+' |08³ ');
       PrintACR('^0(^1J^0) Question #2     : ^1'+ShowYesNo(NewUserToggles[11])+' |08³ ');
@@ -67,7 +69,21 @@ BEGIN
     OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ1!',TRUE,TRUE);
     WITH General DO
       CASE Cmd OF
-        'A' : NewUserToggles[02] := NOT NewUserToggles[02];
+	   'W' : BEGIN
+		   AllowAlias := NOT AllowAlias;
+			   IF AllowAlias = False THEN
+			     BEGIN
+			       NewUserToggles[02] := True;
+			       (*PrintACR('Also disabling Real Name field for new user application.'); { No need to ask twice }
+			       PauseScr(False);*)
+			     END;
+	         END;
+
+    	'A' : BEGIN
+			    NewUserToggles[02] := NOT NewUserToggles[02];
+				IF NewUserToggles[02] = False THEN
+			      AllowAlias := True;
+			  END;
         'B' : NewUserToggles[03] := NOT NewUserToggles[03];
         'C' : NewUserToggles[04] := NOT NewUserToggles[04];
         'D' : NewUserToggles[05] := NOT NewUserToggles[05];
@@ -99,15 +115,6 @@ BEGIN
        'T' : NewUserToggles[20] := NOT NewUserToggles[20];
        'U' : NewUserToggles[21] := NOT NewUserToggles[21];
        'V' : NewUserToggles[23] := NOT NewUserToggles[23];
-	   'W' : BEGIN
-	           AllowAlias := NOT AllowAlias;
-			   If AllowAlias = False Then
-			   Begin
-			     NewUserToggles[02] := False;
-			     PrintACR('Also disabling Real Name field for new user application.'); { No need to ask twice }
-			     PauseScr(False);
-			   End;
-	         END;
 	   'Y' : BEGIN
 			  Nl;
                 Prt('^0Select (^1E^0)nable, (^1D^0)isable, Or [^1ENTER^0] To Abort: ^1');

@@ -289,17 +289,16 @@ VAR
 
 BEGIN
   TextAttr := 10;
-  (* Should this be Prompt ???
-  Write('Attempting to detect emulation ... ');
-  *)
-  Write(RGNoteStr(24,TRUE));
+  Write(RGNoteStr(24,TRUE)); { "Attempting to detect emulation ... " }
   Exclude(ThisUser.Flags,Avatar);
-  Exclude(ThisUser.Flags,Ansi);
-  Exclude(ThisUser.Flags,Vt100);
-  Exclude(ThisUser.Flags,Rip);
+  Exclude(ThisUser.Flags,ANSI);
+  Exclude(ThisUser.Flags,VT100);
+  Exclude(ThisUser.Flags,RIP);
   IF (ComPortSpeed = 0) THEN
   BEGIN
-    Include(ThisUser.Flags,Ansi);
+    Include(ThisUser.Flags,ANSI);
+	S := RGNoteStr(27,TRUE); { "ANSI" }
+	Print(S+RGNoteStr(30,TRUE)); { " detected." }
     Exit;
   END;
   Com_Flush_Recv;
@@ -353,7 +352,7 @@ BEGIN
       SerialOut(#8#8);
   END;
   IF (S <> '') THEN
-    Print('|10'+S+RGNoteStr(30,TRUE)) {' detected.'}
+    Print(S+RGNoteStr(30,TRUE)) {' detected.'}
   ELSE
   BEGIN
     TextAttr := 7;
@@ -770,9 +769,9 @@ BEGIN
   ChopTime := 0;
   CreditTime := 0;
 
-  SL1('');
+  {SL1('');}
 
-  S := '^3Logon node '+IntToStr(ThisNode)+'^5 ['+Dat+']^4 (';
+  S := 'Logon node '+IntToStr(ThisNode)+' ['+Dat+'] (';
   IF (ComPortSpeed > 0) THEN
   BEGIN
     S := S + IntToStr(ActualSpeed)+' baud';
@@ -873,17 +872,14 @@ BEGIN
   IEMSI;
   GotName := FALSE;
   IF ((General.ShuttleLog) AND (NOT FastLogon) AND (NOT HangUp)) THEN
-    DoShuttle;	
+    DoShuttle;
   SetC(0);
-  ClrScr;{ClrScr;}
-  
-PrintACR('^8* * * * * * * * * * *');
-PrintACR('^8* SUCCESSFUL LOGON  *');
-PrintACR('^8* * * * * * * * * * *');
-PrintACR('GeneralCallerNum: '+IntToStr(General.CallerNum));
-PrintACR('GeneralDaysOnline: '+IntToStr(General.DaysOnline));
-PauseScr(FALSE); { LeeW }
-
+  ClrScr;
+(*
+  PrintACR('^2GeneralCallerNum: '+IntToStr(General.CallerNum));
+  PrintACR('^7GeneralDaysOnline: '+IntToStr(General.DaysOnline));
+  PauseScr(FALSE); { LeeW: Testing... }
+*)
   Print(Centre(VerLine(1))); { Version & Copyright Information }
   Print(Centre(VerLine(2)));
 { Print(Centre(VerLine(3))); }

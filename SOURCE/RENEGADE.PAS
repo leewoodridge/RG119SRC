@@ -578,7 +578,7 @@ BEGIN
   TextBackGround(0);
   TextColor(7);
   ClrScr;
-  TextColor(14);
+  {TextColor(14);}
 
   IF (NewEchoMail) AND (ExitErrorLevel = 0) THEN
     ExitErrorLevel := 2;
@@ -590,8 +590,10 @@ BEGIN
   PurgeDir(TempDir,FALSE);
   Com_DeInstall;
 
-  WriteLn('Exiting with errorlevel ',ExitErrorLevel);
-
+  Write('Exiting with errorlevel ',ExitErrorLevel);
+  IF ExitErrorLevel = 255 THEN
+    WriteLn(' (No Errors!)');
+  WriteLn('');
   Halt(ExitErrorLevel);
   
 END.

@@ -1,7 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
 
 UNIT ExecBat;
@@ -162,6 +158,7 @@ VAR
   BatchFile: Text;
   SaveDir: AStr;
   BName: STRING[20];
+  ResultCode: Integer;
 BEGIN
   BName := 'TEMP'+IntToStr(ThisNode)+'.BAT';
   GetDir(0,SaveDir);
@@ -187,7 +184,7 @@ BEGIN
   IF (NOT WantOut) THEN
     BName := BName + ' > NUL';
 
-  ShellDOS(FALSE,BName,RCode);
+  ShellDOS(FALSE,BName,ResultCode);
 
   Shel2(Windowed);
 

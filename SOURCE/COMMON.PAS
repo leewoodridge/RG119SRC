@@ -3386,7 +3386,8 @@ BEGIN
                   IF (UpCase(s[i + 2]) = 'E') THEN { %DE Delay }
                   BEGIN
                     Inc(i,2);
-                    OutKey(' '); OutKey(#8); { guard against +++ }
+                    OutKey(' ');
+					OutKey(#8); { guard against +++ }
                     Delay(800);
                   END
                   ELSE IF ((UpCase(s[i + 2]) = 'F') AND (NOT PrintingFile)) THEN { %DF File Include }
@@ -3397,6 +3398,16 @@ BEGIN
                       cs := cs + s[i];
                       Inc(i);
                     END;
+					{LeeW: insert code to count lines for pause here! }
+					(*LIL := LIL+5;
+						something like this using the length of the file
+						a lot of things reset LIL, hnmm
+						clrscr should
+						%CL should
+						otherwise no?
+						or whereever it sets lil to 0, after check ansi position and set
+						lil based on that #. DO THIS
+					*)
                     PrintF(StripName(cs));
                   END
                   ELSE
@@ -3691,7 +3702,7 @@ Var
 BEGIN
   GetDate(Year,Month,Day,WDay);
   CASE B OF
-    1 : VerLine := '^0Renegade Bulletin Board System, Version '+General.Version;
+    1 : VerLine := '^0Renegade Bulletin Board System, Version ^1'+General.Version;
     2 : VerLine := '^0Copyright (c) 1991-'+IntToStr(Year)+' The Renegade Development Team';
   END;
 END;
@@ -4872,7 +4883,7 @@ BEGIN
                           DV       : Add := 'DV';
                           Win      : Add := 'Windows';
                           OS2      : Add := 'OS/2';
-                          Win32    : Add := 'Windows 32bit';
+                          Win32    : Add := 'Windows 32Bit';
                           Dos5N    : Add := 'DOS/N';
                          END;
                         END;

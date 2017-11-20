@@ -16,6 +16,7 @@ VAR
   Cmd,
   Cmd1: Char;
   TempB,
+  TempB2, { LeeW: Added }
   MinByte,
   MaxByte: Byte;
   TempI,
@@ -45,13 +46,13 @@ VAR
     Counter: Byte;
   BEGIN
     TempStr := '';
-    Prompt('^1"^1');
+    Prompt('^0"^1');
     FOR Counter := 1 TO Length(S) DO
       IF (S[Counter] >= ' ') THEN
         TempStr := TempStr + S[Counter]
       ELSE
-        TempStr := TempStr +  '^3^'+Chr(Ord(S[Counter]) + 64)+'^1';
-    Prompt(PadLeftStr(TempStr,MaxLen)+'^1"');
+        TempStr := TempStr +  '^'+Chr(Ord(S[Counter]) + 64);
+    Prompt(PadLeftStr(TempStr,MaxLen)+'^0"');
   END;
 
   PROCEDURE MMacroo(MacroNum: Byte);
@@ -60,8 +61,9 @@ VAR
     C: Char;
     Counter: Byte;
   BEGIN
-    Print('%CL^1Enter new F'+IntToStr(MacroNum + 1)+' macro now.');
-    Print('^1Enter ^Z to end recording. 100 character limit.%LF');
+	CLS;
+    Print('^0Recording F'+IntToStr(MacroNum + 1)+' macro, press Ctrl+Z when finished. (100 character limit)');
+	NL;
     S := '';
     Counter := 1;
     REPEAT
@@ -119,34 +121,34 @@ BEGIN
 	  Cls;
       PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : System Variables',80));
 	  
-      PrintACR('^0(^1A^0) Max Private Sent Per Call  : ^1'+PadLeftInt(MaxPrivPost,6)+
+      PrintACR('^0(^1A^0) Max Private Sent Per Call  : ^1'+PadLeftInt(MaxPrivPost,7)+
                '^0(^1B^0) Max Feedback Sent Per Call : ^1'+PadLeftInt(MaxFBack,6));
-      PrintACR('^0(^1C^0) Max Public Posts Per Call  : ^1'+PadLeftInt(MaxPubPost,6)+
+      PrintACR('^0(^1C^0) Max Public Posts Per Call  : ^1'+PadLeftInt(MaxPubPost,7)+
                '^0(^1D^0) Max Chat Attempts Per Call : ^1'+PadLeftInt(MaxChat,6));
-      PrintACR('^0(^1E^0) Normal Max Mail Waiting    : ^1'+PadLeftInt(MaxWaiting,6)+
+      PrintACR('^0(^1E^0) Normal Max Mail Waiting    : ^1'+PadLeftInt(MaxWaiting,7)+
                '^0(^1F^0) CoSysOp Max Mail Waiting   : ^1'+PadLeftInt(CSMaxWaiting,6));
-      PrintACR('^0(^1G^0) Max Mass Mail List         : ^1'+PadLeftInt(MaxMassMailList,6)+
-               '^0(^1H^0) Logins Before BDay Check   : ^1'+PadLeftInt(BirthDateCheck,6));
-      PrintACR('^0(^1I^0) Swap shell should use      : ^1'+PadLeftStr(DisplaySwapTo(SwapTo),6)+
+      PrintACR('^0(^1G^0) Max Mass Mail List Size    : ^1'+PadLeftInt(MaxMassMailList,7)+
+               '^0(^1H^0) Birthdate Check Interval   : ^1'+PadLeftInt(BirthDateCheck,6)); { LeeW: Number of logins }
+      PrintACR('^0(^1I^0) Swap Location              : ^1'+PadLeftStr(DisplaySwapTo(SwapTo),7)+
                '^0(^1J^0) Number Of Logon Attempts   : ^1'+PadLeftInt(MaxLogonTries,6));
-      PrintACR('^0(^1K^0) Password Change In Days    : ^1'+PadLeftInt(PasswordChange,6)+
-               '^0(^1L^0) SysOp Chat Color           : ^1'+PadLeftInt(SysOpColor,6));
-      PrintACR('^0(^1M^0) User Chat Color            : ^1'+PadLeftInt(UserColor,6)+
+      PrintACR('^0(^1K^0) Password Change Interval   : ^1'+PadLeftStr(IntToStr(PasswordChange),7)+ { LeeW: Number of days }
+               '^0(^1L^0) SysOp/User Chat Colors     : ^1'+PadLeftInt(SysOpColor,1)+'^0/^1'+PadLeftInt(UserColor,1));
+      PrintACR('^0(^1M^0) UNUSED                     : ^1'+PadLeftStr('',7)+
                '^0(^1N^0) Min. space for posts       : ^1'+PadLeftInt(MinSpaceForPost,6));
-      PrintACR('^0(^1O^0) Min. space for uploads     : ^1'+PadLeftInt(MinSpaceForUpload,6)+
+      PrintACR('^0(^1O^0) Min. space for uploads     : ^1'+PadLeftInt(MinSpaceForUpload,7)+
                '^0(^1P^0) Back SysOp Log keep days   : ^1'+PadLeftInt(BackSysOpLogs,6));
-      PrintACR('^0(^1R^0) Blank WFC Menu Minutes     : ^1'+PadLeftInt(WFCBlankTime,6)+
+      PrintACR('^0(^1R^0) Blank WFC Menu Minutes     : ^1'+PadLeftInt(WFCBlankTime,7)+
                '^0(^1S^0) Alert Beep Delay           : ^1'+PadLeftInt(AlertBeep,6));
-      PrintACR('^0(^1T^0) Number Of System Callers   : ^1'+PadLeftInt(CallerNum,6)+
+      PrintACR('^0(^1T^0) Number Of System Callers   : ^1'+PadLeftInt(CallerNum,7)+
                '^0(^1U^0) Minimum Logon Baud Rate    : ^1'+PadLeftInt(MinimumBaud,6));
-      PrintACR('^0(^1V^0) Minimum DL Baud Rate       : ^1'+PadLeftInt(MinimumDLBaud,6)+
-               '^0(^1W^0) Sec''s Between Time Slices  : ^1'+PadLeftInt(SliceTimer,6));
-      PrintACR('^0(^1X^0) TB Max Time Allowed        : ^1'+PadLeftInt(MaxDepositEver,6)+
+      PrintACR('^0(^1V^0) Minimum DL Baud Rate       : ^1'+PadLeftInt(MinimumDLBaud,7)+
+               '^0(^1W^0) Sec`s Between Time Slices  : ^1'+PadLeftInt(SliceTimer,6));
+      PrintACR('^0(^1X^0) TB Max Time Allowed        : ^1'+PadLeftInt(MaxDepositEver,7)+
                '^0(^1Y^0) TB Max Daily Deposit       : ^1'+PadLeftInt(MaxDepositPerDay,6));
-      PrintACR('^0(^1Z^0) TB Max Daily Withdraw      : ^1'+PadLeftInt(MaxWithDrawalPerDay,6)+
+      PrintACR('^0(^1Z^0) TB Max Daily Withdraw      : ^1'+PadLeftInt(MaxWithDrawalPerDay,7)+
 	           '^0(^1!^0) New User Message Sent To   : ^1'+AOnOff((NewApp = -1),'Off',PadLeftInt(NewApp,5)));
-	  PrintACR('^0(^1@^0) Mins Before Timeout Bell : ^1'+AOnOff((TimeOutBell = -1),'Off',PadLeftInt(TimeOutBell,3)));
-      PrintACR('^0(^1#^0) Mins Before Timeout      : ^1'+AOnOff((TimeOut = -1),'Off',PadLeftInt(TimeOut,3)));
+	  PrintACR('^0(^1@^0) Mins Before Warn/Timeout   : ^1'+AOnOff((TimeOutBell = -1),'Off',IntToStr(TimeOutBell))+
+	  '^0/^1'+AOnOff((TimeOut = -1),'Off',PadLeftInt(TimeOut,3)));
       NL;
       FOR TempB := 0 TO 9 DO
       BEGIN
@@ -161,7 +163,39 @@ BEGIN
       Prt('^0Enter Selection or (^1Q^0) to Quit: ^1');
       OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ1234567890!@#',TRUE,TRUE);
       CASE Cmd OF
-	    '@','#' :
+		'@' : BEGIN
+			    { LeeW: Set the timeout warning time }
+			    Cmd := #0;
+			    Cmd1 := #0;
+				LowNum := 1;
+                HiNum := 20;
+				NL;
+				Prt('^0Idle Timeout Warning: (^1E^0)nable, (^1D^0)isable, <^1CR^0> Abort: ^1');
+				OneK(Cmd1,^M'ED',TRUE,TRUE);
+				IF (Cmd1 IN ['E','D']) THEN
+				  BEGIN
+				    CASE Cmd1 OF
+					  'E' : InputIntegerWOC('^0%LFHow many minutes idle before timeout warning?',TempInt,[NumbersOnly],LowNum,HiNum);
+					  'D' : TempInt := -1;
+					END;
+				  TimeOutBell := TempInt;
+				END;
+				{ LeeW: Set the timeout time }
+				Cmd := #0;
+			    Cmd1 := #0;
+				NL;
+				Prt('^0Idle Timeout: (^1E^0)nable, (^1D^0)isable, <^1CR^0> Abort ^1');
+				OneK(Cmd1,^M'ED',TRUE,TRUE);
+				IF (Cmd1 IN ['E','D']) THEN
+				  BEGIN
+				    CASE Cmd1 OF
+					  'E' : InputIntegerWOC('^0%LFHow many minutes idle before timeout?',TempInt,[NumbersOnly],LowNum,HiNum);
+					  'D' : TempInt := -1;
+					END;
+				  TimeOut := TempInt;
+			  END;
+		  END;
+(*	    '@','#' :
 		  BEGIN
 			NL;
 			Prt('^0Select (^1E^0)nable, (^1D^0)isable, Or [^1ENTER^0] To Abort: ^1');
@@ -192,8 +226,7 @@ BEGIN
                   END;
                   Cmd := #0;
                 END;
-          END;
-		  { ----- }
+		  END;*)
 	    '!' : BEGIN { LeeW: User to send new user application email to }
 			    NL;
                 Prt('^0Select (^1E^0)nable, (^1D^0)isable, Or [^1ENTER^0] To Abort: ^1');
@@ -285,12 +318,11 @@ BEGIN
                           MinByte := 0;
                           MaxByte := 9;
                           TempB := SysOpColor;
+						  TempB2 := UserColor;
                         END;
                   'M' : BEGIN
-                          MinByte := 0;
-                          MaxByte := 9;
-                          TempB := UserColor;
-                        END;
+                          PauseScr(FALSE);
+						END;
                   'N' : BEGIN
                           MinInt := 1;
                           MaxInt := 32767;
@@ -357,6 +389,10 @@ BEGIN
                         InputIntegerWOC('^0%LFNew Value',TempI,[NumbersOnly],MinInt,MaxInt);
                   'T'..'V','X'..'Z' :
                         InputLongIntWOC('^0%LFNew Value',TempL,[DisplayValue,NumbersOnly],MinLongInt,MaxLongInt);
+				  'L' : BEGIN
+						  InputByteWOC('^0%LFSysOp Chat Color',TempB,[NumbersOnly],MinByte,MaxByte);
+						  InputByteWOC('^0%LFUser Chat Color',TempB2,[NumbersOnly],MinByte,MaxByte);
+						END						
                 ELSE
                   InputByteWOC('^0%LFNew Value',TempB,[NumbersOnly],MinByte,MaxByte);
                 END;
@@ -371,8 +407,11 @@ BEGIN
                   'H' : BirthDateCheck := TempI;
                   'J' : MaxLogonTries := TempB;
                   'K' : PasswordChange := TempI;
-                  'L' : SysOpColor := TempB;
-                  'M' : UserColor := TempB;
+                  'L' : BEGIN
+					      SysOpColor := TempB;
+						  UserColor := TempB2;
+						END;
+                  'M' : PauseScr(FALSE);
                   'N' : MinSpaceForPost := TempI;
                   'O' : MinSpaceForUpload := TempI;
                   'P' : BackSysOpLogs := TempB;

@@ -240,7 +240,7 @@ OldGeneralRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
 (* +---------------------------------------------------+ 
    |             START OF OLD USERS.DAT                |
    +---------------------------------------------------+ *)
-   
+(*   
 OldUserRecordType =                     
   {$IFDEF WIN32} PACKED {$ENDIF} RECORD
     Name,                                   { System Name }
@@ -321,7 +321,7 @@ OldUserRecordType =
     Flags: FlagSet;                         { Flags }
     SFlags: StatusFlagSet;                  { Status Flags }
   END;
-
+*)
 (* +---------------------------------------------------+ 
    |              END OF OLD USERS.DAT                 |
    +---------------------------------------------------+ *)
@@ -671,7 +671,7 @@ BEGIN
   ReName(GeneralFile,'RENEGADE.DAT');
   WriteLn('Done');
 END;
-
+(*
 PROCEDURE ConvertUserRec(OldGeneral: OldGeneralRecordType);
 VAR
   OldUserFile: FILE OF OldUserRecordType;
@@ -693,7 +693,7 @@ BEGIN
     Read(OldUserFile,OldUser);
     WITH User DO
     BEGIN
-
+*)
 (* +---------------------------------------------------+ 
    |             START OF NEW USERS.DAT                |
    +---------------------------------------------------+ *)	
@@ -703,7 +703,7 @@ BEGIN
 (* +---------------------------------------------------+ 
    |             END OF NEW USERS.DAT                  |
    +---------------------------------------------------+ *)
-
+(*
     END;
     Write(UserFile,User);
     Inc(Counter);
@@ -716,7 +716,7 @@ BEGIN
   ReName(UserFile,OldGeneral.DataPath+'USERS.DAT');
   WriteLn('Done');
 END;
-
+*)
 VAR
   OldGeneralFile: FILE OF OldGeneralRecordType;
   OldGeneral: OldGeneralRecordType;
@@ -745,7 +745,7 @@ BEGIN
       Kill(OldGeneral.DataPath+'BATCHDL.DAT');
       WriteLn('Done');
     END; *)
-    ConvertUserRec(OldGeneral);
+(*    ConvertUserRec(OldGeneral); *)
     ConvertGeneralRec;
   END;
 END.

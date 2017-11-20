@@ -1,7 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
 
 {  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
@@ -143,8 +139,8 @@ BEGIN
     Cmd := #0;
   IF (Cmd <> #0) AND (Cmd <> '?') AND (NOT (Cmd IN ConfKeys)) THEN
   BEGIN
-    Print('%NLCommand error, operation aborted!');
-    SysOpLog('^7Change conference cmd error, invalid options: "'+Cmd+'".');
+    Print('^8%NLCommand error, operation aborted!');
+    SysOpLog('Change conference cmd error, invalid options: "'+Cmd+'".');
     Exit;
   END;
   IF (Cmd = '?') THEN
@@ -167,9 +163,9 @@ BEGIN
     FOR Cmd := '@' TO 'Z' DO
       IF (Cmd IN ConfKeys) THEN
         OneKCmds := OneKCmds + Cmd;
-    Print('%LF^4Current conference: ^5%CT - %CN');
+    Print('%LF^0You are currently in conference: ^1%CT - %CN');
     REPEAT
-      LOneK('%LFJoin which conference? (^5?^4=^5List^4,<^5CR^4>=^5Quit^4): ',Cmd,^M'?'+OneKCmds,TRUE,TRUE);
+      LOneK('^0%LFJoin Which Conference? [(^1?^0)List,<^1CR^0>Quit]: ^1',Cmd,^M'?'+OneKCmds,TRUE,TRUE);
       IF (Cmd = '?') THEN
       BEGIN
         PrintF('CONFLIST');
@@ -178,19 +174,20 @@ BEGIN
       END
       ELSE IF (Cmd IN ConfKeys) AND FindConference(Cmd,Conference) THEN
         IF (NOT AACS(Conference.ACS)) THEN
-          Print('%LF^7You do not have the required access level for this conference!^1')
+          Print('%LF^8You do not have the required access level for this conference!^1')
         ELSE
         BEGIN
           CurrentConf := Cmd;
           ThisUser.LastConf := CurrentConf;
           PrintF('CONF'+Cmd);
           IF (NoFile) THEN
-            Print('%LFJoined conference: ^5%CT - %CN');
+            Print('^0%LFYou have joined conference: ^1%CT - %CN^0');
           Cmd := ^M;
         END;
     UNTIL (Cmd = ^M) OR (HangUp);
   END;
   NewCompTables;
+  PauseScr(False);
 END;
 
 PROCEDURE ConferenceEditor;

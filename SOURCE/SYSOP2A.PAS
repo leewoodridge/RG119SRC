@@ -82,13 +82,13 @@ BEGIN
       Abort := FALSE;
       Next := FALSE;
           Cls;
-          Print(PadLeftStr('^2 þ Renegade BBS Configuration : Main BBS Configuration',80));	
+          Print(PadLeftStr('^2 '#240' Renegade BBS Configuration : Main',80));	
 		  PrintACR('^0(^1A^0) BBS Name          : ^1'+BBSName);
           PrintACR('^0(^1B^0) Connection Type   : ^1'+ConnType);
           PrintACR('^0(^1C^0) SysOp`s Name      : ^1'+PadLeftStr(SysOpName,14)+
 			      ' ^0(^1D^0) Renegade Version  : ^1'+Version);
           PrintACR('^0(^1E^0) SysOp`s Chat Hrs  : ^1'+PadLeftStr(PHours('Any',lLowTime,HiTime),14)+
-			      ' ^0(^1F^0) Minimum Baud Hrs  : ^1'+PadLeftStr(PHours('Any',MinBaudLowTime,MinBaudHiTime),14));
+			      ' ^0(^1F^0) Min Baud Hrs      : ^1'+PadLeftStr(PHours('Any',MinBaudLowTime,MinBaudHiTime),14));
           PrintACR('^0(^1G^0) Regular DL Hrs    : ^1'+PadLeftStr(PHours('Any',DLLowTime,DLHiTime),14)+
 			      ' ^0(^1H^0) Min Baud DL Hrs   : ^1'+PHours('Any',MinBaudDLLowTime,MinBaudDLHiTime));
           PrintACR('^0(^1I^0) System Passwords                   '+
@@ -108,7 +108,7 @@ BEGIN
           PrintACR('^0(^17^0) Archivers           : ^1'+ArcsPath);
           PrintACR('^0(^18^0) File Attachments    : ^1'+FileAttachPath);
           Nl;
-          Prt('^0Enter Selection Or (^1Q^0)uit: ^1');
+          Prt('^0Enter Selection Or [^1A^0-^1N^0,^10^0-^18^0,(^1Q^0)uit]: ^1');
 
       OneK(Cmd,'QABCDEFGHIJKLMN0123456789',TRUE,TRUE);
       CASE Cmd OF
@@ -116,7 +116,7 @@ BEGIN
         'B' : Begin
 				Repeat
 				ClrScr;
-				PrintACR(PadLeftStr('^2 þ Renegade BBS Configuration : Connection Type',80));
+				PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : Connection Type',80));
 				PrintACR('^1Please select the method(s) that users will be able to connect to your BBS');
 				PrintACR('through.');
 				Nl;
@@ -125,7 +125,9 @@ BEGIN
 				PrintACR('^0(^1C^0) Both');
 				{PrintACR('^0(^1D^0) None');} { Don't think we need this as an option }
 				Nl;
-				Prt('^0Enter Selection or (^1Q^0) to Quit: ^1');
+				PrintACR('^0(^1Q^0) Quit');
+				NL;
+				Prt('^0Choice?: ^1');
 				OneK(Cmd,'QABC',TRUE,TRUE);
 						  Case Cmd Of
 							'A' : Begin { Modem }
@@ -158,7 +160,12 @@ BEGIN
 			  Cmd := #0;
 	  End;
         'C' : InputWN1(RGSysCfgStr(5,TRUE),SysOpName,(SizeOf(SysOpName) - 1),[InterActiveEdit],Changed);
-        'D' : RGNoteStr(0,FALSE);
+        'D' : BEGIN
+			    {RGNoteStr(0,FALSE);}
+			    NL;
+			    Print('Renegade BBS V'+Version+' '#196#196' http://www.website.com/');
+				PauseScr(FALSE);
+		      END;
         'E' : IF (InCom) THEN
                 RGNoteStr(1,FALSE)
               ELSE
@@ -169,12 +176,14 @@ BEGIN
         'I' : BEGIN
                 REPEAT
 					ClrScr;
-					PrintACR(PadLeftStr('^2 þ Renegade BBS Configuration : System Passwords',80));
+					PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : System Passwords',80));
 					PrintACR('^0(^1A^0) SysOp Password         : ^1'+SysOpPW);
 				    PrintACR('^0(^1B^0) New User Password      : ^1'+NewUserPW);
 					PrintACR('^0(^1C^0) Baud Override Password : ^1'+MinBaudOverride);
 					Nl;
-					Prt('^0Enter Selection Or (^1Q^0) to Quit: ^1');				  
+					PrintACR('^0(^1Q^0) Quit');
+					NL;
+					Prt('^0Choice?: ^1');				  
                   OneK(Cmd,'QABC',TRUE,TRUE);
                   CASE Cmd OF
                     'A' : InputWN1(RGSysCfgStr(11,TRUE),SysOpPw,(SizeOf(SysOpPW) - 1),[InterActiveEdit,UpperOnly],Changed);
@@ -189,22 +198,24 @@ BEGIN
         'K' : BEGIN
                 REPEAT
 				  ClrScr;
-				  PrintACR(PadLeftStr('^2 þ Renegade BBS Configuration : System Menus',80));
+				  PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : System Menus',80));
 				  
 				PrintACR('^0(^11^0) Global        : ^1'+IntToStr(GlobalMenu)+'');
-				{ Menu commands here appear on other menus unless global display is toggled off }
+				{ Menu commands here appear on all other menus unless global display is toggled off }
 				PrintACR('^0(^12^0) Start         : ^1'+IntToStr(AllStartMenu)+'');
 				{ First menu users are sent to after default login sequence }
 				PrintACR('^0(^13^0) Shuttle Logon : ^1'+IntToStr(ShuttleLogonMenu));
 				{ Shuttle Logon Menu }
 				PrintACR('^0(^14^0) New User Info : ^1'+IntToStr(NewUserInformationMenu));
-				{ New user information review before user saves profile }
+				{ New user information review before user saves/abandons profile }
 				PrintACR('^0(^15^0) Message Read  : ^1'+IntToStr(MessageReadMenu));
 				{ Prompt while listing files }
 				PrintACR('^0(^16^0) File List     : ^1'+IntToStr(FileListingMenu));
 				{ Prompt while reading messages }
 				Nl;
-				Prt('^0Enter Selection Or (^1Q^0) to Quit: ^1');				  
+				PrintACR('^0(^1Q^0) Quit');
+				NL;
+				Prt('^0Choice?: ^1');				  
                   OneK(Cmd,'123456Q',TRUE,TRUE);
                   CASE Cmd OF
                     '1' : FindMenu(RGSysCfgStr(16,TRUE),GlobalMenu,0,NumMenus,Changed);
@@ -219,14 +230,25 @@ BEGIN
               END;
         'L' : InputWN1(RGSysCfgStr(22,TRUE),BulletPrefix,(SizeOf(BulletPrefix) - 1),[InterActiveEdit,UpperOnly],Changed);
         'M' : IF (InCom) THEN
-                RGNoteStr(1,FALSE)
+                RGNoteStr(1,FALSE) {"This can only be changed locally"}
               ELSE
-              BEGIN
-                MultiNode := (NOT MultiNode);
-                SaveGeneral(FALSE);
-                ClrScr;
-                Writeln('Please restart Renegade.');
-                Halt;
+                BEGIN
+				  NL;
+				  IF (PYNQ('^0You must restart Renegade to '+AOnOff(MultiNode,'disable','enable')+
+				  ' multi-node support, continue? ^1',0,FALSE)) THEN
+				    BEGIN 
+					  MultiNode := (NOT MultiNode);
+		  			  SaveGeneral(FALSE);
+			  		  ClrScr;
+					  NL;
+				 	  Print('^0Multi-node support '+AOnOff(MultiNode,'enabled','disabled')+'. Please restart Renegade ...');
+					  NL;
+					  Halt;
+				    END
+				  ELSE
+				    BEGIN
+					  { LeeW: Do nothing }
+				    END;
               END;
         'N' : BEGIN
                 NetworkMode := (NOT NetworkMode);
@@ -244,7 +266,7 @@ BEGIN
         '6' : InputPath(RGSysCfgStr(30,TRUE),ProtPath,TRUE,FALSE,Changed);
         '7' : InputPath(RGSysCfgStr(31,TRUE),ArcsPath,TRUE,FALSE,Changed);
         '8' : InputPath(RGSysCfgStr(32,TRUE),FileAttachPath,TRUE,FALSE,Changed);
-        '9' : InputPath(RGSysCfgStr(33,TRUE),lMultPath,TRUE,FALSE,Changed);
+        {'9' : InputPath(RGSysCfgStr(33,TRUE),lMultPath,TRUE,FALSE,Changed);} { LeeW: no longer used }
       END;
     END;
   UNTIL (Cmd = 'Q') OR (HangUp);

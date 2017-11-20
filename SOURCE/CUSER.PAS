@@ -985,71 +985,6 @@ VAR
           Done1 := True;
         End
     End;
-(*
-PROCEDURE ChangeConference(MenuOption: Str50);
-VAR
-  OneKCmds: AStr;
-  Cmd: Char;
-  RecNumToList: Integer;
-BEGIN
-  MenuOption := AllCaps(SQOutSp(MenuOption));
-  IF (MenuOption <> '') THEN
-    Cmd := MenuOption[1]
-  ELSE
-    Cmd := #0;
-  IF (Cmd <> #0) AND (Cmd <> '?') AND (NOT (Cmd IN ConfKeys)) THEN
-  BEGIN
-    Print('%NLCommand error, operation aborted!');
-    SysOpLog('^7Change conference cmd error, invalid options: "'+Cmd+'".');
-    Exit;
-  END;
-  IF (Cmd = '?') THEN
-  BEGIN
-    PrintF('CONFLIST');
-    IF (NoFile) THEN
-      DisplayConferenceRecords(RecNumToList,FALSE);
-  END
-  ELSE IF (Cmd IN ConfKeys) AND FindConference(Cmd,Conference) THEN
-  BEGIN
-    IF ((AACS(Conference.ACS))) THEN
-    BEGIN
-      CurrentConf := Cmd;
-      {This}User.LastConf := CurrentConf;
-    END;
-  END
-  ELSE
-  BEGIN
-    OneKCmds := '';
-    FOR Cmd := '@' TO 'Z' DO
-      IF (Cmd IN ConfKeys) THEN
-        OneKCmds := OneKCmds + Cmd;
-    Print('%LFCurrent conference: '+User.LastConf+' - %CN');
-    REPEAT
-      LOneK('%LFJoin which conference? (^5?^4=^5List^4,<^5CR^4>=^5Quit^4): ',Cmd,^M'?'+OneKCmds,TRUE,TRUE);
-      IF (Cmd = '?') THEN
-      BEGIN
-        PrintF('CONFLIST');
-        IF (NoFile) THEN
-          DisplayConferenceRecords(RecNumToList,FALSE);
-      END
-      ELSE IF (Cmd IN ConfKeys) AND FindConference(Cmd,Conference) THEN
-        IF (NOT AACS(Conference.ACS)) THEN
-          Print('%LF^7You do not have the required access level for this conference!^1')
-        ELSE
-        BEGIN
-          CurrentConf := Cmd;
-          {This}User.LastConf := Cmd;
-          PrintF('CONF'+Cmd);
-          IF (NoFile) THEN
-            Print('%LFJoined conference: ^5%CT - %CN');
-          Cmd := ^M;
-        END;
-    UNTIL (Cmd = ^M) OR (HangUp);
-  END;
-  NewCompTables;
-  Done1 := True;
-END;
-*)
 	
   Procedure WW(www: Byte);
   Begin
@@ -1085,7 +1020,6 @@ END;
         24 : Mailbox;			{ Mailbox / Mail Forwarding }
         25 : Toggle_Editor;		{ Fullscreen Or Line Editor }
         26 : Toggle_LightBars;	{ Use LightBars? }
-		27 : ChangeConference('');  { Conference }
     End;
   End;
 

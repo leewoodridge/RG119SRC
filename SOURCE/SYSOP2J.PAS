@@ -102,7 +102,7 @@ VAR
   BEGIN
     REPEAT
       Cls;
-	  Print(PadLeftStr('^2 '+#254+' Color Scheme Editor',80));
+	  Print(PadLeftStr('^2 '#240' Color Scheme Editor',80));
       FOR Counter := 1 TO 10 DO
       BEGIN
         SetC(7);
@@ -474,9 +474,9 @@ VAR
           Next := FALSE;
           CLS;
           IF (Editing) THEN
-            Print(PadLeftStr('^2 '+#254+' Editing Color Scheme #'+IntToStr(RecNumToEdit),80)) {IntToStr(NumSchemes)}
+            Print(PadLeftStr('^2 '#240' Editing Color Scheme #'+IntToStr(RecNumToEdit),80)) {IntToStr(NumSchemes)}
           ELSE
-            Print(PadLeftStr('^2 '+#254+' Inserting Color Scheme #'+IntToStr(RecNumToEdit),80)); {IntToStr(NumSchemes+1)}
+            Print(PadLeftStr('^2 '#240' Inserting Color Scheme #'+IntToStr(RecNumToEdit),80)); {IntToStr(NumSchemes+1)}
           {NL;}
           PrintACR('^01'+#242+' Description : ^1'+Scheme.Description);
             Prompt('^02'+#242+' Colors      : ');
@@ -505,7 +505,7 @@ VAR
           CmdStr := '12345678'
         ELSE
           CmdStr := '12345678[]FJL';
-        LOneK('%LF^0Color Scheme Editor: ',Cmd1,'Q?'+CmdStr++^M,TRUE,TRUE);
+        LOneK('%LF^0Color Scheme Editor [(^1?^0)Help]: ',Cmd1,'Q?'+CmdStr++^M,TRUE,TRUE);
         CASE Cmd1 OF
           '1' : REPEAT
                   TempScheme1.Description := Description;
@@ -557,7 +557,7 @@ VAR
                 END;
           '?' : BEGIN
 				  NL;
-                  Print('%LF^0<^1CR^0> Refresh Screen');
+                  Print('^0<^1CR^0> Refresh Screen');
                   IF (NOT Editing) THEN
                     LCmds(22,1,'? Help','Q Quit')
                   ELSE
@@ -783,7 +783,7 @@ VAR
     Abort := FALSE;
     Next := FALSE;
     CLS;
-	Print(PadLeftStr('^2 '+#254+' Color Scheme Editor',80));
+	Print(PadLeftStr('^2 '#240' Color Scheme Editor',80));
     PrintACR('^4+----+--------------------------------------------------+---------------------+');
 	PrintACR('^4| ^3## ^4| ^3Description                                      ^4| ^3Colors              ^4|');
     PrintACR('^4+----+--------------------------------------------------+---------------------+');
@@ -818,7 +818,7 @@ BEGIN
   REPEAT
     IF (Cmd <> '?') THEN
       ListSchemes(RecNumToList);
-    LOneK('%LF^0Color Scheme Editor: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
+    LOneK('%LF^0Color Scheme Editor [(^1?^0)Help]: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
     CASE Cmd OF
       ^M  : IF (RecNumToList < 1) OR (RecNumToList > NumSchemes) THEN
               RecNumToList := 1;

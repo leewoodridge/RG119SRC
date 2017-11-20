@@ -51,11 +51,14 @@ VAR
   VAR
     Changed: Boolean;
   BEGIN
-    Print('%LF^0Current modem '+DisplayStr+' string: "^0'+InputStr+'^0"');
-    Print('%LFUse: "|" for a carriage return');
-    Print('     "~" for a half-second delay');
-    Print('     "^" to toggle DTR off for 1/4 second');
-    InputWN1('%LF^0Enter new modem '+DisplayStr+' string:%LF^0: ',InputStr,Len,[InterActiveEdit],Changed);
+	NL;
+    Print('^0Current modem '+DisplayStr+' string: "^1'+InputStr+'^0"');
+	NL;
+    Print('Use "|" for a carriage return');
+    Print('    "~" for a half-second delay');
+    Print('    "^" to toggle DTR off for a quarter-second');
+	NL;
+    InputWN1('^0Enter new modem '+DisplayStr+' string:%LF',InputStr,Len,[InterActiveEdit],Changed);
   END;
 
   FUNCTION WhichBaud(B: Byte): AStr;
@@ -94,7 +97,7 @@ BEGIN
       Abort := FALSE;
       Next := FALSE;
       ClrScr;
-	  PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : Modem / Node '+IntToStr(ThisNode)+' Configuration',80));
+	  PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : Modem / Node #'+IntToStr(ThisNode)+'',80));
 	  Print('Here you can configure...');
       NL;
       PrintACR('^11^0> Maximum Baud Rate : ^1'+PadLeftInt(InitBaud,20)+
@@ -122,19 +125,24 @@ BEGIN
       CASE Cmd OF
         '1' : IF (InCom) THEN
               BEGIN
-                Print('%LF^7This can only be changed locally.');
+                Print('%LF^7This can only be changed locally.'); {leew:rgnote1}
                 PauseScr(FALSE);
               END
               ELSE
               BEGIN
-                Print('%LF^5Modem maximum baud rates:^1');
-                Print('%LF^1(^3A^1). 2400');
-                Print('^1(^3B^1). 9600');
-                Print('^1(^3C^1). 19200');
-                Print('^1(^3D^1). 38400');
-                Print('^1(^3E^1). 57600');
-                Print('^1(^3F^1). 115200');
-                LOneK('%LFModem speed? [^5A^4-^5F^4,^5<CR>^4=^5Quit^4]: ',Cmd,^M'ABCDEF',TRUE,TRUE);
+				ClrScr;
+				PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : Maximum Baud Rate',80));
+                {Print('^0Modem maximum baud rates:');}
+				Print('^0Select the maximum baud rate of your modem for this node.');
+				NL;
+                Print('^0<^1A^0> 2400');
+                Print('^0<^1B^0> 9600');
+                Print('^0<^1C^0> 19200');
+                Print('^0<^1D^0> 38400');
+                Print('^0<^1E^0> 57600');
+                Print('^0<^1F^0> 115200');
+				NL;
+                LOneK('^0Modem Speed? [^1A^0-^1F^0,<^1CR^0>Quit]: ',Cmd,^M'ABCDEF',TRUE,TRUE);
                 CASE Cmd OF
                   'A' : InitBaud := 2400;
                   'B' : InitBaud := 9600;
@@ -190,18 +198,19 @@ BEGIN
                 REPEAT
                   Abort := FALSE;
                   Next := FALSE;
-                  Print('%CL^5Modem configuration - Result Codes');
-                  NL;
-                  PrintACR('^1A. NO CARRIER    : ^5'+PadLeftStr(NOCARRIER,21)+'^1B. RELIABLE      : ^5'+RELIABLE);
-                  PrintACR('^1C. OK            : ^5'+PadLeftStr(OK,21)+'^1D. RING          : ^5'+RING);
-                  PrintACR('^1E. CALLER ID     : ^5'+PadLeftStr(CALLERID,21)+
-                           '^1F. ID/User note  : ^5'+ShowOnOff(UseCallerID));
+				  ClrScr;
+				  PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : Modem Result Codes',80));
+                  PrintACR('^1A^0> NO CARRIER    : ^1'+PadLeftStr(NOCARRIER,21)+'^1B^0> RELIABLE      : ^1'+RELIABLE);
+                  PrintACR('^1C^0> OK            : ^1'+PadLeftStr(OK,21)+'^1D^0> RING          : ^1'+RING);
+                  PrintACR('^1E^0> CALLER ID     : ^1'+PadLeftStr(CALLERID,21)+
+                           '^1F^0> ID/User Note  : ^1'+ShowOnOff(UseCallerID));
                   FOR TempB := 1 TO MaxResultCodes DO
                     IF (NOT Odd(TempB)) THEN
-                      Print('^1'+Chr(TempB + 70)+'. '+PadLeftStr(WhichBaud(TempB),14)+': ^5'+Connect[TempB])
+                      Print('^1'+Chr(TempB + 70)+'^0> '+PadLeftStr(WhichBaud(TempB),14)+': ^1'+Connect[TempB])
                     ELSE
-                      Prompt(PadLeftStr('^1'+Chr(TempB + 70)+'. '+PadLeftStr(WhichBaud(TempB),14)+': ^5'+Connect[TempB],40));
-                  LOneK('%LFEnter selection [^5A^4-^5Z^4,^5<CR>^4=^5Quit^4]: ',Cmd,^M'ABCDEFGHIJKLMNOPQRSTUVWXYZ',TRUE,TRUE);
+                      Prompt(PadLeftStr('^1'+Chr(TempB + 70)+'^0> '+PadLeftStr(WhichBaud(TempB),14)+': ^1'+Connect[TempB],40));
+				  NL;
+                  LOneK('^0Enter Selection [^1A^0-^1Z^0,<^1CR^0>Quit]: ',Cmd,^M'ABCDEFGHIJKLMNOPQRSTUVWXYZ',TRUE,TRUE);
                   CASE Cmd OF
                     'A' : InputWN1('%LFEnter NO CARRIER string: ',NOCARRIER,(SizeOf(NOCARRIER) - 1),
                                    [InterActiveEdit,UpperOnly],Changed);
