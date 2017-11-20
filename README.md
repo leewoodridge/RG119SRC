@@ -24,6 +24,10 @@ Updates
 - Put flags and sflags in their proper places. Most new flags should go in flags NOT sflags
 - Revamped records editor menus in user editor, added more fields
 - Missing directories during init now allows you to create the dir rather than just showing error
+- toggling multinode on/off now prompts user to continue instead of just exiting immediately
+- combined warning time and timeout time in to one option
+- combined sysop and user chat colors in to one option
+- simplify configuration options
 
 Renegade v1.19
 ==============
