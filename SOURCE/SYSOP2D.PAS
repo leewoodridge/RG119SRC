@@ -1,5 +1,7 @@
 {$A+,B-,D-,E-,F+,I-,L-,N-,O+,R-,S+,V-}
 
+(* RENEGADE BBS: SYSTEM VARIABLES *)
+
 UNIT SysOp2D;
 
 INTERFACE
@@ -12,144 +14,166 @@ USES
   Common;
 
 PROCEDURE SystemGeneralVariables;
-VAR
-  Cmd,
-  Cmd1: Char;
-  TempB,
-  TempB2, { LeeW: Added }
-  MinByte,
-  MaxByte: Byte;
-  TempI,
-  LowNum,
-  HiNum,
-  TempInt,
-  MinInt,
-  MaxInt: SmallInt;
-  TempL,
-  MinLongInt,
-  MaxLongInt: LongInt;
-
-  FUNCTION DisplaySwapTo(SwapTo: Byte): Str4;
-  BEGIN
-    CASE SwapTo OF
-      0   : DisplaySwapTo := 'Disk';
-      1   : DisplaySwapTo := 'XMS';
-      2   : DisplaySwapTo := 'EMS';
-      4   : DisplaySwapTo := 'EXT';
-      255 : DisplaySwapTo := 'Any';
-    END;
-  END;
-
-  PROCEDURE DisplayMacroo(CONST S: AStr; MaxLen: Byte);
   VAR
-    TempStr: AStr;
-    Counter: Byte;
-  BEGIN
-    TempStr := '';
-    Prompt('^0"^1');
-    FOR Counter := 1 TO Length(S) DO
-      IF (S[Counter] >= ' ') THEN
-        TempStr := TempStr + S[Counter]
-      ELSE
-        TempStr := TempStr +  '^'+Chr(Ord(S[Counter]) + 64);
-    Prompt(PadLeftStr(TempStr,MaxLen)+'^0"');
-  END;
+	Cmd,
+	Cmd1: Char;
+	TempB,
+	TempB2, { LeeW: Added }
+	MinByte,
+	MaxByte: Byte;
+	TempI,
+	LowNum,
+	HiNum,
+	TempInt,
+	MinInt,
+	MaxInt: SmallInt;
+	TempL,
+	MinLongInt,
+	MaxLongInt: LongInt;
+
+(*  FUNCTION DisplaySwapTo(SwapTo: Byte): Str4;
+	BEGIN
+	  CASE SwapTo OF
+		0   : DisplaySwapTo := 'Disk';
+		1   : DisplaySwapTo := 'XMS';
+		2   : DisplaySwapTo := 'EMS';
+		4   : DisplaySwapTo := 'EXT';
+		255 : DisplaySwapTo := 'Any';
+	  END;
+	END;
+*)
+  PROCEDURE DisplayMacroo(CONST S: AStr; MaxLen: Byte);
+	VAR
+	  TempStr: AStr;
+	  Counter: Byte;
+	BEGIN
+	  TempStr := '';
+	  Prompt('^0"^1');
+	  FOR Counter := 1 TO Length(S) DO
+		IF (S[Counter] >= ' ') THEN
+		  TempStr := TempStr + S[Counter]
+		ELSE
+		  TempStr := TempStr +  '^'+Chr(Ord(S[Counter]) + 64);
+		Prompt(PadLeftStr(TempStr,MaxLen)+'^0"');
+	END;
 
   PROCEDURE MMacroo(MacroNum: Byte);
-  VAR
-    S: AStr;
-    C: Char;
-    Counter: Byte;
-  BEGIN
-	CLS;
-    Print('^0Recording F'+IntToStr(MacroNum + 1)+' macro, press Ctrl+Z when finished. (100 character limit)');
-	NL;
-    S := '';
-    Counter := 1;
-    REPEAT
-      C := Char(GetKey);
-      IF (C = ^H) THEN
-      BEGIN
-        C := #0;
-        IF (Counter >= 2) THEN
-        BEGIN
-          BackSpace;
-          Dec(Counter);
-          IF (S[Counter] < #32) THEN
-            BackSpace;
-        END;
-      END;
-      IF (Counter <= 100) AND (C <> #0) THEN
-      BEGIN
-        IF (C IN [#32..#255]) THEN
-        BEGIN
-          OutKey(C);
-          S[Counter] := C;
-          Inc(Counter);
-        END
-        ELSE IF (C IN [^A,^B,^C,^D,^E,^F,^G,^H,^I,^J,^K,^L,^M,^N,^P,^Q,^R,^S,^T,^U,^V,^W,^X,^Y,#27,#28,#29,#30,#31]) THEN
-        BEGIN
-          IF (C = ^M) THEN
-            NL
-          ELSE
-            Prompt('^3^'+Chr(Ord(C) + 64)+'^1');
-          S[Counter] := C;
-          Inc(Counter);
-        END;
-      END;
-    UNTIL ((C = ^Z) OR (HangUp));
-    S[0] := Chr(Counter - 1);
-    Print('%LF%LF^3Your F'+IntToStr(MacroNum + 1)+' macro is now:%LF');
-    DisplayMacroo(S,160);
-    Com_Flush_Recv;
-    IF (NOT PYNQ('%LFIs this what you want? ',0,FALSE)) THEN
-      Print('%LFMacro not saved.')
-    ELSE
-    BEGIN
-      General.Macro[MacroNum] := S;
-      Print('%LFMacro saved.');
-    END;
-    PauseScr(FALSE);
-  END;
+	VAR
+	  S: AStr;
+	  C: Char;
+	  Counter: Byte;
+	BEGIN
+	  CLS;
+	  Print('^0Recording F'+IntToStr(MacroNum + 1)+' macro, press Ctrl+Z when finished. (100 character limit)');
+	  NL;
+	  S := '';
+	  Counter := 1;
+	  REPEAT
+		C := Char(GetKey);
+		IF (C = ^H) THEN
+		  BEGIN
+			C := #0;
+			IF (Counter >= 2) THEN
+			  BEGIN
+				BackSpace;
+				Dec(Counter);
+				IF (S[Counter] < #32) THEN
+				  BackSpace;
+			  END;
+		  END;
+		IF (Counter <= 100) AND (C <> #0) THEN
+		  BEGIN
+			IF (C IN [#32..#255]) THEN
+			  BEGIN
+				OutKey(C);
+				S[Counter] := C;
+				Inc(Counter);
+			  END
+			ELSE IF (C IN [^A,^B,^C,^D,^E,^F,^G,^H,^I,^J,^K,^L,^M,^N,^P,^Q,^R,^S,^T,^U,^V,^W,^X,^Y,#27,#28,#29,#30,#31]) THEN
+			  BEGIN
+				IF (C = ^M) THEN
+				  NL
+				ELSE
+				  Prompt('^3^'+Chr(Ord(C) + 64)+'^1');
+				S[Counter] := C;
+				Inc(Counter);
+			  END;
+		  END;
+	  UNTIL ((C = ^Z) OR (HangUp));
+	  S[0] := Chr(Counter - 1);
+	  NL;
+	  NL;
+	  Print('^0Your F'+IntToStr(MacroNum + 1)+' macro is now:');
+	  NL;
+	  DisplayMacroo(S,160);
+	  Com_Flush_Recv;
+	  IF (NOT PYNQ('^0%LFIs this what you want? ',0,FALSE)) THEN
+		Print('^0%LFMacro aborted')
+	  ELSE
+		BEGIN
+		  General.Macro[MacroNum] := S;
+		  Print('^0%LFYour F'+IntToStr(MacroNum + 1)+' Macro has been saved'); { LeeW: Check this }
+		END;
+	  PauseScr(FALSE);
+	END;
+(* LeeW: Indenting done! *)
+	BEGIN
+	  REPEAT
+		WITH General DO
+		  BEGIN
+			Abort := FALSE;
+			Next := FALSE;
+			CLS;
+			PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : System Variables',80));
+			
+			PrintACR('^0(^1C^0) Max Public Posts   : ^1'+PadLeftStr(AOnOff((MaxPubPost = 0),'Unlimited',
+														IntToStr(MaxPubPost)+'^0 Per Day'),14)+
+					 '^0(^1X^0) TBank Max Time     : ^1'+PadLeftStr(AOnOff((MaxDepositEver = 0),'Unlimited',
+														IntToStr(MaxDepositEver)+'^0 '+Plural('Minute',MaxDepositEver)),14));
+			PrintACR('^0(^1A^0) Max Private Msgs   : ^1'+PadLeftStr(IntToStr(MaxPrivPost)+'^0 Per Day',14)+
+					 '^0(^1Y^0) TBank Max Deposit  : ^1'+PadLeftStr(AOnOff((MaxDepositPerDay = 0),'Unlimited',
+														IntToStr(MaxDepositPerDay)+'^0 '+Plural('Minute',MaxDepositPerDay)),14));
+			PrintACR('^0(^1B^0) Max Feedback       : ^1'+PadLeftStr(IntToStr(MaxFBack)+'^0 Per Day',14)+
+					 '^0(^1Z^0) TBank Max Withdraw : ^1'+PadLeftStr(AOnOff((MaxWithdrawalPerDay = 0),'Unlimited',
+														IntToStr(MaxWithdrawalPerDay)+'^0 '+Plural('Minute',MaxWithdrawalPerDay)),14));
+			PrintACR('^0(^1E^0) Max Mail Waiting   : ^1'+PadLeftInt(MaxWaiting,14)+
+					 '');
+			PrintACR('^0(^1G^0) Max Mass Mail List : ^1'+PadLeftStr(IntToStr(MaxMassMailList)+'^0 Users',14)+
+					 '');
+			PrintACR('^0(^1D^0) Max Chat Attempts  : ^1'+PadLeftStr(IntToStr(MaxChat)+'^0 Per Day',14)+
+					 '');
+			PrintACR('^0(^1K^0) PW Change Interval : ^1'+PadLeftStr(AOnOff((PasswordChange = 0),'Never',
+														IntToStr(PasswordChange)+'^0 '+Plural('Day',PasswordChange)),14)+
+					 '');
+			PrintACR('^0(^1H^0) BD Check Interval  : ^1'+PadLeftStr(AOnOff((BirthDateCheck = 0),'Never',
+														IntToStr(BirthDateCheck)+'^0 '+Plural('Login',BirthDateCheck)),14)+
+					 '');
+			PrintACR('^0(^1J^0) Max Login Attempts : ^1'+PadLeftInt(MaxLogonTries,14)+
+					 '');
+			PrintACR('^0(^1@^0) Idle Warn/Timeout  : ^1'+PadLeftStr(AOnOff((TimeOutBell = -1),'Never',IntToStr(TimeOutBell))+
+														'^0/^1'+AOnOff((TimeOut = -1),'Never',IntToStr(TimeOut)+
+														'^0 Mins'),14)+ {LeeW: This isn't right! }
+					 '');
+			PrintACR('^0(^1F^0) Pre-Event Warning  : ^1'+PadLeftStr(AOnOff((EventWarningTime = 0),'None',IntToStr(EventWarningTime)+
+														'^0 '+Plural('Second',EventWarningTime)),14)+
+					 '');
 
-BEGIN
-  REPEAT
-    WITH General DO
-    BEGIN
-      Abort := FALSE;
-      Next := FALSE;
-	  Cls;
-      PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : System Variables',80));
-	  
-      PrintACR('^0(^1A^0) Max Private Sent Per Call  : ^1'+PadLeftInt(MaxPrivPost,7)+
-               '^0(^1B^0) Max Feedback Sent Per Call : ^1'+PadLeftInt(MaxFBack,6));
-      PrintACR('^0(^1C^0) Max Public Posts Per Call  : ^1'+PadLeftInt(MaxPubPost,7)+
-               '^0(^1D^0) Max Chat Attempts Per Call : ^1'+PadLeftInt(MaxChat,6));
-      PrintACR('^0(^1E^0) Normal Max Mail Waiting    : ^1'+PadLeftInt(MaxWaiting,7)+
-               '^0(^1F^0) CoSysOp Max Mail Waiting   : ^1'+PadLeftInt(CSMaxWaiting,6));
-      PrintACR('^0(^1G^0) Max Mass Mail List Size    : ^1'+PadLeftInt(MaxMassMailList,7)+
-               '^0(^1H^0) Birthdate Check Interval   : ^1'+PadLeftInt(BirthDateCheck,6)); { LeeW: Number of logins }
-      PrintACR('^0(^1I^0) Swap Location              : ^1'+PadLeftStr(DisplaySwapTo(SwapTo),7)+
-               '^0(^1J^0) Number Of Logon Attempts   : ^1'+PadLeftInt(MaxLogonTries,6));
-      PrintACR('^0(^1K^0) Password Change Interval   : ^1'+PadLeftStr(IntToStr(PasswordChange),7)+ { LeeW: Number of days }
-               '^0(^1L^0) SysOp/User Chat Colors     : ^1'+PadLeftInt(SysOpColor,1)+'^0/^1'+PadLeftInt(UserColor,1));
-      PrintACR('^0(^1M^0) UNUSED                     : ^1'+PadLeftStr('',7)+
-               '^0(^1N^0) Min. space for posts       : ^1'+PadLeftInt(MinSpaceForPost,6));
-      PrintACR('^0(^1O^0) Min. space for uploads     : ^1'+PadLeftInt(MinSpaceForUpload,7)+
-               '^0(^1P^0) Back SysOp Log keep days   : ^1'+PadLeftInt(BackSysOpLogs,6));
-      PrintACR('^0(^1R^0) Blank WFC Menu Minutes     : ^1'+PadLeftInt(WFCBlankTime,7)+
-               '^0(^1S^0) Alert Beep Delay           : ^1'+PadLeftInt(AlertBeep,6));
-      PrintACR('^0(^1T^0) Number Of System Callers   : ^1'+PadLeftInt(CallerNum,7)+
-               '^0(^1U^0) Minimum Logon Baud Rate    : ^1'+PadLeftInt(MinimumBaud,6));
-      PrintACR('^0(^1V^0) Minimum DL Baud Rate       : ^1'+PadLeftInt(MinimumDLBaud,7)+
-               '^0(^1W^0) Sec`s Between Time Slices  : ^1'+PadLeftInt(SliceTimer,6));
-      PrintACR('^0(^1X^0) TB Max Time Allowed        : ^1'+PadLeftInt(MaxDepositEver,7)+
-               '^0(^1Y^0) TB Max Daily Deposit       : ^1'+PadLeftInt(MaxDepositPerDay,6));
-      PrintACR('^0(^1Z^0) TB Max Daily Withdraw      : ^1'+PadLeftInt(MaxWithDrawalPerDay,7)+
-	           '^0(^1!^0) New User Message Sent To   : ^1'+AOnOff((NewApp = -1),'Off',PadLeftInt(NewApp,5)));
-	  PrintACR('^0(^1@^0) Mins Before Warn/Timeout   : ^1'+AOnOff((TimeOutBell = -1),'Off',IntToStr(TimeOutBell))+
-	  '^0/^1'+AOnOff((TimeOut = -1),'Off',PadLeftInt(TimeOut,3)));
-      NL;
+(*	'^0(^1P^0) SysOp Log Length   : ^1'+PadLeftStr(IntToStr(BackSysOpLogs)+'^0 '+Plural('Day',BackSysOpLogs),14));  
+	'^0(^1R^0) Blank WFC Menu     : ^1'+PadLeftStr(AOnOff((WFCBlankTime = 0),'Never',
+									IntToStr(WFCBlankTime)+'^0 Min(s)'),14));
+	PrintACR('^0(^1N^0) Min Free For Posts : ^1'+PadLeftStr(IntToStr(MinSpaceForPost)+'^0 kB',14)+
+	PrintACR('^0(^1S^0) Alert Delay        : ^1'+PadLeftStr(IntToStr(AlertBeep)+'^0 Sec(s)',14)+ 
+	PrintACR('^0(^1W^0) Sec Btwen Tm Slcs  : ^1'+PadLeftInt(SliceTimer,14));	  
+	PrintACR('^0(^1L^0) Chat Colors        : ^1'+PadLeftInt(SysOpColor,1)+'^0/^1'+PadLeftInt(UserColor,1));*)
+
+	(*'^0(^1F^0) Max Mail Waiting (CoSysOp+): ^1'+PadLeftInt(CSMaxWaiting,7) { LeeW: Is this even implemented? }*)
+
+	(*
+	  alert delay, time slice, swap loc should be in main cfg
+	  chat colors should be in color config
+	*)
+
+	  NL;
       FOR TempB := 0 TO 9 DO
       BEGIN
         Prompt('^0<^1'+IntToStr(TempB)+'^0> F'+IntToStr(TempB + 1)+' Macro : ');
@@ -159,10 +183,11 @@ BEGIN
         ELSE
           Prompt('  ');
       END;
-	  Nl;
+	  NL;
       Prt('^0Enter Selection or (^1Q^0) to Quit: ^1');
       OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ1234567890!@#',TRUE,TRUE);
       CASE Cmd OF
+	  'F' : InputByteWOC(RGSysCfgStr(14,TRUE),EventWarningTime,[DisplayValue,NumbersOnly],0,255);
 		'@' : BEGIN
 			    { LeeW: Set the timeout warning time }
 			    Cmd := #0;
@@ -195,65 +220,19 @@ BEGIN
 				  TimeOut := TempInt;
 			  END;
 		  END;
-(*	    '@','#' :
-		  BEGIN
-			NL;
-			Prt('^0Select (^1E^0)nable, (^1D^0)isable, Or [^1ENTER^0] To Abort: ^1');
-			OneK(Cmd1,^M'ED',TRUE,TRUE);
-                IF (Cmd1 IN ['E','D']) THEN
-                BEGIN
-                  CASE Cmd1 OF
-                    'E' : BEGIN
-                            CASE Cmd OF
-                              '@' : BEGIN
-                                      LowNum := 1;
-                                      HiNum := 20;
-                                      TempInt := TimeOutBell;
-                                    END;
-                              '#' : BEGIN
-                                      LowNum := 1;
-                                      HiNum := 20;
-                                      TempInt := TimeOut;
-                                    END;
-                            END;
-                            InputIntegerWOC('^0%LFEnter Value For This Function',TempInt,[NumbersOnly],LowNum,HiNum);
-                          END;
-                    'D' : TempInt := -1;
-                  END;
-                  CASE Cmd OF
-                    '@' : TimeOutBell := TempInt;
-                    '#' : TimeOut := TempInt;
-                  END;
-                  Cmd := #0;
-                END;
-		  END;*)
-	    '!' : BEGIN { LeeW: User to send new user application email to }
-			    NL;
-                Prt('^0Select (^1E^0)nable, (^1D^0)isable, Or [^1ENTER^0] To Abort: ^1');
-                OneK(Cmd1,^M'ED',TRUE,TRUE);
-                IF (Cmd1 IN ['E','D']) THEN
-                  BEGIN
-				    LowNum := 1;
-                    HiNum := (MaxUsers - 1);
-                    TempInt := NewApp;
-                    CASE Cmd1 OF
-                      'E' : InputIntegerWOC('%LFEnter value for this function',TempInt,[NumbersOnly],LowNum,HiNum);
-                      'D' : TempInt := -1;
-                    END;
-                    NewApp := TempInt;
-                    Cmd1 := #0;
-                  END;
-				END;
         '0'..'9' :
               MMacroo(Ord(Cmd) - Ord('0'));
         'I' : BEGIN
-                Print('^0%LFSwap Locations:%LF');
+				NL;
+                Print('^0Swap Locations:');
+				NL;
                 Print('^0(^1D^0)isk');
                 Print('^0(^1E^0)MS');
                 Print('^0(^1X^0)MS');
                 Print('^0(^1N^0)on XMS Extended');
                 Print('^0(^1A^0)ny');
-                lOneK('^0%LFSwap To Which? [<CR>Quit]: ',Cmd,'DEXNA'^M,TRUE,TRUE);
+				NL;
+                lOneK('^0Swap To Which? [<CR>Quit]: ',Cmd,'DEXNA'^M,TRUE,TRUE);
                 CASE Pos(Cmd,'DXENA') OF
                   1..3 : SwapTo := (Pos(Cmd,'DXE') - 1);
                      4 : SwapTo := 4;
@@ -289,11 +268,11 @@ BEGIN
                           MaxByte := 255;
                           TempB := MaxWaiting;
                         END;
-                  'F' : BEGIN
+                  (*'F' : BEGIN
                           MinByte := 0;
                           MaxByte := 255;
                           TempB := CSMaxWaiting;
-                        END;
+				  END;*)
                   'G' : BEGIN
                           MinByte := 2;
                           MaxByte := 255;
@@ -305,7 +284,7 @@ BEGIN
                           TempI := BirthDateCheck;
                         END;
                   'J' : BEGIN
-                          MinByte := 0;
+                          MinByte := 1;
                           MaxByte := 255;
                           TempB := MaxLogonTries;
                         END;
@@ -402,7 +381,7 @@ BEGIN
                   'C' : MaxPubPost := TempB;
                   'D' : MaxChat := TempB;
                   'E' : MaxWaiting := TempB;
-                  'F' : CSMaxWaiting := TempB; (* Not Hooked Up *)
+                  {'F' : CSMaxWaiting := TempB; (* Not Hooked Up *)}
                   'G' : MaxMassMailList := TempB;
                   'H' : BirthDateCheck := TempI;
                   'J' : MaxLogonTries := TempB;

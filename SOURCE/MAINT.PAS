@@ -29,7 +29,8 @@ USES
   ShortMsg,
   TimeFunc,
   Vote,
-  CRT;
+  CRT,
+  OneLiner;
 
 PROCEDURE LogonMaint;
 VAR
@@ -387,20 +388,20 @@ BEGIN
     BEGIN
       ShowBDay(IntToStr(UserNum));
       IF (NoFile) THEN
-        ShowBDay('');
+        ShowBDay(''); { LeeW: What's with this? }
       IF (NoFile) THEN
         IF (BSince) THEN
         BEGIN
           NL;
-          Print('^3Happy Birthday, '+Caps(ThisUser.Name)+' !!!');
-          Print('^3(a little late, but it''s the thought that counts!)');
+          Print('^0Happy Birthday ^1'+Caps(ThisUser.Name)+'^0!');
+          Print('^0(a little late, but it''s the thought that counts!)');
           NL;
         END
         ELSE
         BEGIN
           NL;
-          Print('^3Happy Birthday, '+Caps(ThisUser.Name)+' !!!');
-          Print('^3You turned '+IntToStr(AgeUser(ThisUser.BirthDate))+' today!!');
+          Print('^0Happy Birthday ^1'+Caps(ThisUser.Name)+'^0!');
+          Print('^0You turned ^1'+IntToStr(AgeUser(ThisUser.BirthDate))+'^0 today!');
           NL;
         END;
       PauseScr(FALSE);
@@ -413,6 +414,7 @@ BEGIN
         ReadAutoMsg;
 	    NL;
 	  END;
+	  
     IF (General.YourInfoInLogon) THEN
     BEGIN
       PrintF('YOURINFO');
@@ -429,18 +431,36 @@ BEGIN
 	  NL;    
     END;
 
-    IF (NOT (RVoting IN ThisUser.Flags)) THEN
+	IF (General.LastCallersInLogon) THEN { LeeW: Added }
+	  BEGIN
+		TodaysCallers(0);
+	  END;
+
+	IF (General.OneLinersInLogon) THEN { LeeW: Added }
+	  BEGIN
+		DoOneLiners;
+		CLS;
+	  END;
+	
+    IF (NOT (RVoting IN ThisUser.Flags)) AND (General.VoteInLogon) THEN
     BEGIN
       Counter := UnVotedTopics;
       IF (Counter > 0) THEN
       BEGIN
         NL;
-        Prompt('^0You have not voted on ^1'+IntToStr(Counter)+'^0 voting '+Plural('question',Counter));
+        Prompt('^0You have not voted on ^1'+IntToStr(Counter)+'^0 voting '+Plural('question',Counter)+'...');
+		NL;
+		NL;
+		IF PYNQ('^0Would you like to vote now? ',0,FALSE) THEN { LeeW: Added }
+		  BEGIN
+		    VoteAll;
+		  END;
         NL;
       END;
     END;
 
 	{ LeeW: Some kind of delay/pause here -- investigate }
+	{ it's the lil down further... }
 	
     IF Exist(General.DataPath+'BATCHDL.DAT') THEN
     BEGIN
@@ -511,8 +531,8 @@ BEGIN
 
     BatchDLULInfo;
 
-    IF (LIL <> 0) THEN
-      PauseScr(FALSE);
+(*    IF (LIL <> 0) THEN
+PauseScr(FALSE); *) { LeeW: testing... }
 
     Update_Screen;
   END;

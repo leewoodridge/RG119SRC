@@ -71,6 +71,9 @@ VAR
   LineFile: FILE OF LineRec;
   Cmd: Char;
   Changed: Boolean;
+  MinLongInt, { LeeW: Added }
+  MaxLongInt, {}
+  TempL: LongInt; {}
 BEGIN
   Assign(LineFile,General.DataPath+'NODE'+IntToStr(ThisNode)+'.DAT');
   Reset(LineFile);
@@ -85,19 +88,23 @@ BEGIN
           Print(PadLeftStr('^2 '#240' Renegade BBS Configuration : Main',80));	
 		  PrintACR('^0(^1A^0) BBS Name          : ^1'+BBSName);
           PrintACR('^0(^1B^0) Connection Type   : ^1'+ConnType);
-          PrintACR('^0(^1C^0) SysOp`s Name      : ^1'+PadLeftStr(SysOpName,14)+
-			      ' ^0(^1D^0) Renegade Version  : ^1'+Version);
-          PrintACR('^0(^1E^0) SysOp`s Chat Hrs  : ^1'+PadLeftStr(PHours('Any',lLowTime,HiTime),14)+
-			      ' ^0(^1F^0) Min Baud Hrs      : ^1'+PadLeftStr(PHours('Any',MinBaudLowTime,MinBaudHiTime),14));
-          PrintACR('^0(^1G^0) Regular DL Hrs    : ^1'+PadLeftStr(PHours('Any',DLLowTime,DLHiTime),14)+
-			      ' ^0(^1H^0) Min Baud DL Hrs   : ^1'+PHours('Any',MinBaudDLLowTime,MinBaudDLHiTime));
-          PrintACR('^0(^1I^0) System Passwords                   '+
-			       '^0(^1J^0) Pre-Event Warning : ^1'+IntToStr(EventWarningTime)+' ^0Second(s)');
+          PrintACR('^0(^1C^0) SysOp`s Name      : ^1'+PadLeftStr(SysOpName,14));
+		  {NL;}
+          PrintACR('^0(^1E^0) SysOp`s Chat Hrs  : ^1'+PadLeftStr(PHours('Any',lLowTime,HiTime),24)+
+				   '^0(^1M^0) MultiNode Support : ^1'+PadLeftStr(ShowOnOff(MultiNode),3));
+          PrintACR('^0(^1G^0) Regular DL Hrs    : ^1'+PadLeftStr(PHours('Any',DLLowTime,DLHiTime),24)+
+				   '^0(^1N^0) Network Mode      : ^1%NM'); { LeeW: This shouldn't be a MCI! }
+		  PrintACR('^0(^1F^0) Min Baud / Hrs    : ^1'+PadLeftStr(IntToStr(MinimumBaud)+' ^0/^1 '+
+														PHours('Any',MinBaudLowTime,MinBaudHiTime),22)+
+				   '');
+		  PrintACR('^0(^1H^0) Min Baud DL / Hrs : ^1'+PadLeftStr(IntToStr(MinimumDLBaud)+' ^0/^1 '+
+														PHours('Any',MinBaudDLLowTime,MinBaudDLHiTime),22)+
+				   '');
+		  NL;
+          PrintACR('^0(^1I^0) System Passwords                   ');
           PrintACR('^0(^1K^0) System Menus                       '+
 		           '^0(^1L^0) Bulletin Prefix   : ^1'+BulletPrefix+'');
-          PrintACR('^0(^1M^0) MultiNode Support : ^1'+PadLeftStr(ShowOnOff(MultiNode),14)+
-			      ' ^0(^1N^0) Network Mode      : ^1%NM'); { LeeW: Why is this a MCI? }
-          Nl;
+          NL;
           PrintACR('^0(^10^0) Data Files          : ^1'+DataPath);
           PrintACR('^0(^11^0) Miscellaneous Files : ^1'+MiscPath);
           PrintACR('^0(^12^0) Message Storage     : ^1'+MsgPath);
@@ -107,7 +114,7 @@ BEGIN
           PrintACR('^0(^16^0) Protocols           : ^1'+ProtPath);
           PrintACR('^0(^17^0) Archivers           : ^1'+ArcsPath);
           PrintACR('^0(^18^0) File Attachments    : ^1'+FileAttachPath);
-          Nl;
+          NL;
           Prt('^0Enter Selection Or [^1A^0-^1N^0,^10^0-^18^0,(^1Q^0)uit]: ^1');
 
       OneK(Cmd,'QABCDEFGHIJKLMN0123456789',TRUE,TRUE);
@@ -170,9 +177,23 @@ BEGIN
                 RGNoteStr(1,FALSE)
               ELSE
                 GetTimeRange(6,lLowTime,HiTime);
-        'F' : GetTimeRange(7,MinBaudLowTime,MinBaudHiTime);
+        'F' : begin
+				MinLongInt := 0;
+                MaxLongInt := 115200;
+                TempL := MinimumBaud;
+				InputLongIntWOC('^0%LFNew Value',TempL,[DisplayValue,NumbersOnly],MinLongInt,MaxLongInt);
+				MinimumBaud := TempL;
+			    GetTimeRange(7,MinBaudLowTime,MinBaudHiTime);
+			  end;
         'G' : GetTimeRange(8,DLLowTime,DLHiTime);
-        'H' : GetTimeRange(9,MinBaudDLLowTime,MinBaudDLHiTime);
+        'H' : BEGIN
+				MinLongInt := 0;
+                MaxLongInt := 115200;
+                TempL := MinimumDLBaud;
+				InputLongIntWOC('^0%LFNew Value',TempL,[DisplayValue,NumbersOnly],MinLongInt,MaxLongInt);
+				MinimumDLBaud := TempL;
+				GetTimeRange(9,MinBaudDLLowTime,MinBaudDLHiTime);
+			  END;
         'I' : BEGIN
                 REPEAT
 					ClrScr;
@@ -194,7 +215,7 @@ BEGIN
                 UNTIL (Cmd IN ['Q']) OR (HangUp);
                 Cmd := #0;
               END;
-        'J' : InputByteWOC(RGSysCfgStr(14,TRUE),EventWarningTime,[DisplayValue,NumbersOnly],0,255);
+		{        'J' : InputByteWOC(RGSysCfgStr(14,TRUE),EventWarningTime,[DisplayValue,NumbersOnly],0,255);}
         'K' : BEGIN
                 REPEAT
 				  ClrScr;

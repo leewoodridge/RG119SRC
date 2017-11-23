@@ -43,7 +43,7 @@ BEGIN
       Abort := FALSE;
       Next := FALSE;
 	  CLS;
-	  Print(PadLeftStr('^2 '#240' Renegade BBS Configuration',80)+'|16');
+	  Print(PadLeftStr('^2 '#240' Renegade BBS Configuration',70)+PadRightStr('V'+Version+' ',10)+'^0');
 	  PrintACR('^0(^1A^0) Main BBS Configuration                 ^0(^1B^0) Modem/Node Configuration');
 	  PrintACR('^0(^1C^0) System ACS Settings                    ^0(^1D^0) System Variables');
 	  PrintACR('^0(^1E^0) System Toggles                         ^0(^1F^0) File System Configuration');

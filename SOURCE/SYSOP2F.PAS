@@ -20,6 +20,9 @@ USES
 PROCEDURE FileAreaConfiguration;
 VAR
   Cmd: Char;
+  MinInt,
+  MaxInt,
+  TempI: Integer;
 BEGIN
   REPEAT
     WITH General DO
@@ -29,29 +32,30 @@ BEGIN
       Cls;
 	  PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : File System Configuration',80));
       {NL;}
-      PrintACR('^0(^1A^0) File Ratio System                : ^1'+ShowOnOff(ULDLRatio));
-      PrintACR('^0(^1B^0) File Point System                : ^1'+ShowOnOff(FileCreditRatio));
-      PrintACR('^0(^1C^0) Daily DL Limits                  : ^1'+ShowOnOff(DailyLimits));
-      PrintACR('^0(^1D^0) Test/Convert Uploads             : ^1'+ShowOnOff(TestUploads));
-      PrintACR('^0(^1E^0) File Point Rewarding System      : ^1'+ShowOnOff(RewardSystem));
-      PrintACR('^0(^1F^0) Search For/Use FILE_ID.DIZ       : ^1'+ShowOnOff(FileDiz));
-      PrintACR('^0(^1G^0) Recompress Like Archives         : ^1'+ShowOnOff(Recompress));
-      PrintACR('^0(^1H^0) Credit Reward Compensation Ratio : ^1'+IntToStr(RewardRatio)+'^0%');
-      PrintACR('^0(^1I^0) File Point Compensation Ratio    : ^1'+IntToStr(FileCreditComp)+'^0 To ^11');
-      PrintACR('^0(^1J^0) File Size Per 1 File Point       : ^1'+IntToStr(FileCreditCompBaseSize)+'^0k');
-      PrintACR('^0(^1K^0) Upload Time Refund               : ^1'+IntToStr(ULRefund)+'^0%');
-      PrintACR('^0(^1L^0) "To SysOp" File Area             : ^1'+AOnOff(ToSysOpDir = 0,'*None*',IntToStr(ToSysOpDir)));
-      PrintACR('^0(^1M^0) Auto-Validate All Files          : ^1'+ShowYesNo(ValidateAllFiles));
-      PrintACR('^0(^1N^0) Max KBytes Allowed In Temp Dir   : ^1'+IntToStr(MaxInTemp)+'^0k');
-      PrintACR('^0(^1O^0) Min KBytes To Save For Resume    : ^1'+IntToStr(MinResume)+'^0k');
-      PrintACR('^0(^1P^0) Max Batch DL Files               : ^1'+IntToStr(MaxBatchDLFiles));
-      PrintACR('^0(^1R^0) Max Batch UL Files               : ^1'+IntToStr(MaxBatchUlFiles));
-      PrintACR('^0(^1S^0) UL Duplicate File Search         : ^1'+ShowOnOff(SearchDup));
-      PrintACR('^0(^1T^0) Force Batch DL At Login          : ^1'+ShowOnOff(ForceBatchDL));
-      PrintACR('^0(^1U^0) Force Batch UL At Login          : ^1'+ShowOnOff(ForceBatchUL));
+      PrintACR('^0(^1A^0) File Ratio System           : ^1'+ShowOnOff(ULDLRatio));
+      PrintACR('^0(^1B^0) File Point System           : ^1'+ShowOnOff(FileCreditRatio));
+	  PrintACR('^0(^1E^0) File Point Rewarding System : ^1'+ShowOnOff(RewardSystem));
+      PrintACR('^0(^1C^0) Daily DL Limits             : ^1'+ShowOnOff(DailyLimits));
+      PrintACR('^0(^1D^0) Test/Convert Uploads        : ^1'+ShowOnOff(TestUploads));
+      PrintACR('^0(^1F^0) Search For/Use FILE_ID.DIZ  : ^1'+ShowOnOff(FileDiz));
+      PrintACR('^0(^1G^0) Recompress Like Archives    : ^1'+ShowOnOff(Recompress));
+      PrintACR('^0(^1H^0) Credit Reward Ratio         : ^1'+IntToStr(RewardRatio)+'^0%');
+      PrintACR('^0(^1I^0) File Point Ratio            : ^1'+IntToStr(FileCreditComp)+'^0 To ^11');
+      PrintACR('^0(^1J^0) File Size Per 1 File Point  : ^1'+IntToStr(FileCreditCompBaseSize)+'^0k');
+      PrintACR('^0(^1K^0) Upload Time Refund          : ^1'+IntToStr(ULRefund)+'^0%');
+      PrintACR('^0(^1L^0) "To SysOp" File Area        : ^1'+AOnOff(ToSysOpDir = 0,'*None*',IntToStr(ToSysOpDir)));
+      PrintACR('^0(^1M^0) Auto-Validate All Files     : ^1'+ShowYesNo(ValidateAllFiles));
+      PrintACR('^0(^1N^0) Max KBytes In Temp Dir      : ^1'+IntToStr(MaxInTemp)+'^0k');
+      PrintACR('^0(^1O^0) Min KB For Resume           : ^1'+IntToStr(MinResume)+'^0k');
+      PrintACR('^0(^1P^0) Max Batch DL Files          : ^1'+IntToStr(MaxBatchDLFiles));
+      PrintACR('^0(^1R^0) Max Batch UL Files          : ^1'+IntToStr(MaxBatchUlFiles));
+      PrintACR('^0(^1S^0) UL Duplicate File Search    : ^1'+ShowOnOff(SearchDup));
+      PrintACR('^0(^1T^0) Force Batch DL At Login     : ^1'+ShowOnOff(ForceBatchDL));
+      PrintACR('^0(^1U^0) Force Batch UL At Login     : ^1'+ShowOnOff(ForceBatchUL));
+	  PrintACR('^0(^1V^0) Min Free Space For Uploads  : ^1'+PadLeftStr(IntToStr(MinSpaceForUpload)+'^0 kB',14));
       NL;
       Prt('^0File System Configuration: ');
-      OneK(Cmd,'QABCDEFGHIJKLMNOPRSTU',TRUE,TRUE);
+      OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUV',TRUE,TRUE);
       CASE Cmd OF
         'A' : ULDLRatio := NOT ULDLRatio;
         'B' : FileCreditRatio := NOT FileCreditRatio;
@@ -73,6 +77,13 @@ BEGIN
         'S' : SearchDup := NOT SearchDup;
         'T' : ForceBatchDL := NOT ForceBatchDL;
         'U' : ForceBatchUL := NOT ForceBatchUL;
+		'V' : BEGIN
+				MinInt := 1;
+				MaxInt := 32767;
+				TempI := MinSpaceForUpload;
+				InputIntegerWOC('^0%LFNew Value',TempI,[NumbersOnly],MinInt,MaxInt);
+				MinSpaceForUpload := TempI;
+			  END;
       END;
     END;
   UNTIL (Cmd = 'Q') OR (HangUp);

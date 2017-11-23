@@ -437,7 +437,7 @@ BEGIN
    +---------------------------------------------------+ *)
   
   BEGIN
-      ForgotPWQuestion := OldGeneral.ForgotPWQuestion;
+    ForgotPWQuestion := OldGeneral.ForgotPWQuestion;
     QWKWelcome := OldGeneral.QWKWelcome;
     QWKNews := OldGeneral.QWKNews;
     QWKGoodbye := OldGeneral.QWKGoodbye;
@@ -580,6 +580,8 @@ BEGIN
     AutoChatOpen := OldGeneral.AutoChatOpen;
     AutoMInLogon := OldGeneral.AutoMInLogon;
     BullInLogon := OldGeneral.BullInLogon;
+(*	LastCallersInLogon := TRUE; { LeeW: Added }
+OneLinerInLogon := TRUE; { LeeW: Added } *)
     YourInfoInLogon := OldGeneral.YourInfoInLogon;
     OffHookLocalLogon := OldGeneral.OffHookLocalLogon;
     ForceVoting := OldGeneral.ForceVoting;

@@ -592,7 +592,11 @@ TYPE
     DLOneday,                         { Max Download In One Day (#) }
     DLKOneDay: SecurityRangeType;     { Max Download In One Day (K) }
 	
-	ConnectionType: Array [1..2] Of Boolean; { 1 = Modem, 2 = Telnet } { LeeW: cant just add things like this}
+	ConnectionType: Array [1..2] Of Boolean; { LeeW: Added } { 1 = Modem, 2 = Telnet }
+	
+	LastCallersInLogon,			{ LeeW: Added } { Display Last Callers During Logon }
+	OneLinersInLogon,			{ LeeW: Added } { Display OneLiners During Logon }
+	VoteInLogon: Boolean;		{ LeeW: Added } { Display Voting Information During Logon }
   END;
 
   ShortMessageRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { SHORTMSG.DAT : One-Line Messages }

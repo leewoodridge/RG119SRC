@@ -80,6 +80,7 @@ VAR
       Exit;
     END;
     LoadURec(User,UNum1);
+	{IF (User.Waiting >= General.MaxWaiting) OR (NoMail IN User.Flags) AND (NOT CoSysOp) THEN}
     IF (User.Waiting >= General.MaxWaiting) OR (NoMail IN User.Flags) AND (NOT CoSysOp) THEN
     BEGIN
       UNum1 := 0;

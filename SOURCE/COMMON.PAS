@@ -3121,7 +3121,7 @@ END;
 FUNCTION ShowOnOff(b: Boolean): STRING;
 BEGIN
   IF (b) THEN
-    ShowOnOff := 'On '
+    ShowOnOff := 'On'
   ELSE
     ShowOnOff := 'Off';
 END;
@@ -3131,7 +3131,7 @@ BEGIN
   IF (b) THEN
     ShowYesNo := 'Yes'
   ELSE
-    ShowYesNo := 'No ';
+    ShowYesNo := 'No';
 END;
 
 FUNCTION YN(Len: Byte; DYNY: Boolean): Boolean;

@@ -2,6 +2,9 @@
 { System Toggles }
 
 (*  1.  Add checking for deleted users or forwarded mail to option 1 *)
+{
+	implement lastcallersinlogon and onelinersinlogon in login procedure
+	}
 
 UNIT SysOp2E;
 
@@ -16,110 +19,151 @@ USES
   Common,
   MiscUser;
 
+FUNCTION DisplaySwapTo(SwapTo: Byte): Str4;
+  BEGIN
+	CASE SwapTo OF
+	  0   : DisplaySwapTo := 'Disk';
+	  1   : DisplaySwapTo := 'XMS';
+	  2   : DisplaySwapTo := 'EMS';
+	  4   : DisplaySwapTo := 'EXT';
+	  255 : DisplaySwapTo := 'Any';
+	END;
+  END;
+
+  
+  
 PROCEDURE SystemFlaggedFunctions;
-VAR
-  Cmd,
-  Cmd1: Char;
-  LowNum,
-  HiNum,
-  TempInt: SmallInt;
-BEGIN
-  REPEAT
-    WITH General DO
-    BEGIN
-      Abort := FALSE;
-      Next := FALSE;
-          ClrScr;
-      PrintACR(PadLeftStr('|17|15 þ Renegade BBS Configuration : System Toggles',80));
-     
-      PrintACR('|07(|15C|07) Local Security Protection : |15'+ShowOnOff(LocalSec)+
-	   '  |08³  - Login Procedure -');
-      PrintACR('|07(|15D|07) Use EMS For Overlay File  : |15'+ShowOnOff(UseEMS)+
-	   '  |08³  |07(|15B|07) Phone Number In Logon     : |15'+ShowOnOff(PhonePW));
-      PrintACR('|07(|15E|07) Global Activity Trapping  : |15'+ShowOnOff(GlobalTrap)+
-	   '  |08³  |07(|15G|07) AutoMessage In Logon      : |15'+ShowOnOff(AutoMInLogon));
-      PrintACR('|07(|15F|07) Auto Chat Buffer Open     : |15'+ShowOnOff(AutoChatOpen)+
-	   '  |08³  |07(|15H|07) Bulletins In Logon        : |15'+ShowOnOff(BullInLogon));
-      PrintACR('|07(|15J|07) Strip Color Off SysOp Log : |15'+ShowOnOff(StripCLog)+
-	   '  |08³  |07(|15I|07) User Info In Logon        : |15'+ShowOnOff(YourInfoInLogon));
-      PrintACR('|07(|15K|07) Offhook In Local Logon    : |15'+ShowOnOff(OffHookLocalLogon)+
-	   '  |08³  |07(|15W|07) Random Quote In Logon     : |15'+ShowOnOff(LogonQuote));
-      PrintACR('|07(|15L|07) Trap Teleconferencing     : |15'+ShowOnOff(TrapTeleConf)+
-	   '  |08³  |07(|15X|07) User Add Quote In Logon   : |15'+ShowOnOff(UserAddQuote));
-      PrintACR('|07(|15M|07) Compress File/Msg Numbers : |15'+ShowOnOff(CompressBases)+
-	   '  |08³  |07(|15S|07) Use Shuttle Logon         : |15'+ShowOnOff(ShuttleLog));
-      PrintACR('|07(|15N|07) Use BIOS For Video Output : |15'+ShowOnOff(UseBIOS));
-      PrintACR('|07(|15O|07) Use IEMSI Handshakes      : |15'+ShowOnOff(UseIEMSI));
-      PrintACR('|07(|15R|07) Swap Shell Function       : |15'+ShowOnOff(SwapShell));
-      PrintACR('|07(|15T|07) Chat Call Paging          : |15'+ShowOnOff(ChatCall));
-      PrintACR('|07(|15U|07) Time Limits Are Per Call  : |15'+ShowOnOff(PerCall));
-      PrintACR('|07(|15V|07) SysOp Password Checking   : |15'+ShowOnOff(SysOpPWord));
-      PrintACR('|07(|15Y|07) Use Lightbars             : |15'+ShowOnOff(UseLightBars));
-	  PrintACR('^0(^1Z^0) Can Unval''d Users Log In From Shuttle: ^1'+ShowYesNo(ShuttleUnvalLogin));
-	  PrintACR('^0(^1!^0) Refuse New Users: ^1'+ShowYesNo(ClosedSystem));
-	  Nl;	  
-(*      PrintACR('|07(|152|07) Mins Before Timeout Bell : |15'+AOnOff((TimeOutBell = -1),'Off',PadLeftInt(TimeOutBell,3)));
-      PrintACR('|07(|153|07) Mins Before Timeout      : |15'+AOnOff((TimeOut = -1),'Off',PadLeftInt(TimeOut,3)));
-      Nl; *)
-      Prt('|07Enter Selection Or (|15Q|07) To Quit: |15');
-      OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ123!',TRUE,TRUE);
-      CASE Cmd OF
-	    '!' : ClosedSystem := NOT ClosedSystem;
-	    'Z' : ShuttleUnvalLogin := NOT ShuttleUnvalLogin;
-        'A' : {AllowAlias := NOT AllowAlias};
-        'B' : BEGIN
-                PhonePW := NOT PhonePW;
-                IF (PhonePW) THEN
-                 Begin
-                 { If we`re going to verify phone numbers, users will need to provide them, so we`ll also ask
-                   for phone numbers in new user application. }
-                  NewUserToggles[7] := True;
-                  Print('Also Enabling Phone Number In New User Application.');
-                  PauseScr(False);
-                 End
-              END;
-        'C' : LocalSec := NOT LocalSec;
-        'D' : BEGIN
-                UseEMS := NOT UseEMS;
-                IF (UseEMS) THEN
-                  OvrUseEMS := TRUE
-                ELSE
-                  OvrUseEMS := FALSE;
-              END;
-        'E' : GlobalTrap := NOT GlobalTrap;
-        'F' : AutoChatOpen := NOT AutoChatOpen;
-        'G' : AutoMInLogon := NOT AutoMInLogon;
-        'H' : BullInLogon := NOT BullInLogon;
-        'I' : YourInfoInLogon := NOT YourInfoInLogon;
-        'J' : StripCLog := NOT StripCLog;
-        'K' : OffHookLocalLogon := NOT OffHookLocalLogon;
-        'L' : TrapTeleConf := NOT TrapTeleConf;
-        'M' : BEGIN
-                CompressBases := NOT CompressBases;
-                IF (CompressBases) THEN
-                  Print('^0%LFCompressing File & Message Areas ...')
-                ELSE
-                  Print('^0%LFDe-Compressing File & Message Areas ...');
-                NewCompTables;
-              END;
-        'N' : BEGIN
-                UseBIOS := NOT UseBIOS;
-                DirectVideo := NOT UseBIOS; { LeeW: Is this right? }
-              END;
-        'O' : UseIEMSI := NOT UseIEMSI;
-        'P' : ClosedSystem := NOT ClosedSystem;
-        'R' : SwapShell := NOT SwapShell;
-        'S' : ShuttleLog := NOT ShuttleLog;
-        'T' : ChatCall := NOT ChatCall;
-        'U' : PerCall := NOT PerCall;
-        'V' : SysOpPWord := NOT SysOpPWord;
-        'W' : LogonQuote := NOT LogonQuote;
-        'X' : UserAddQuote := NOT UserAddQuote;
-        'Y' : UseLightBars := NOT UseLightBars;
-        'Z' : PauseScr(False); {LeeW: Unused}
-      END;
-    END;
-  UNTIL (Cmd = 'Q') OR (HangUp);
-END;
+  VAR
+	Cmd,
+	Cmd1: Char;
+	LowNum,
+	HiNum,
+	TempInt: SmallInt;
+  BEGIN
+	REPEAT
+	  WITH General DO
+		BEGIN
+		  Abort := FALSE;
+		  Next := FALSE;
+		  ClrScr;
+		  PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : System Toggles',80));
+		  
+		  PrintACR('^0(^1C^0) Local Security Protection : ^1'+PadLeftStr(ShowOnOff(LocalSec),7)+
+				   '- Login Procedure -');
+		  PrintACR('^0(^1D^0) Use EMS For Overlay File  : ^1'+PadLeftStr(ShowOnOff(UseEMS),7)+
+				   '^0(^1B^0) Phone Number In Logon     : ^1'+PadLeftStr(ShowOnOff(PhonePW),7));
+		  PrintACR('^0(^1E^0) Global Activity Trapping  : ^1'+PadLeftStr(ShowOnOff(GlobalTrap),7)+
+				   '^0(^1G^0) AutoMessage In Logon      : ^1'+PadLeftStr(ShowOnOff(AutoMInLogon),7));
+		  PrintACR('^0(^1F^0) Auto Chat Buffer Open     : ^1'+PadLeftStr(ShowOnOff(AutoChatOpen),7)+
+				   '^0(^1H^0) Bulletins In Logon        : ^1'+PadLeftStr(ShowOnOff(BullInLogon),7));
+		  PrintACR('^0(^1J^0) Strip Color Off SysOp Log : ^1'+PadLeftStr(ShowOnOff(StripCLog),7)+
+				   '^0(^1I^0) User Info In Logon        : ^1'+PadLeftStr(ShowOnOff(YourInfoInLogon),7));
+		  PrintACR('^0(^1K^0) Offhook In Local Logon    : ^1'+PadLeftStr(ShowOnOff(OffHookLocalLogon),7)+
+				   '^0(^1W^0) Random Quote In Logon     : ^1'+PadLeftStr(ShowOnOff(LogonQuote),7));
+		  PrintACR('^0(^1L^0) Trap Teleconferencing     : ^1'+PadLeftStr(ShowOnOff(TrapTeleConf),7)+
+				   '^0(^1X^0) User Add Quote In Logon   : ^1'+PadLeftStr(ShowOnOff(UserAddQuote),7));
+		  PrintACR('^0(^1M^0) Compress File/Msg Numbers : ^1'+PadLeftStr(ShowOnOff(CompressBases),7)+
+				   '^0(^1S^0) Use Shuttle Logon         : ^1'+PadLeftStr(ShowOnOff(ShuttleLog),7));
+		  PrintACR('^0(^1N^0) Use BIOS For Video Output : ^1'+PadLeftStr(ShowOnOff(UseBIOS),7)+
+				   '^0(^1Z^0) Unval Log In From Shuttle : ^1'+PadLeftStr(ShowYesNo(ShuttleUnvalLogin),7));
+		  PrintACR('^0(^1O^0) Use IEMSI Handshakes      : ^1'+PadLeftStr(ShowOnOff(UseIEMSI),7)+
+				   '^0(^1!^0) Last Callers In Logon     : ^1'+PadLeftStr(ShowOnOff(LastCallersInLogon),7));
+		  PrintACR('^0(^1R^0) Swap Shell Function       : ^1'+PadLeftStr(ShowOnOff(SwapShell)+'^0 > ^1'+
+															 DisplaySwapTo(SwapTo),10)+
+				   '');
+(* LeeW: Don't display "swap to" location if disabled ^ *)
+(* LeeW: Maybe "force batch ul/dl" should be with logon secq *)
+		  PrintACR('^0(^1T^0) Chat Call Paging          : ^1'+PadLeftStr(ShowOnOff(ChatCall),7)+
+				   '^0(^1@^0) OneLiners In Logon        : ^1'+PadLeftStr(ShowOnOff(OneLinersInLogon),7));
+		  PrintACR('^0(^1U^0) Time Limits Are Per Call  : ^1'+PadLeftStr(ShowOnOff(PerCall),7)+
+				   '^0(^1#^0) Vote In Logon             : ^1'+PadLeftStr(ShowOnOff(VoteInLogon),7));
+		  PrintACR('^0(^1V^0) SysOp Password Checking   : ^1'+PadLeftStr(ShowOnOff(SysOpPWord),7)+
+				   '');
+		  PrintACR('^0(^1Y^0) Use Lightbars             : ^1'+PadLeftStr(ShowOnOff(UseLightBars),7)+
+				   '');
+		  NL;
+		  Prt('^0Enter Selection Or (^1Q^0) To Quit: ^1');
+		  OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ!@#',TRUE,TRUE);
+		  CASE Cmd OF
+			'!' : LastCallersInLogon := NOT LastCallersInLogon;
+			'@' : OneLinersInLogon := NOT OneLinersInLogon;
+			'#' : VoteInLogon := NOT VoteInLogon;
+			'A' : PauseScr(FALSE);
+			'B' : BEGIN
+					PhonePW := NOT PhonePW;
+					IF (PhonePW) THEN
+					  BEGIN
+						{ If we`re going to verify phone numbers, users will need to provide them, so we`ll also ask
+						  for phone numbers in new user application. }
+						NewUserToggles[7] := True;
+						Print('Also Enabling Phone Number In New User Application.');
+						PauseScr(False);
+					  END
+				  END;
+			'C' : LocalSec := NOT LocalSec;
+			'D' : BEGIN
+					UseEMS := NOT UseEMS;
+					IF (UseEMS) THEN
+					  OvrUseEMS := TRUE
+					ELSE
+					  OvrUseEMS := FALSE;
+				  END;
+			'E' : GlobalTrap := NOT GlobalTrap;
+			'F' : AutoChatOpen := NOT AutoChatOpen;
+			'G' : AutoMInLogon := NOT AutoMInLogon;
+			'H' : BullInLogon := NOT BullInLogon;
+			'I' : YourInfoInLogon := NOT YourInfoInLogon;
+			'J' : StripCLog := NOT StripCLog;
+			'K' : OffHookLocalLogon := NOT OffHookLocalLogon;
+			'L' : TrapTeleConf := NOT TrapTeleConf;
+			'M' : BEGIN
+					CompressBases := NOT CompressBases;
+					IF (CompressBases) THEN
+					  Print('^0%LFCompressing File & Message Areas ...')
+					ELSE
+					  Print('^0%LFDe-Compressing File & Message Areas ...');
+					NewCompTables;
+					PauseScr(FALSE);
+				  END;
+			'N' : BEGIN
+					UseBIOS := NOT UseBIOS;
+					DirectVideo := NOT UseBIOS;
+				  END;
+			'O' : UseIEMSI := NOT UseIEMSI;
+			'P' : ClosedSystem := NOT ClosedSystem;
+			'R' : BEGIN
+					IF PYNQ('Swap Shell? ',0,FALSE) THEN
+					  BEGIN
+						SwapShell := TRUE;
+						Print('^0%LFSwap Locations:%LF');
+						Print('^0(^1D^0)isk');
+						Print('^0(^1E^0)MS');
+						Print('^0(^1X^0)MS');
+						Print('^0(^1N^0)on XMS Extended');
+						Print('^0(^1A^0)ny');
+						lOneK('^0%LFSwap To Which? [<CR>Quit]: ',Cmd,'DEXNA'^M,TRUE,TRUE);
+						CASE Pos(Cmd,'DXENA') OF
+						  1..3 : SwapTo := (Pos(Cmd,'DXE') - 1);
+						  4 : SwapTo := 4;
+						  5 : SwapTo := 255;
+						END;
+						Cmd := #0;
+					  END
+					ELSE
+					  SwapShell := FALSE;
+				  END;
+			'S' : ShuttleLog := NOT ShuttleLog;
+			'T' : ChatCall := NOT ChatCall;
+			'U' : PerCall := NOT PerCall;
+			'V' : SysOpPWord := NOT SysOpPWord;
+			'W' : LogonQuote := NOT LogonQuote;
+			'X' : UserAddQuote := NOT UserAddQuote;
+			'Y' : UseLightBars := NOT UseLightBars;
+			'Z' : ShuttleUnvalLogin := NOT ShuttleUnvalLogin;
+		  END;
+		END;
+	UNTIL (Cmd = 'Q') OR (HangUp);
+  END;
 
 END.
+(* LeeW: Indenting done! *)
