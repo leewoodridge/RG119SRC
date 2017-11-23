@@ -28,6 +28,14 @@ Updates
 - combined warning time and timeout time in to one option
 - combined sysop and user chat colors in to one option
 - simplify configuration options
+- Max logon attempts: minimum is now 1, since 0 was equal to 1 anyway
+- Combined min baud and hrs
+- Combined min dl baud and hrs
+- Re-arranging menu options... WIP...
+- Combined swap shell toggle and location setting
+- Fixing indents
+- Added toggles to show Voting, LastCallers, and OneLiners during logon, rather than having them in start menu since they're pretty standard
+- Voting prompt during logon about unanswered questions now gives you the option to vote on them now
 
 Renegade v1.19
 ==============
