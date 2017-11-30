@@ -34,38 +34,38 @@ PROCEDURE NewUserTogglesConfiguration;
 		  Print('^0Here you can configure which questions and options you`d like new users to be');
 		  Print('^0prompted on during their application');
 		  NL;
-		  PrintACR('^0(^1!^0) Refuse New Users : ^1'+ShowYesNo(ClosedSystem));
+		  PrintACR('^0(^1!^0) Refuse New Users : ^1'+PadLeftStr(ShowYesNo(ClosedSystem),3));
 		  NL;
-		  PrintACR('^0(^1A^0) Handle/Alias     : ^1'+ShowYesNo(AllowAlias)		 +' |08³ '+
-				   '^0(^1N^0) ANSI Colors      : ^1'+ShowYesNo(NewUserToggles[14]));
-		  PrintACR('^0(^1B^0) Real Name        : ^1'+ShowYesNo(NewUserToggles[2])+' |08³ '+
-				   '^0(^1O^0) Color Scheme     : ^1'+ShowYesNo(NewUserToggles[15]));
-		  PrintACR('^0(^1C^0) Country          : ^1'+ShowYesNo(NewUserToggles[3])+' |08³ '+
-				   '^0(^1P^0) Screen Size      : ^1'+ShowYesNo(NewUserToggles[16]));
-		  PrintACR('^0(^1D^0) City, State      : ^1'+ShowYesNo(NewUserToggles[4])+' |08³ '+
-				   '^0(^1R^0) Screen Clearing  : ^1'+ShowYesNo(NewUserToggles[17]));
-		  PrintACR('^0(^1E^0) Address          : ^1'+ShowYesNo(NewUserToggles[5])+' |08³ '+
-				   '^0(^1S^0) Screen Pause     : ^1'+ShowYesNo(NewUserToggles[18]));
-		  PrintACR('^0(^1F^0) Zip Code         : ^1'+ShowYesNo(NewUserToggles[6])+' |08³ '+
-				   '^0(^1T^0) Hotkeys          : ^1'+ShowYesNo(NewUserToggles[19]));
-		  PrintACR('^0(^1G^0) Phone Number     : ^1'+ShowYesNo(NewUserToggles[7])+' |08³ '+
-				   '^0(^1U^0) QWK              : ^1'+ShowYesNo(NewUserToggles[20]));
-		  PrintACR('^0(^1H^0) Birthdate        : ^1'+ShowYesNo(NewUserToggles[8])+' |08³ '+
-				   '^0(^1V^0) Expert Mode      : ^1'+ShowYesNo(NewUserToggles[21]));
-		  PrintACR('^0(^1I^0) Gender Identity  : ^1'+ShowYesNo(NewUserToggles[9])+' |08³ '+
-				   '^0(^1W^0) Forgot Password  : ^1'+ShowYesNo(NewUserToggles[23]));
-		  PrintACR('^0(^1J^0) Question #1      : ^1'+ShowYesNo(NewUserToggles[10])+' |08³ '+
-				   '^0(^1X^0) New User Letter  : ^1'+AOnOff((NewApp = -1),'No','Yes^0 > #^1'+IntToStr(NewApp)+''));
-		  PrintACR('^0(^1K^0) Question #2      : ^1'+ShowYesNo(NewUserToggles[11])+' |08³ '(*+
+		  PrintACR('^0(^1A^0) Handle/Alias     : ^1'+PadLeftStr(ShowYesNo(AllowAlias),3)+'   '+
+				   '^0(^1N^0) ANSI Colors      : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[14]),3));
+		  PrintACR('^0(^1B^0) Real Name        : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[2]),3)+'   '+
+				   '^0(^1O^0) Color Scheme     : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[15]),3));
+		  PrintACR('^0(^1C^0) Country          : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[3]),3)+'   '+
+				   '^0(^1P^0) Screen Size      : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[16]),3));
+		  PrintACR('^0(^1D^0) City, State      : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[4]),3)+'   '+
+				   '^0(^1R^0) Screen Clearing  : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[17]),3));
+		  PrintACR('^0(^1E^0) Address          : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[5]),3)+'   '+
+				   '^0(^1S^0) Screen Pause     : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[18]),3));
+		  PrintACR('^0(^1F^0) Zip Code         : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[6]),3)+'   '+
+				   '^0(^1T^0) Hotkeys          : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[19]),3));
+		  PrintACR('^0(^1G^0) Phone Number     : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[7]),3)+'   '+
+				   '^0(^1U^0) QWK              : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[20]),3));
+		  PrintACR('^0(^1H^0) Birthdate        : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[8]),3)+'   '+
+				   '^0(^1V^0) Expert Mode      : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[21]),3));
+		  PrintACR('^0(^1I^0) Gender Identity  : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[9]),3)+'   '+
+				   '^0(^1W^0) Forgot Password  : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[23]),3));
+		  PrintACR('^0(^1J^0) Question #1      : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[10]),3)+'   '+
+				   '^0(^1X^0) New User Letter  : ^1'+PadLeftStr(AOnOff((NewApp = -1),'No','Yes^0 > #^1'+IntToStr(NewApp)+''),12));
+		  PrintACR('^0(^1K^0) Question #2      : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[11]),3)+'   '(*+
 				   '^0(^1Y^0) UNUSED           : ^1'*));
-		  PrintACR('^0(^1L^0) Question #3      : ^1'+ShowYesNo(NewUserToggles[12])+' |08³ '(*+
+		  PrintACR('^0(^1L^0) Question #3      : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[12]),3)+'   '(*+
 				   '^0(^1Z^0) UNUSED           : ^1'*));
-		  PrintACR('^0(^1M^0) Term Emulation   : ^1'+ShowYesNo(NewUserToggles[13])+' |08³ ');
+		  PrintACR('^0(^1M^0) Term Emulation   : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[13]),3)+'   ');
 		END;
 	  MCIAllowed := TRUE;
 	  NL;
-	  Prt('^0New User Application Toggles [^1A^0-^1Z^0,(^1Q^0)uit]: ^1');
-	  OneK(Cmd,'!ABCDEFGHIJKLMNOPQRSTUVWXYZ^',TRUE,TRUE);
+	  Prt('^0New User Application Toggles [^1!^0,^1A^0-^1X^0,(^1Q^0)uit]: ^1');
+	  OneK(Cmd,'!ABCDEFGHIJKLMNOPQRSTUVWX^',TRUE,TRUE);
 	  WITH General DO
 		CASE Cmd OF
 		  '!' : ClosedSystem := NOT ClosedSystem;

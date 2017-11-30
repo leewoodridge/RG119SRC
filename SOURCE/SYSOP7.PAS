@@ -4,8 +4,11 @@
 {  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
   | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
   |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
-
+  -----------
   MENU EDITOR
+  -----------
+  ISSUES:
+	- going into submenu system menus, when returning, returns to page 1 instead of where last was
 }
 
 UNIT SysOp7;
@@ -162,6 +165,7 @@ VAR
   SaveCurMenu: Byte;
   RecNumToList: Integer;
   SaveTempPause: Boolean;
+  Changed: Boolean;
 
   FUNCTION DisplayMenuFlags(MenuFlags: MenuFlagSet; C1,C2: Char): AStr;
   VAR
@@ -579,7 +583,7 @@ VAR
                                     LCmds(21,1,'A Auto Time Display',	'F Force Line Input');
                                     LCmds(21,1,'T No Menu Titles',		'1 No ANS Prompt');
                                     LCmds(21,1,'2 No AVT Prompt',		'3 No RIP Prompt');
-                                    LCmds(21,1,'4 No Global Display',		'5 No Global Use');
+                                    LCmds(21,1,'4 No Global Display',	'5 No Global Use');
                                   END;
                           END;
                         UNTIL (Cmd1 = ^M) OR (HangUp);
@@ -655,18 +659,46 @@ BEGIN
 	
 	{LeeW: printacr(inttostr(recnumtolist-1)+' '+inttostr(nummenus)+' '); divide to figure out num pages}
 	
-    LOneK('^0Menu Editor [(^1?^0)Help]: ',Cmd,'QDIM?'^M,TRUE,TRUE);
+    LOneK('^0Menu Editor [^1DIMS^0,(^1?^0)Help,(^1Q^0)uit]: ',Cmd,'QDIM?S'^M,TRUE,TRUE);
     CASE Cmd OF
       ^M  : IF (RecNumToList < 1) OR (RecNumToList > NumMenus) THEN
               RecNumToList := 1;
       'D' : DeleteMenu;
       'I' : InsertMenu;
       'M' : ModifyMenu;
+	  'S' : BEGIN
+                WITH General DO 
+				  REPEAT
+				  CLS;
+				  PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : System Menus',80));
+				  PrintACR('^0Here you can define which menus are used for various functions on your BBS.');
+				  NL;
+				PrintACR('^0(^11^0) Global Commands      : ^1'+IntToStr(GlobalMenu)+'');
+				PrintACR('^0(^12^0) Start                : ^1'+IntToStr(AllStartMenu)+'');
+				PrintACR('^0(^13^0) Shuttle Logon        : ^1'+IntToStr(ShuttleLogonMenu));
+				PrintACR('^0(^14^0) New User Information : ^1'+IntToStr(NewUserInformationMenu));
+				PrintACR('^0(^15^0) Reading Messages     : ^1'+IntToStr(MessageReadMenu));
+				PrintACR('^0(^16^0) Listing Files        : ^1'+IntToStr(FileListingMenu));
+				NL;
+				Prt('^0System Menus [^11^0-^16^0,(^1Q^0)uit]: ');				  
+                  OneK(Cmd,'123456Q',TRUE,TRUE);
+                  CASE Cmd OF
+                    '1' : FindMenu(RGSysCfgStr(16,TRUE),GlobalMenu,0,NumMenus,Changed);
+                    '2' : FindMenu(RGSysCfgStr(17,TRUE),AllStartMenu,1,NumMenus,Changed);
+                    '3' : FindMenu(RGSysCfgStr(18,TRUE),ShuttleLogonMenu,0,NumMenus,Changed);
+                    '4' : FindMenu(RGSysCfgStr(19,TRUE),NewUserInformationMenu,1,NumMenus,Changed);
+                    '5' : FindMenu(RGSysCfgStr(20,TRUE),MessageReadMenu,1,NumMenus,Changed);
+                    '6' : FindMenu(RGSysCfgStr(21,TRUE),FileListingMenu,1,NumMenus,Changed);
+                  END;
+                UNTIL (Cmd IN ['Q']) OR (HangUp);
+                Cmd := #0;
+              END;
       '?' : BEGIN
 			  Nl;
               Print('^0<^1CR^0> Next Page / Refresh');
               LCmds(14,1,'D Delete Menu','I Insert Menu');
               LCmds(14,1,'M Modify Menu','Q Quit');
+			  LCmds(14,1,'S System Menus','')
             END;
     END;
     IF (CMD <> ^M) THEN

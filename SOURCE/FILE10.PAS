@@ -866,9 +866,12 @@ VAR
 
 BEGIN
   NL;
-  Print('^4[^5M^4]anual, [^5A^4]utomatic, [^5P^4]oint entry, [^5Q^4]uit');
+  {Print('^4[^5M^4]anual, [^5A^4]utomatic, [^5P^4]oint entry, [^5Q^4]uit');}
+  Print('^0(^1M^0)anual');
+  Print('^0(^1A^0)utomatic');
+  Print('^0(^1P^0)oint Entry');
   NL;
-  Prt('File validation: ');
+  Prt('^0File Validation [^1MAP^0,(^1Q^0)uit]: ');
   OneK(Cmd,'QMAP',TRUE,TRUE);
   IF (Cmd <> 'Q') THEN
   BEGIN
@@ -881,7 +884,7 @@ BEGIN
     Abort := FALSE;
     Next := FALSE;
     NL;
-    IF (NOT InWFCMenu) AND (NOT PYNQ('Search all file areas? ',0,TRUE)) THEN
+    IF (NOT InWFCMenu) AND (NOT PYNQ('^0Search All File Areas? ',0,TRUE)) THEN
       ValFiles(FileArea,Cmd,(Cmd = 'A'),(Cmd = 'P'))
     ELSE
     BEGIN

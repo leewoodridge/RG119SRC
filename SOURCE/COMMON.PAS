@@ -4215,13 +4215,13 @@ BEGIN
     ELSE IF (TempDirPath = '') THEN
     BEGIN
       NL;
-      Print('^7A valid path must be specified!^1');
+      Print('^8A valid path must be specified!^1');
     END
     ELSE IF (NOT (TempDirPath[1] IN ['A'..'Z'])) OR (Length(TempDirPath) < 3) OR
          (NOT (TempDirPath[2] = ':')) OR (NOT (TempDirPath[3] = '\')) THEN
     BEGIN
       NL;
-      Print('^7Invalid drive specification: "'+Copy(TempDirPath,1,3)+'"^1');
+      Print('^8Invalid drive specification: "'+Copy(TempDirPath,1,3)+'"^1');
       TempDirPath := '';
     END
     ELSE
@@ -4231,7 +4231,7 @@ BEGIN
       IF (IOResult <> 0) THEN
       BEGIN
         NL;
-        Print('^7Drive does not exist: "'+Copy(TempDirPath,1,3)+'"^1');
+        Print('^8Drive does not exist: "'+Copy(TempDirPath,1,3)+'"^1');
         TempDirPath := '';
       END
       ELSE
@@ -4259,8 +4259,8 @@ BEGIN
                       IF (LastError <> 0) THEN
                       BEGIN
                         NL;
-                        Print('Error creating directory: '+Copy(TempDirPath,1,(Counter - 1)));
-                        SysOpLog('^7Error creating directory: '+Copy(TempDirPath,1,(Counter - 1)));
+                        Print('^8Error creating directory: '+Copy(TempDirPath,1,(Counter - 1)));
+                        SysOpLog('^8Error creating directory: '+Copy(TempDirPath,1,(Counter - 1)));
                         TempDirPath := '';
                       END;
                     END;

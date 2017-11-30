@@ -20,6 +20,7 @@ VAR
 BEGIN
   Abort := FALSE;
   Next := FALSE;
+  PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : Archiver Configuration',80));
   PrintACR('^4+---+----+-----+----------------------------+----------------------------+----+');
   PrintACR('^4| ^3A ^4| ^3## ^4| ^3Ext ^4| ^3Compression CmdLine        ^4| ^3Decompression CmdLine      ^4| ^3SC ^4|');
   PrintACR('^4+---+----+-----+----------------------------+----------------------------+----+');
@@ -334,7 +335,7 @@ BEGIN
       NL;
       DisplayCmt;
     END;
-    LOneK('^0%LFArchive Editor: ',Cmd,'QDIM123?'^M,TRUE,TRUE);
+    LOneK('^0%LFArchiver Configuration [^11^0-^13^0,^1DIM^0,(^1?^0)Help,(^1Q^0)uit]: ',Cmd,'QDIM123?'^M,TRUE,TRUE);
     CASE Cmd OF
       'D' : DeleteArchive(TempArchive,RecNumToList);
       'I' : InsertArchive(TempArchive,Cmd,RecNumToList);

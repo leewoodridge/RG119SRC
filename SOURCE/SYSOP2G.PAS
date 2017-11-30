@@ -3,8 +3,9 @@
 {  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
   | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
   |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
-
-  validation editor
+  -------------------------------------
+  SUBSCRIPTION/VALIDATION CONFIGURATION
+  -------------------------------------
 }
 
 UNIT SysOp2G;
@@ -86,6 +87,7 @@ BEGIN
   TempStr := '';
   NumOnline := 0;
   CLS;
+  PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : Subscription/Validation Configuration',80));
   PrintACR('^4+----+---+-----------------------------+----+---+-----------------------------+');
   PrintACR('^4| ^3## ^4| ^3K ^4| ^3Description                 ^4| ^3## ^4| ^3K ^4| ^3Description                 ^4|');
   PrintACR('^4+----+---+-----------------------------+----+---+-----------------------------+');
@@ -862,7 +864,7 @@ BEGIN
   REPEAT
     IF (Cmd <> '?') THEN
       DisplayValidationRecords(RecNumToList);
-    LOneK('^0%LFValidation Editor: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
+    LOneK('^0%LFValidation Configuration [^1DIMP^0,(^1?^0)Help,(^1Q^0)uit]: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
     CASE Cmd OF
       ^M  : IF (RecNumToList < 1) OR (RecNumToList > NumValKeys) THEN
               RecNumToList := 1;

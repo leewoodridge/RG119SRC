@@ -58,7 +58,7 @@ VAR
     Print('    "~" for a half-second delay');
     Print('    "^" to toggle DTR off for a quarter-second');
 	NL;
-    InputWN1('^0Enter new modem '+DisplayStr+' string:%LF',InputStr,Len,[InterActiveEdit],Changed);
+    InputWN1('^0Enter New Modem '+DisplayStr+' String: ',InputStr,Len,[InterActiveEdit],Changed);
   END;
 
   FUNCTION WhichBaud(B: Byte): AStr;
@@ -100,37 +100,41 @@ BEGIN
 	  PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : Modem / Node #'+IntToStr(ThisNode)+'',80));
 	  Print('Here you can configure...');
       NL;
-      PrintACR('^11^0> Maximum Baud Rate : ^1'+PadLeftInt(InitBaud,20)+
-               '^12^0> Port Number       : ^1'+IntToStr(ComPort));
-      PrintACR('^13^0> Modem Init        : ^1'+PadLeftStr(Init,20)+
-               '^14^0> Modem Answer      : ^1'+Answer);
-      PrintACR('^15^0> Modem Hang Up     : ^1'+PadLeftStr(HangUp,20)+
-               '^16^0> Modem Off Hook    : ^1'+Offhook);
-      PrintACR('^17^0> COM Port Locking  : ^1'+PadLeftStr(ShowOnOff(LockedPort IN MFlags),20)+
-               '^18^0> XON/XOFF (SW) Flow: ^1'+ShowOnOff(XONXOFF IN MFlags));
-      PrintACR('^19^0> CTS/RTS (HW) Flow : ^1'+PadLeftStr(ShowOnOff(CTSRTS IN MFlags),20)+
-               '^1A^0> ACS For This Node : ^1'+LogonACS);
-      PrintACR('^1B^0> Drop File Path    : ^1'+PadLeftStr(DoorPath,20)+
-               '^1C^0> Answer On Ring    : ^1'+IntToStr(AnswerOnRing));
-      PrintACR('^1D^0> TeleConf Normal   : ^1'+PadLeftStr(TeleConfNormal,20)+
-               '^1E^0> MultiRing Only    : ^1'+ShowOnOff(MultiRing));
-      PrintACR('^1F^0> TeleConf Anon     : ^1'+PadLeftStr(TeleConfAnon,20));
-      PrintACR('^1G^0> TeleConf Global   : ^1'+TeleConfGlobal);
-      PrintACR('^1H^0> TeleConf Private  : ^1'+TeleConfPrivate);
-      PrintACR('^1I^0> IRQ String        : ^1'+IRQ);
-      PrintACR('^1J^0> Address String    : ^1'+Address);
-      PrintACR('^1R^0> Modem Result Codes');
-      Prt('^0%LFModem/Node Configuration: ');
-      OneK(Cmd,'Q123456789ABCDEFGHIJR'^M,TRUE,TRUE);
+      
+	  PrintACR('^0(^1A^0) Com Port Number  : ^1'+PadLeftStr(IntToStr(ComPort),6)+
+			   '^0(^1G^0) Max Baud Rate    : ^1'+PadLeftInt(InitBaud,27));
+	  PrintACR('^0(^1B^0) I/O Address      : ^1'+PadLeftStr(Address,6)+
+			   '^0(^1H^0) Modem Init       : ^1'+PadLeftStr(Init,27));
+	  PrintACR('^0(^1C^0) IRQ Number       : ^1'+PadLeftStr(IRQ,6)+
+			   '^0(^1I^0) Modem Answer     : ^1'+PadLeftStr(Answer,27));
+      PrintACR('^0(^1D^0) Com Port Locking : ^1'+PadLeftStr(ShowOnOff(LockedPort IN MFlags),6)+
+			   '^0(^1J^0) Modem Hangup     : ^1'+PadLeftStr(HangUp,27));
+      PrintACR('^0(^1E^0) XON/XOFF (SW)    : ^1'+PadLeftStr(ShowOnOff(XONXOFF IN MFlags),6)+
+			   '^0(^1K^0) Modem Offhook    : ^1'+PadLeftStr(Offhook,27));
+      PrintACR('^0(^1F^0) CTS/RTS (HW)     : ^1'+PadLeftStr(ShowOnOff(CTSRTS IN MFlags),6)+
+			   '^0(^1L^0) Modem Result Codes ...');
+	  NL;
+	  PrintACR('^0(^1M^0) Answer On Ring   : ^1'+PadLeftStr(IntToStr(AnswerOnRing),10));
+	  PrintACR('^0(^1N^0) Multi-Ring Only  : ^1'+PadLeftStr(ShowYesNo(MultiRing),10));
+	  PrintACR('^0(^1O^0) Node ACS         : ^1'+PadLeftStr(LogonACS,20));
+	  PrintACR('^0(^1P^0) Drop File Path   : ^1'+PadLeftStr(DoorPath,50));
+	  PrintACR('^0(^1R^0) TeleConf Normal  : ^1'+PadLeftStr(TeleConfNormal,50));
+	  PrintACR('^0(^1S^0) TeleConf Anon    : ^1'+PadLeftStr(TeleConfAnon,50));
+	  PrintACR('^0(^1T^0) TeleConf Global  : ^1'+PadLeftStr(TeleConfGlobal,50));
+	  PrintACR('^0(^1U^0) TeleConf Private : ^1'+PadLeftStr(TeleConfPrivate,50));
+
+      Prt('^0%LFModem/Node #'+IntToStr(ThisNode)+' Configuration [^1A^0-^1U^0,(^1Q^0)uit]: ');
+      OneK(Cmd,'QABCDEFGHIJKLMNOPRSTU'^M,TRUE,TRUE);
       CASE Cmd OF
-        '1' : IF (InCom) THEN
+        'G' : IF (InCom) THEN
               BEGIN
-                Print('%LF^7This can only be changed locally.'); {leew:rgnote1}
+				NL;
+                Print('^8This can only be changed locally.'); {leew:rgnote1}
                 PauseScr(FALSE);
               END
               ELSE
               BEGIN
-				ClrScr;
+				CLS;
 				PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : Maximum Baud Rate',80));
                 {Print('^0Modem maximum baud rates:');}
 				Print('^0Select the maximum baud rate of your modem for this node.');
@@ -153,17 +157,19 @@ BEGIN
                 END;
                 Cmd := #0;
               END;
-        '2' : IF (InCom) THEN
+        'A' : IF (InCom) THEN
               BEGIN
-                Print('%LF^7This can only be changed locally.');
+				NL;
+                Print('^8This can only be changed locally.');
                 PauseScr(FALSE);
               END
               ELSE
               BEGIN
                 TempB := ComPort;
-                InputByteWC('%LFCom port',TempB,[DisplayValue,NumbersOnly],0,64,Changed);
+				NL;
+                InputByteWC('^0Enter Com Port Number',TempB,[DisplayValue,NumbersOnly],0,64,Changed);
                 IF (Changed) THEN
-                  IF PYNQ('%LFAre you sure this is what you want? ',0,FALSE) THEN
+                  IF PYNQ('^0%LFAre you sure this is what you want? ',0,FALSE) THEN
                   BEGIN
                     Com_DeInstall;
                     ComPort := TempB;
@@ -172,29 +178,30 @@ BEGIN
                 IF (NOT LocalIOOnly) AND (ComPort = 0) THEN
                   LocalIOOnly := TRUE;
               END;
-        '3' : NewModemString('init',Init,(SizeOf(Init) - 1));
-        '4' : NewModemString('answer',Answer,(SizeOf(Answer) - 1));
-        '5' : NewModemString('hangup',HangUp,(SizeOf(HangUp) - 1));
-        '6' : NewModemString('offhook',Offhook,(SizeOf(Offhook) - 1));
-        '7' : ToggleMFlags('7',MFlags,Changed);
-        '8' : ToggleMFlags('8',MFlags,Changed);
-        '9' : ToggleMFlags('9',MFlags,Changed);
-        'A' : InputWN1('%LFNew ACS: ',LogonACS,(SizeOf(LogonACS) - 1),[InterActiveEdit],Changed);
-        'B' : InputPath('%LF^1Enter path to write door interface files to (^5End with a ^1"^5\^1"):%LF^4: ',
+        'B' : InputWN1('%LF^0Enter I/O Address (For %C MCI Code): ',Address,(SizeOf(Address) - 1),[InterActiveEdit],Changed);
+		'C' : InputWN1('%LF^0Enter IRQ Number (For %E MCI Code): ',IRQ,(SizeOf(IRQ) - 1),[InterActiveEdit],Changed);
+        'H' : NewModemString('Init',Init,(SizeOf(Init) - 1));
+        'I' : NewModemString('Answer',Answer,(SizeOf(Answer) - 1));
+        'J' : NewModemString('Hangup',HangUp,(SizeOf(HangUp) - 1));
+        'K' : NewModemString('Offhook',Offhook,(SizeOf(Offhook) - 1));
+        'D' : ToggleMFlags('7',MFlags,Changed);
+        'E' : ToggleMFlags('8',MFlags,Changed);
+        'F' : ToggleMFlags('9',MFlags,Changed);
+        'O' : InputWN1('^0%LFEnter ACS Required For Node '+IntToStr(ThisNode)+': ',LogonACS,(SizeOf(LogonACS) - 1),
+			  [InterActiveEdit],Changed);
+        'P' : InputPath('^0%LF^1Enter Path For Dropfiles : ',
                         DoorPath,TRUE,FALSE,Changed);
-        'C' : InputByteWOC('%LFAnswer after ring number',AnswerOnRing,[DisplayValue,NumbersOnly],0,255);
-        'E' : MultiRing := NOT MultiRing;
-        'D' : InputWN1('%LF^1Enter new teleconference string:%LF^4: ',TeleConfNormal,(SizeOf(TeleConfNormal) - 1),
+        'M' : InputByteWOC('^0%LFAnswer after ring number',AnswerOnRing,[DisplayValue,NumbersOnly],0,255);
+        'N' : MultiRing := NOT MultiRing;
+        'R' : InputWN1('^0%LFEnter new teleconference string:%LF: ',TeleConfNormal,(SizeOf(TeleConfNormal) - 1),
                        [ColorsAllowed,InterActiveEdit],Changed);
-        'F' : InputWN1('%LF^1Enter new teleconference string:%LF^4: ',TeleConfAnon,(SizeOf(TeleConfAnon) - 1),
+        'S' : InputWN1('^0%LFEnter new teleconference string:%LF: ',TeleConfAnon,(SizeOf(TeleConfAnon) - 1),
                        [ColorsAllowed,InterActiveEdit],Changed);
-        'G' : InputWN1('%LF^1Enter new teleconference string:%LF^4: ',TeleConfGlobal,(SizeOf(TeleConfGlobal) - 1),
+        'T' : InputWN1('^0%LFEnter new teleconference string:%LF: ',TeleConfGlobal,(SizeOf(TeleConfGlobal) - 1),
                        [ColorsAllowed,InterActiveEdit],Changed);
-        'H' : InputWN1('%LF^1Enter new teleconference string:%LF^4: ',TeleConfPrivate,(SizeOf(TeleConfPrivate) - 1),
+        'U' : InputWN1('^0%LFEnter new teleconference string:%LF: ',TeleConfPrivate,(SizeOf(TeleConfPrivate) - 1),
                                 [ColorsAllowed,InterActiveEdit],Changed);
-        'I' : InputWN1('%LFIRQ for %E MCI code: ',IRQ,(SizeOf(IRQ) - 1),[InterActiveEdit],Changed);
-        'J' : InputWN1('%LFAddress for %C MCI code: ',Address,(SizeOf(Address) - 1),[InterActiveEdit],Changed);
-        'R' : BEGIN
+        'L' : BEGIN
                 REPEAT
                   Abort := FALSE;
                   Next := FALSE;

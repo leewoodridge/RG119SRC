@@ -53,11 +53,13 @@ PROCEDURE ShowLogs;
 VAR
   TempStr: Str10;
   Day: Word;
+  Changed: Boolean;
 BEGIN
   NL;
-  Print('SysOp Logs available for up to '+IntToStr(General.BackSysOpLogs)+' days ago.');
-  Prt('Date (MM/DD/YYYY) or # days ago (0-'+IntToStr(General.BackSysOpLogs)+') [0]: ');
-  Input(TempStr,10);
+  TempStr := '0';
+  InputWN1('^0Enter date in MM/DD/YYYY format, or number of days ago [^10^0-^1'+IntToStr(General.BackSysOpLogs)+
+  '^0] ',TempStr,(SizeOf(TempStr)-1),[InteractiveEdit],Changed);
+  {Input(TempStr,10);}
   IF (Length(TempStr) = 10) AND (DayNum(TempStr) > 0) THEN
     Day := (DayNum(DateStr) - DayNum(TempStr))
   ELSE
@@ -71,10 +73,11 @@ BEGIN
   IF (NoFile) THEN
   BEGIN
     NL;
-    Print('SysOp log not found.');
+    Print('^8SysOp log not found.');
   END;
   IF (UserOn) THEN
     SysOpLog('Viewed SysOp Log - '+AOnOff(Day = 0,'Today''s',IntToStr(Day)+' days ago'));
+  PauseScr(FALSE); { LeeW: Added }
 END;
 
 END.

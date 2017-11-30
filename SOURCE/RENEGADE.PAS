@@ -50,7 +50,7 @@ USES
 {$O MsgPack   } {$O Common1   } {$O Common2   } {$O Common3   } {$O Boot      }
 {$O WfcMenu   } {$O Timefunc  } {$O Sysop1    } {$O Sysop2    } {$O Offline   }
 {$O Sysop2j   } {$O Sysop2a   } {$O Sysop2b   } {$O Sysop2c   } {$O Sysop2d   }
-{$O Sysop2e   } {$O Sysop2f   } {$O Sysop2l   } {$O Sysop2g   } {$O Sysop2i   }
+(*{$O Sysop2e   }*) {$O Sysop2f   } {$O Sysop2l   } {$O Sysop2g   } {$O Sysop2i   }
 {$O Sysop2h   } {$O File4     } {$O Sysop2k   } {$O Sysop3    } {$O Sysop4    }
 {$O Sysop6    } {$O Sysop7    } {$O Sysop7m   } {$O Sysop8    } {$O Sysop2m   }
 {$O Sysop9    } {$O Sysop10   } {$O Sysop11   } {$O Mail0     } {$O Mail1     }

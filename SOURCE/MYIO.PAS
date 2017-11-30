@@ -60,8 +60,10 @@ PROCEDURE CursorOn(b: BOOLEAN);
 PROCEDURE infield1(x,y: Byte; VAR s: AStr; Len: Byte);
 PROCEDURE Infielde(VAR s: AStr; Len: Byte);
 PROCEDURE Infield(VAR s: AStr; Len: Byte);
+(*
 FUNCTION l_yn: BOOLEAN;
 FUNCTION l_pynq(CONST s: AStr): BOOLEAN;
+*)
 PROCEDURE CWrite(CONST s: AStr);
 PROCEDURE CWriteAt(x,y: Integer; CONST s: AStr);
 FUNCTION CStringLength(CONST s: AStr): Integer;
@@ -352,7 +354,7 @@ BEGIN
   S := '';
   Infielde(S,Len);
 END;
-
+(*
 FUNCTION l_yn: BOOLEAN;
 VAR
   C: Char;
@@ -375,11 +377,11 @@ END;
 FUNCTION l_pynq(CONST S: AStr): BOOLEAN;
 BEGIN
   TextColor(4);
-  Write(S);
+  Write(S+'sajkdhsajkdask');
   TextColor(11);
   l_pynq := l_yn;
 END;
-
+*)
 PROCEDURE CWrite(CONST S: AStr);
 VAR
   C: Char;

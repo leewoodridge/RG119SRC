@@ -1086,8 +1086,8 @@ BEGIN
           'L' : BEGIN
                   ClrScr;
                   ShowLogs;
-                  NL;
-                  PauseScr(FALSE);
+                  {NL;
+                  PauseScr(FALSE);}
                 END;
           'M' : IF (CPW) THEN
                 BEGIN

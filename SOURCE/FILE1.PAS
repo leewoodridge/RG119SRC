@@ -1480,10 +1480,7 @@ BEGIN
   IF (NumOnline = 1) AND (NOT Abort) AND (NOT HangUp) THEN
     PrintACR(TempStr)
   ELSE IF (NumFAreas = 0) AND (NOT Abort) AND (NOT HangUp) THEN
-    LRGLngStr(67,FALSE);
-  {
-  %LF^7No file areas!^1
-  }
+    LRGLngStr(67,FALSE); {"No file areas!"}
   FileArea := SaveFileArea;
   LoadFileArea(FileArea);
 END;

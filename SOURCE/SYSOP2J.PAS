@@ -3,12 +3,9 @@
 {  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
   | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
   |_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)
-
+  -------------------
   COLOR SCHEME EDITOR
-  
-  just the very top header needs work, mostly done
-  
-  have "yes"/"no" prompts be in ^1
+  -------------------
 }
 
 UNIT SysOp2J;
@@ -21,9 +18,6 @@ IMPLEMENTATION
 
 USES
   Common,
-(*File11,
-  File1,
-  Mail4,*)
   TimeFunc;
 
 PROCEDURE ColorConfiguration;
@@ -36,6 +30,11 @@ VAR
   Cmd: Char;
   RecNumToList: Integer;
   SaveTempPause: Boolean;
+  
+  	MinByte,
+	MaxByte,
+	TempB,
+	TempB2: Byte;
 
   FUNCTION DisplayColorStr(Color: Byte): AStr;
   VAR
@@ -465,6 +464,7 @@ VAR
   VAR
     CmdStr: AStr;
     Ok: Boolean;
+	
   BEGIN
     WITH Scheme DO
       REPEAT
@@ -818,7 +818,7 @@ BEGIN
   REPEAT
     IF (Cmd <> '?') THEN
       ListSchemes(RecNumToList);
-    LOneK('%LF^0Color Scheme Editor [(^1?^0)Help]: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
+    LOneK('%LF^0Color Scheme Editor [(^1?^0)Help]: ',Cmd,'QDIMP?!'^M,TRUE,TRUE);
     CASE Cmd OF
       ^M  : IF (RecNumToList < 1) OR (RecNumToList > NumSchemes) THEN
               RecNumToList := 1;
@@ -831,7 +831,32 @@ BEGIN
               LCmds(22,1,'D Delete Color Scheme','I Insert Color Scheme');
               LCmds(22,1,'M Modify Color Scheme','P Position Color Scheme');
               LCmds(22,1,'? Help','Q Quit');
+			  LCmds(22,1,'! More Options','');
             END;
+        '!' : BEGIN
+                WITH General DO REPEAT
+					CLS;
+					PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : More Options',80));
+					PrintACR('^0(^1%^0) Chat Colors : ^1'+PadLeftInt(SysOpColor,1)+'^0 / ^1'+PadLeftInt(UserColor,1));
+					NL;
+					Prt('^0More Options [^1%^0,(^1Q^0)uit]: ');				  
+                  OneK(Cmd,'Q%',TRUE,TRUE);
+                  CASE Cmd OF
+			'%' : BEGIN
+					MinByte := 0;
+					MaxByte := 9;
+					TempB := SysOpColor;
+					TempB2 := UserColor;
+					InputByteWOC('^0%LFSysOp Chat Color',TempB,[NumbersOnly],MinByte,MaxByte);
+					InputByteWOC('^0%LFUser Chat Color',TempB2,[NumbersOnly],MinByte,MaxByte);
+					SysOpColor := TempB;
+					UserColor := TempB2;
+				  END;
+
+                  END;
+                UNTIL (Cmd IN ['Q']) OR (HangUp);
+                Cmd := #0;
+              END;
     END;
     IF (CMD <> ^M) THEN
       RecNumToList := 1;

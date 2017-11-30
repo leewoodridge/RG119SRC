@@ -950,7 +950,7 @@ BEGIN
     SysOpLog('Logged user off for system event');
     NL;
     NL;
-    Print('^G^7Shutting down for System Event.'^G);
+    Print('^G^8Shutting down for System Event.'^G);
     NL;
     HangUp := TRUE;
   END;
@@ -981,7 +981,7 @@ BEGIN
     TimedOut := TRUE;
     PrintF('NOTLEFT');
     IF (NoFile) THEN
-      Print('^7You have used up all of your time.');
+      Print('^8You have used up all of your time.');
     NL;
     HangUp := TRUE;
   END;
@@ -1115,10 +1115,10 @@ VAR
         0 : Write('Done');
         1 : Write('Security Level (0-255)');
         2 : Write('Download Security Level (0-255)');
-        3 : Write('Account balance');
-        4 : Write('SysOp Note for this user');
-        5 : Write('Access flags ("!" to toggle all)');
-        6 : Write('Restrictions & special ("!" to clear)');
+        3 : Write('Account Balance');
+        4 : Write('SysOp Note');
+        5 : Write('Access Flags ("!" To Toggle All)');
+        6 : Write('Restrictions & Privileges ("!" To Clear)');
       END;
     END;
   END;

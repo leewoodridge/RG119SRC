@@ -25,18 +25,20 @@ BEGIN
     BEGIN
       Abort := FALSE;
       Next := FALSE;
-      Print('^0%CLOffline Mail Configuration:');
-      NL;
-      PrintACR('^1A^0'+#242+' QWK/REP Packet Name   : ^1'+PacketName);
-      PrintACR('^1B^0'+#242+' Welcome Filename      : ^1'+QWKWelcome);
-      PrintACR('^1C^0'+#242+' News Filename         : ^1'+QWKNews);
-      PrintACR('^1D^0'+#242+' Goodbye Filename      : ^1'+QWKGoodbye);
-      PrintACR('^1E^0'+#242+' Local QWK/REP Path    : ^1'+QWKLocalPath);
-      PrintACR('^1F^0'+#242+' Ignore Time For DL?   : ^1'+ShowOnOff(QWKTimeIgnore));
-      PrintACR('^1G^0'+#242+' Max Messages Total    : ^1'+IntToStr(MaxQWKTotal));
-      PrintACR('^1H^0'+#242+' Max Messages Per Base : ^1'+IntToStr(MaxQWKBase));
-      PrintACR('^1I^0'+#242+' ACS For Network .REP  : ^1'+QWKNetworkACS);
-      Prt('^0%LFEnter selection [^5A^4-^5I^4,^5Q^4=^5Quit^4]: ');
+	  CLS;
+	  Print(PadLeftStr('^2 '#240' Renegade BBS Configuration : Offline Mail Configuration',80));
+      {Print('^0%CLOffline Mail Configuration:');
+      NL;}
+      PrintACR('^0(^1A^0) QWK/REP Packet Name   : ^1'+PacketName);
+      PrintACR('^0(^1B^0) Welcome Filename      : ^1'+QWKWelcome);
+      PrintACR('^0(^1C^0) News Filename         : ^1'+QWKNews);
+      PrintACR('^0(^1D^0) Goodbye Filename      : ^1'+QWKGoodbye);
+      PrintACR('^0(^1E^0) Local QWK/REP Path    : ^1'+QWKLocalPath);
+      PrintACR('^0(^1F^0) Ignore Time For DL?   : ^1'+ShowYesNo(QWKTimeIgnore));
+      PrintACR('^0(^1G^0) Max Messages Total    : ^1'+IntToStr(MaxQWKTotal));
+      PrintACR('^0(^1H^0) Max Messages Per Base : ^1'+IntToStr(MaxQWKBase));
+      PrintACR('^0(^1I^0) ACS For Network .REP  : ^1'+QWKNetworkACS);
+      Prt('^0%LFOffline Mail Configuration [^1A^0-^1I^0,(^1Q^0)uit]:');
       OneK(Cmd,'QABCDEFGHI'^M,TRUE,TRUE);
       CASE Cmd OF
         'A' : InputWN1('%LFQWK Packet name: ',PacketName,(SizeOf(PacketName) - 1),[InterActiveEdit],Changed);

@@ -1,6 +1,9 @@
 {$A+,B-,D-,E-,F+,I-,L-,N-,O+,R-,S+,V-}
 
 (* RENEGADE BBS: SYSTEM VARIABLES *)
+	(*
+	  chat colors should be in color config
+	*)
 
 UNIT SysOp2D;
 
@@ -13,10 +16,53 @@ IMPLEMENTATION
 USES
   Common;
 
+PROCEDURE GetTimeRange(CONST RGStrNum: LongInt; VAR LoTime,HiTime: SmallInt);
+  VAR
+    TempStr: Str5;
+    LowTime,
+    HighTime: Integer;
+  BEGIN
+    IF (NOT (PYNQ(RGSysCfgStr(RGStrNum,TRUE),0,FALSE))) THEN
+    BEGIN
+      LowTime := 0;
+      HighTime := 0;
+    END
+    ELSE
+    BEGIN
+      NL;
+      Print('All entries in 24 hour time.  Hour: (0-23), Minute: (0-59)');
+      NL;
+      Prt('Starting time: ');
+      MPL(5);
+      InputFormatted('',TempStr,'##:##',TRUE);
+      IF (StrToInt(Copy(TempStr,1,2)) IN [0..23]) AND (StrToInt(Copy(TempStr,4,2)) IN [0..59]) THEN
+        LowTime := ((StrToInt(Copy(TempStr,1,2)) * 60) + StrToInt(Copy(TempStr,4,2)))
+      ELSE
+        LowTime := 0;
+      NL;
+      Prt('Ending time: ');
+      MPL(5);
+      InputFormatted('',TempStr,'##:##',TRUE);
+      IF (StrToInt(Copy(TempStr,1,2)) IN [0..23]) AND (StrToInt(Copy(TempStr,4,2)) IN [0..59]) THEN
+        HighTime := ((StrToInt(Copy(TempStr,1,2)) * 60) + StrToInt(Copy(TempStr,4,2)))
+      ELSE
+        HighTime := 0;
+    END;
+    NL;
+    Print('Hours: '+PHours('Always allowed',LowTime,HighTime));
+    NL;
+    IF PYNQ('Are you sure this is what you want? ',0,FALSE) THEN
+    BEGIN
+      LoTime := LowTime;
+      HiTime := HighTime;
+    END;
+  END;
+  
 PROCEDURE SystemGeneralVariables;
   VAR
 	Cmd,
 	Cmd1: Char;
+	TempIdle: String;
 	TempB,
 	TempB2, { LeeW: Added }
 	MinByte,
@@ -31,17 +77,6 @@ PROCEDURE SystemGeneralVariables;
 	MinLongInt,
 	MaxLongInt: LongInt;
 
-(*  FUNCTION DisplaySwapTo(SwapTo: Byte): Str4;
-	BEGIN
-	  CASE SwapTo OF
-		0   : DisplaySwapTo := 'Disk';
-		1   : DisplaySwapTo := 'XMS';
-		2   : DisplaySwapTo := 'EMS';
-		4   : DisplaySwapTo := 'EXT';
-		255 : DisplaySwapTo := 'Any';
-	  END;
-	END;
-*)
   PROCEDURE DisplayMacroo(CONST S: AStr; MaxLen: Byte);
 	VAR
 	  TempStr: AStr;
@@ -119,8 +154,17 @@ PROCEDURE SystemGeneralVariables;
 (* LeeW: Indenting done! *)
 	BEGIN
 	  REPEAT
-		WITH General DO
+		WITH General DO		
 		  BEGIN
+			IF (TimeOutBell = -1) AND (TimeOut = -1) THEN
+			  TempIdle := '^1Never'
+			ELSE IF (TimeOutBell = -1) AND (TimeOut > 0) THEN
+			  TempIdle := '^1Never^0/^1'+IntToStr(TimeOut)+' ^0Minutes'
+			ELSE IF (TimeOutBell > 0) AND (TimeOut = -1) THEN
+			  TempIdle := '^1'+IntToStr(TimeOutBell)+'^0 Mins/^1Never'
+			ELSE IF (TimeOutBell > 0) AND (TimeOut > 0) THEN
+			  TempIdle := '^1'+IntToStr(TimeOutBell)+'^0/^1'+IntToStr(TimeOut)+' ^0Minutes';
+			
 			Abort := FALSE;
 			Next := FALSE;
 			CLS;
@@ -137,42 +181,28 @@ PROCEDURE SystemGeneralVariables;
 					 '^0(^1Z^0) TBank Max Withdraw : ^1'+PadLeftStr(AOnOff((MaxWithdrawalPerDay = 0),'Unlimited',
 														IntToStr(MaxWithdrawalPerDay)+'^0 '+Plural('Minute',MaxWithdrawalPerDay)),14));
 			PrintACR('^0(^1E^0) Max Mail Waiting   : ^1'+PadLeftInt(MaxWaiting,14)+
-					 '');
+					 '^0(^1%^0) Time Limits Are    : ^1'+PadLeftStr(AOnOff((PerCall = FALSE),'Per Day','Per Call'),14));
 			PrintACR('^0(^1G^0) Max Mass Mail List : ^1'+PadLeftStr(IntToStr(MaxMassMailList)+'^0 Users',14)+
-					 '');
+					 '^0(^1&^0) Lightbars          : ^1'+PadLeftStr(AOnOff((UseLightBars),'Enabled','Disabled'),14));
 			PrintACR('^0(^1D^0) Max Chat Attempts  : ^1'+PadLeftStr(IntToStr(MaxChat)+'^0 Per Day',14)+
-					 '');
+					 '^0(^1I^0) SysOp Chat Hours   : ^1'+PadLeftStr(PHours('Any Time',lLowTime,HiTime),14));
 			PrintACR('^0(^1K^0) PW Change Interval : ^1'+PadLeftStr(AOnOff((PasswordChange = 0),'Never',
 														IntToStr(PasswordChange)+'^0 '+Plural('Day',PasswordChange)),14)+
-					 '');
+					 '^0(^1L^0) Download Hours     : ^1'+PadLeftStr(PHours('Any Time',DLLowTime,DLHiTime),14));
 			PrintACR('^0(^1H^0) BD Check Interval  : ^1'+PadLeftStr(AOnOff((BirthDateCheck = 0),'Never',
 														IntToStr(BirthDateCheck)+'^0 '+Plural('Login',BirthDateCheck)),14)+
-					 '');
+					 '^0(^1M^0) Minimum Baud       : ^1'+PadLeftStr(IntToStr(MinimumBaud),14));
+			PrintACR('^0(^1$^0) PH Check           : ^1'+PadLeftStr(ShowOnOff(PhonePW),14)+
+					 '^0    Hours For Less     : ^1'+PadLeftStr(PHours('Any Time',MinBaudLowTime,MinBaudHiTime),14)); { min baud hours }
+			PrintACR('^0(^1^^0) SysOp PW Check     : ^1'+PadLeftStr(ShowOnOff(SysOpPWord),14)+
+					 '^0(^1N^0) Minimum Baud To DL : ^1'+PadLeftStr(IntToStr(MinimumDLBaud),14));
 			PrintACR('^0(^1J^0) Max Login Attempts : ^1'+PadLeftInt(MaxLogonTries,14)+
-					 '');
-			PrintACR('^0(^1@^0) Idle Warn/Timeout  : ^1'+PadLeftStr(AOnOff((TimeOutBell = -1),'Never',IntToStr(TimeOutBell))+
-														'^0/^1'+AOnOff((TimeOut = -1),'Never',IntToStr(TimeOut)+
-														'^0 Mins'),14)+ {LeeW: This isn't right! }
+					 '^0    Hours For Less     : ^1'+PadLeftStr(PHours('Any Time',MinBaudDLLowTime,MinBaudDLHiTime),14));
+			PrintACR('^0(^1@^0) Idle Warn/Timeout  : ^1'+PadLeftStr(TempIdle,14)+
 					 '');
 			PrintACR('^0(^1F^0) Pre-Event Warning  : ^1'+PadLeftStr(AOnOff((EventWarningTime = 0),'None',IntToStr(EventWarningTime)+
 														'^0 '+Plural('Second',EventWarningTime)),14)+
 					 '');
-
-(*	'^0(^1P^0) SysOp Log Length   : ^1'+PadLeftStr(IntToStr(BackSysOpLogs)+'^0 '+Plural('Day',BackSysOpLogs),14));  
-	'^0(^1R^0) Blank WFC Menu     : ^1'+PadLeftStr(AOnOff((WFCBlankTime = 0),'Never',
-									IntToStr(WFCBlankTime)+'^0 Min(s)'),14));
-	PrintACR('^0(^1N^0) Min Free For Posts : ^1'+PadLeftStr(IntToStr(MinSpaceForPost)+'^0 kB',14)+
-	PrintACR('^0(^1S^0) Alert Delay        : ^1'+PadLeftStr(IntToStr(AlertBeep)+'^0 Sec(s)',14)+ 
-	PrintACR('^0(^1W^0) Sec Btwen Tm Slcs  : ^1'+PadLeftInt(SliceTimer,14));	  
-	PrintACR('^0(^1L^0) Chat Colors        : ^1'+PadLeftInt(SysOpColor,1)+'^0/^1'+PadLeftInt(UserColor,1));*)
-
-	(*'^0(^1F^0) Max Mail Waiting (CoSysOp+): ^1'+PadLeftInt(CSMaxWaiting,7) { LeeW: Is this even implemented? }*)
-
-	(*
-	  alert delay, time slice, swap loc should be in main cfg
-	  chat colors should be in color config
-	*)
-
 	  NL;
       FOR TempB := 0 TO 9 DO
       BEGIN
@@ -185,8 +215,34 @@ PROCEDURE SystemGeneralVariables;
       END;
 	  NL;
       Prt('^0Enter Selection or (^1Q^0) to Quit: ^1');
-      OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ1234567890!@#',TRUE,TRUE);
+      OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ1234567890!@#$%^&',TRUE,TRUE);
       CASE Cmd OF
+	          'I' : IF (InCom) THEN
+                RGNoteStr(1,FALSE)
+              ELSE
+                GetTimeRange(6,lLowTime,HiTime);
+        'M' : begin
+				MinLongInt := 0;
+                MaxLongInt := 115200;
+                TempL := MinimumBaud;
+				InputLongIntWOC('^0%LFNew Value',TempL,[DisplayValue,NumbersOnly],MinLongInt,MaxLongInt);
+				MinimumBaud := TempL;
+			    GetTimeRange(7,MinBaudLowTime,MinBaudHiTime);
+			  end;
+        'L' : GetTimeRange(8,DLLowTime,DLHiTime);
+        'N' : BEGIN
+				MinLongInt := 0;
+                MaxLongInt := 115200;
+                TempL := MinimumDLBaud;
+				InputLongIntWOC('^0%LFNew Value',TempL,[DisplayValue,NumbersOnly],MinLongInt,MaxLongInt);
+				MinimumDLBaud := TempL;
+				GetTimeRange(9,MinBaudDLLowTime,MinBaudDLHiTime);
+			  END;
+	  
+	  
+	  
+	  {-=-=}
+	  
 	  'F' : InputByteWOC(RGSysCfgStr(14,TRUE),EventWarningTime,[DisplayValue,NumbersOnly],0,255);
 		'@' : BEGIN
 			    { LeeW: Set the timeout warning time }
@@ -220,6 +276,20 @@ PROCEDURE SystemGeneralVariables;
 				  TimeOut := TempInt;
 			  END;
 		  END;
+			'$' : BEGIN
+					PhonePW := NOT PhonePW;
+					IF (PhonePW) THEN
+					  BEGIN
+						{ If we`re going to verify phone numbers, users will need to provide them, so we`ll also ask
+						  for phone numbers in new user application. }
+						NewUserToggles[7] := True;
+						Print('Also Enabling Phone Number In New User Application.');
+						PauseScr(False);
+					  END
+				  END;
+			'%' : PerCall := NOT PerCall;
+			'^' : SysOpPWord := NOT SysOpPWord;
+			'&' : UseLightBars := NOT UseLightBars;
         '0'..'9' :
               MMacroo(Ord(Cmd) - Ord('0'));
         'I' : BEGIN
@@ -293,20 +363,11 @@ PROCEDURE SystemGeneralVariables;
                           MaxInt := 32767;
                           TempI := PasswordChange;
                         END;
-                  'L' : BEGIN
-                          MinByte := 0;
-                          MaxByte := 9;
-                          TempB := SysOpColor;
-						  TempB2 := UserColor;
-                        END;
+
                   'M' : BEGIN
                           PauseScr(FALSE);
 						END;
-                  'N' : BEGIN
-                          MinInt := 1;
-                          MaxInt := 32767;
-                          TempI := MinSpaceForPost;
-                        END;
+
                   'O' : BEGIN
                           MinInt := 1;
                           MaxInt := 32767;
@@ -341,11 +402,6 @@ PROCEDURE SystemGeneralVariables;
                           MinLongInt := 0;
                           MaxLongInt := 115200;
                           TempL := MinimumDLBaud;
-                        END;
-                  'W' : BEGIN
-                          MinByte := 1;
-                          MaxByte := 255;
-                          TempB := SliceTimer;
                         END;
                   'X' : BEGIN
                           MinLongInt := 0;

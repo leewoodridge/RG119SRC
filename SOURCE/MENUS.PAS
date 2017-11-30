@@ -1,8 +1,9 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O-,R-,S+,V-}
+
+(*
+	add sysop cmd to go to file config menu for fileop and msg config menu for msg op then put in each menu
+	
+*)
 
 UNIT Menus;
 
@@ -67,18 +68,20 @@ USES
   Script,
   Stats,
   LineChat,
-  Sysop1,
-  Sysop2,
+  SysOp1,
+  SysOp2,
+  SysOp2F,
   SysOp2G,
-  Sysop3,
-  Sysop4,
+  SysOp2P,
+  SysOp3,
+  SysOp4,
   SysOp5,
-  Sysop6,
-  Sysop7,
-  Sysop8,
-  Sysop9,
-  Sysop10,
-  Sysop11,
+  SysOp6,
+  SysOp7,
+  SysOp8,
+  SysOp9,
+  SysOp10,
+  SysOp11,
   SysOp12,
   TimeBank,
   TimeFunc,
@@ -767,7 +770,7 @@ BEGIN
             'P' : IF (ReadMsgArea = -1) THEN
                   BEGIN
                     NL;
-                    Print('^7This option is not available when reading private messages!^1');
+                    Print('^8This option is not available when reading private messages!^1');
                   END
                   ELSE
                   BEGIN
@@ -883,7 +886,7 @@ BEGIN
     'R' : CASE Cmd[2] OF
             '#' : BEGIN
                     NL;
-                    Print('Enter the number of a message to read it.');
+                    Print('^0Enter the number of a message to read it.');
                   END;
             'A' : TReadPrompt := 1;
             '-' : IF (Msg_On > 1) THEN
@@ -891,7 +894,7 @@ BEGIN
                   ELSE
                   BEGIN
                     NL;
-                    Print('You are already at the first message.');
+                    Print('^0You are already at the first message.');
                   END;
             'M' : TReadPrompt := 3;
             'X' : TReadPrompt := 4;
@@ -900,7 +903,7 @@ BEGIN
             'I' : IF (NOT (MAForceRead IN MemMsgArea.MAFlags)) OR (CoSysOp) THEN
                     TReadPrompt := 7
                   ELSE
-                    Print('You must read all of the messages in this area.');
+                    Print('^8You must read all of the messages in this area.');
             'B' : TReadPrompt := 8;
             'F' : TReadPrompt := 9;
             'C' : TReadPrompt := 10;
@@ -909,11 +912,11 @@ BEGIN
             'G' : IF (NOT (MAForceRead IN MemMsgArea.MAFlags)) OR (CoSysOp) THEN
                     TReadPrompt := 13
                   ELSE
-                    Print('^7You must read all of the messages in this area!^1');
+                    Print('^8You must read all of the messages in this area!^1');
             'Q' : IF (NOT (MAForceRead IN MemMsgArea.MAFlags)) OR (CoSysOp) THEN
                     TReadPrompt := 14
                   ELSE
-                    Print('^7You must read all of the messages in this area!^1');
+                    Print('^8You must read all of the messages in this area!^1');
             'L' : TReadPrompt := 15;
             'U' : TReadPrompt := 16;
             'T' : TReadPrompt := 17;
@@ -934,7 +937,7 @@ BEGIN
     'V' : CASE Cmd[2] OF
             '#' : BEGIN
                     NL;
-                    Print('Enter the number of the topic to vote on.');
+                    Print('^0Enter the number of the topic you want to vote on.');
                     IF (Novice IN ThisUser.Flags) THEN
                       PauseScr(FALSE);
                   END;
@@ -965,16 +968,20 @@ BEGIN
           END;
     '*' : CASE Cmd[2] OF
             {'=' : ShowCmds(MenuOption);} { What's the purpose of this? }
+			'A' : {UNUSED};
             'B' : IF (CheckPW) THEN
                   BEGIN
                     SysOpLog('* Message Area Editor');
                     MessageAreaEditor;
                   END;
             'C' : IF (CheckPW) THEN
-                    ChangeUser;
+                    BEGIN
+					SysOpLog('* Changed User');
+					ChangeUser;
+					END;
             'D' : IF (CheckPW) THEN
                   BEGIN
-                    SysOpLog('* Entered Dos Emulator');
+                    SysOpLog('* Entered DOS Emulator');
                     MiniDOS;
                   END;
             'E' : IF (CheckPW) THEN
@@ -987,31 +994,45 @@ BEGIN
                     SysOpLog('* File Area Editor');
                     FileAreaEditor;
                   END;
-            'V' : IF (CheckPW) THEN
-                  BEGIN
-                    SysOpLog('* Vote Editor');
-                    VotingEditor;
-                  END;
+			'G' : {UNUSED};
+			'H' : {UNUSED};
+			'I' : {UNUSED};
+			'J' : {UNUSED};
+			'K' : {UNUSED};
             'L' : IF (CheckPW) THEN
+			        BEGIN
+					SysOpLog('* Viewed SysOp Logs');
                     ShowLogs;
+					END;
+			'M' : {UNUSED};
             'N' : IF (CheckPW) THEN
 			        TEdit1; { Edit Text File } { Do We Need This? }
+			'O' : {UNUSED};
             'P' : IF (CheckPW) THEN
                   BEGIN
                     SysOpLog('* System Configuration Editor');
                     SystemConfigurationEditor;
                   END;
+			'Q' : IF (CheckPW) THEN
+					BEGIN
+					  SysOpLog('* Message System Configuration');
+					  MessageSystemConfiguration;
+					END;
             'R' : IF (CheckPW) THEN
                   BEGIN
                     SysOpLog('* Conference Editor');
                     ConferenceEditor;
                   END;
+			'S' : IF (CheckPW) THEN
+					BEGIN
+					SysOpLog('* File System Configuration');
+					FileSystemConfiguration;
+					END;
             'T' : IF (CheckPW) THEN
                    BEGIN
                     {$IFDEF MSDOS}
 					mem[Seg0040:$0017] := mem[Seg0040:$0017] XOR 16;
 					{$ENDIF}
-					
                      IF (SysOpAvailable) THEN
                        BEGIN
                        SysOpLog('* Turned on chat availablity');
@@ -1026,11 +1047,18 @@ BEGIN
                     SysOpLog('* User Editor');
                     UserEditor(UserNum);
                   END;
+            'V' : IF (CheckPW) THEN
+                  BEGIN
+                    SysOpLog('* Voting Editor');
+                    VotingEditor;
+                  END;
+			'W' : {UNUSED};
             'X' : IF (CheckPW) THEN
                   BEGIN
                     SysOpLog('* Protocol Editor');
                     ProtocolEditor;
                   END;
+			'Y' : {UNUSED};
             'Z' : IF (CheckPW) THEN
 			      BEGIN
                     SysOpLog('* History Editor');
@@ -1052,21 +1080,39 @@ BEGIN
                     ReadAllMessages('');
                   END;
             '4' : IF (CheckPW) THEN
+					BEGIN
+					SysOpLog('* Unlisted Download');
 			        IF (MenuOption = '') THEN
                       Do_Unlisted_Download
                     ELSE
                       UnlistedDownload(MenuOption);
-            '5' : BEGIN
-                    SysOpLog('* Rechecked files');
-                    ReCheck;
-                  END;
+					  END;
+            '5' : IF (CheckPW) THEN
+					BEGIN
+					  SysOpLog('* Rechecked Files');
+					  ReCheck;
+					END;
             '6' : IF (CheckPW) THEN
-                    UploadAll;
+                    BEGIN
+					  SysOpLog('* Uploaded All Files'); {LeeW: better wording}
+					  UploadAll;
+					END;
             '7' : IF (CheckPW) THEN
-			        ValidateFiles;
-            '8' : AddGIFSpecs;
+			        BEGIN
+					SysOpLog('* Validated Files');
+					ValidateFiles;
+					END;
+            '8' : IF (CheckPW) THEN
+					BEGIN
+					  SysOpLog('* Added GIF Specs To Files');
+					  AddGIFSpecs;
+					END;
             '9' : IF (CheckPW) THEN
-			        PackMessageAreas;
+			        BEGIN
+					SysOpLog('* Packed Message Areas');
+					PackMessageAreas;
+					END;
+			'0' : {UNUSED};
             '#' : IF (CheckPW) THEN
                   BEGIN
                     SysOpLog('* Menu Editor');

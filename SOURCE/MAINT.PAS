@@ -565,7 +565,7 @@ PauseScr(FALSE); *) { LeeW: testing... }
       IF (NoFile) THEN
       BEGIN
         NL;
-        Print('^0You must select a new password every ^1'+IntToStr(General.PasswordChange)+'^0 days.');
+        Print('^0You must select a new password every ^1'+IntToStr(General.PasswordChange)+'^0 days.'); { LeeW: plural }
         NL;
       END;
       CStuff(22,3,ThisUser);
@@ -645,7 +645,7 @@ BEGIN
       SaveURec(ThisUser,UserNum);
 
     IF (HungUp) THEN
-      SL1('^7-= Hung Up =-');
+      SL1('^8 Hung Up ');
 
     SL1('^4Read: ^3'+IntToStr(PublicReadThisCall)+'^4 / Time on: ^3'+IntToStr(TotTimeOn));
 
@@ -888,17 +888,21 @@ BEGIN
           Assign(F,General.LogsPath+'SYSOP'+IntToStr(Counter)+'.LOG');
           Rename(F,General.LogsPath+'SYSOP'+IntToStr(Counter + 1)+'.LOG');
         END;
-
-      SL1('');
-      SL1('Total mins active..: '+IntToStr(History.Active));
-      SL1('Percent of activity: '+SQOutSp(CTP(History.Active,1440))+' ('+IntToStr(History.Callers)+' calls)');
-      SL1('New users..........: '+IntToStr(History.NewUsers));
-      SL1('Public posts.......: '+IntToStr(History.Posts));
-      SL1('Private mail sent..: '+IntToStr(History.Email));
-      SL1('FeedBack sent......: '+IntToStr(History.FeedBack));
-      SL1('Critical errors....: '+IntToStr(History.Errors));
-      SL1('Downloads today....: '+IntToStr(History.Downloads)+'-'+ConvertKB(History.DK,FALSE));
-      SL1('Uploads today......: '+IntToStr(History.Uploads)+'-'+ConvertKB(History.UK,FALSE));
+	  SL1('');
+	  SL1('+---------------+');
+      SL1('| DAILY SUMMARY |');
+	  SL1('+---------------+');
+	  SL1('');
+      SL1('Active Time      : '+IntToStr(History.Active)+' Minutes');
+      SL1('Active Percent   : '+SQOutSp(CTP(History.Active,1440))+'% ('+IntToStr(History.Callers)+' Calls)');
+      SL1('New Users        : '+IntToStr(History.NewUsers));
+      SL1('Public Posts     : '+IntToStr(History.Posts));
+      SL1('Private Messages : '+IntToStr(History.Email));
+      SL1('Feedback Sent    : '+IntToStr(History.FeedBack));
+      SL1('Critical Errors  : '+IntToStr(History.Errors));
+      SL1('Downloads        : '+IntToStr(History.Downloads)+' ('+ConvertKB(History.DK,FALSE)+')');
+      SL1('Uploads          : '+IntToStr(History.Uploads)+' ('+ConvertKB(History.UK,FALSE)+')');
+	  SL1('');
 
       FillChar(History,SizeOf(History),0);
       History.Date := Date2PD(DateStr);
@@ -988,6 +992,8 @@ BEGIN
     Print('System averages have been updated.');
     PauseScr(FALSE);
   END;
+  { LeeW: Should display something... no? }
+  PauseScr(FALSE);
 END;
 
 END.

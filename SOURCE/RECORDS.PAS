@@ -253,6 +253,7 @@ TYPE
     AR: ARFlagSet;                          { AR Flags }
     Flags: FlagSet;                         { Flags }
     SFlags: StatusFlagSet;                  { Status Flags }
+(*	Country: Byte;							{ Country } *)
   END;
 
   MsgStatusR =
@@ -272,9 +273,9 @@ TYPE
     Real: STRING[36];	{ Real Name }
     Name: STRING[36];	{ System Name }
     Zone,				{  }
-    Net,
-    Node,
-    Point: SmallWord;
+    Net,				{  }
+    Node,				{  }
+    Point: SmallWord;	{  }
   END;
 
   MHeaderRec = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
@@ -297,16 +298,16 @@ TYPE
   HistoryRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { HISTORY.DAT : Summary Logs }
     Date: UniXTime;             { The Date }
     Active,                     { Activity }
-    Callers,                    { Callers (connections) daily?}
+    Callers,                    { Callers }
     NewUsers,                   { New Users }
     Posts,                      { Message Posts }
     Email,                      { Private Mail Sent }
     FeedBack,                   { Feedback Sent }
     Errors,                     { Errors }
-    Uploads,                    { # Of Uploads }
-    Downloads,                  { # Of Downloads }
-    UK,                         { Uploaded Kb }
-    DK: LongInt;                { Downloaded Kb }
+    Uploads,                    { Uploads }
+    Downloads,                  { Downloads }
+    UK,                         { Uploaded KB }
+    DK: LongInt;                { Downloaded KB }
     UserBaud: ARRAY [0..20] OF LongInt;
   END;
 
@@ -341,25 +342,23 @@ TYPE
     TeleConfAnon,					{ TeleConferencing: Anonymous Prefix }
     TeleConfGlobal,					{ TeleConferencing: Global Prefix }
     TeleConfPrivate: STRING[40];	{ TeleConferencing: Private Prefix }
-    Ok,								{  }
-    Ring,							{  }
-    Reliable,						{  }
-    CallerID,						{  }
-    NoCarrier: STRING[20];			{  }
-    Connect: ARRAY [1..22] OF STRING[20];
+    Ok,								{ Modem Result Code }
+    Ring,							{  "             " }
+    Reliable,						{  "             " }
+    CallerID,						{  "             " }
+    NoCarrier: STRING[20];			{  "             " }
+    Connect: ARRAY [1..22] OF STRING[20]; {  "             " }
 	
     { 300, 600, 1200, 2400, 4800, 7200, 9600, 12000, 14400, 16800, 19200,
       21600, 24000, 26400, 28800, 31200, 33600, 38400, 57600, 115200 + 2 Extra }
     
 	UseCallerID: Boolean;			{ Add Caller ID To SysOp Note }
     LogonACS: ACString;				{ ACS Required For This Node }
-    IRQ,							{  }
-    Address: STRING[10];			{ Used Only For Functional MCI Codes: %C = Comport Address, %E = IRQ }
+    IRQ,							{ IRQ Number - For %E MCI }
+    Address: STRING[10];			{ I/O Address - For %C MCI }
     AnswerOnRing: Byte;				{ Answer After How Many Rings }
     MultiRing: Boolean;				{ Answer Ringmaster Or Other Multiple-Ring System Only }
-    NodeTelnetUrl: STRING[65];		{ Telnet URL }
-(*	TeleConfX: Integer;				{ TeleConferencing X Pos }
-	TeleConfY: Integer;				{ TeleConferencing Y Pos } *)
+    NodeTelnetURL: STRING[65];		{ Telnet URL }
   END;
 
   ValidationRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { Validation }
@@ -410,7 +409,7 @@ TYPE
     MinBaudOverride,                   { Minimum Baud Override Password }
     { ACS Requirements: Begin }
 	QWKNetworkACS,                     { QWK Network Rep }
-    LastOnDatACS,					   {  }
+    LastOnDatACS,					   { Add To Last Callers }
     SOP,                               { SysOp }
     CSOP,                              { Co-SysOp }
     MSOP,                              { Message SysOp }
@@ -431,7 +430,7 @@ TYPE
     ULValReq,                          { Uploads Require Validation }
     TeleConfMCI,                       { Use MCI In TeleConference }
     OverrideChat,                      { Override Chat Hours }
-    NetMailACS,                        { NetMail }
+    NetMailACS,                        { Send NetMail }
     Invisible,                         { Invisible Mode } { LeeW: Should This Be Deleted? }
     FileAttachACS,                     { Add File Attachments To Messages }
     ChangeVote,                        { Change Their Vote }
@@ -448,14 +447,14 @@ TYPE
     MaxLogonTries,                     { Max Tries Allowed For PW's At Logon }
     SysOpColor,                        { SysOp Color In Chat Mode }
     UserColor,                         { User Color In Chat Mode }
-    SliceTimer, 					   {  }
+    SliceTimer, 					   { Seconds Between Time Slices }
     MaxBatchDLFiles,				   { Max Files In Batch DL Queue }
     MaxBatchULFiles,				   { Max Files In Batch UL Queue }
 	Text_Color,                        { Color Of Standard Text }
     Quote_Color,                       { Color Of Quoted Text }
     Tear_Color,                        { Color Of Tear Line }
     Origin_Color,                      { Color Of Origin Line }
-    BackSysOpLogs,                     { Days To Keep SYSOP##.LOG }
+    BackSysOpLogs,                     { Number Of Days To Keep SysOp Logs }
     EventWarningTime,                  { Minutes Before Event To Warn User }
     WFCBlankTime,                      { Minutes Before Blanking WFC Menu }
     AlertBeep,                         { Time Between Alert Beeps (Was Integer) }
@@ -481,7 +480,7 @@ TYPE
     MinBaudDLLowTime,                  { Minimum Baud Downloading Hours: Begin }
     MinBaudDLHiTime,                   { Minimum Baud Downloading Hours: End }
     NewApp,                            { Send New User Application Letter To User # }
-    TimeOutBell,                       { Minutes Before TimeOut Beep }
+    TimeOutBell,                       { Minutes Before TimeOut Alert }
     TimeOut,                           { Minutes Before TimeOut }
     ToSysOpDir,                        { "To SysOp" File Area }
     CreditMinute,                      { Credits Per Minute }
