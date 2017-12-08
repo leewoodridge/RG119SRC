@@ -33,7 +33,7 @@ BEGIN
       Next := FALSE;
       MCIAllowed := FALSE;
       CLS;
-      PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : System AC Settings',80));
+      PrintACR(PadLeftStr('^2 '#240' Renegade BBS : System AC Settings',80));
 	  Print('Here you can configure the ACS requirements for...'); { LeeW: Finish this }
       NL;
       PrintACR('^0(^1A^0) Full SysOp            : ^1'+PadLeftStr(SOp,12)+
@@ -63,7 +63,7 @@ BEGIN
       PrintACR('^0(^1Z^0) Last On Add           : ^1'+PadLeftStr(LastOnDatACS,12));
       MCIAllowed := TRUE;
       NL;
-      Prt('^0Enter Selection or (^1Q^0)uit: ^1');
+      Prt('^0Enter Selection or [^1A^0-^1Z^0,(^1Q^0)uit]: ^1');
       OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ',TRUE,TRUE);
       IF (Cmd IN ['A'..'P','R'..'Z']) THEN
       BEGIN

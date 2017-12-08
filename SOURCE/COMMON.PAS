@@ -3004,7 +3004,7 @@ BEGIN
   TempS := TempS + '^'+C2+'/';
   FOR Flag := FNoDLRatio TO FNoDeletion DO
     IF (Flag IN Flags) THEN
-      TempS := TempS + '^'+C1+Copy('1234',(Ord(Flag) - 19),1)
+      TempS := TempS + '^'+C1+Copy('1234',(Ord(Flag) - 9),1)
     ELSE
       TempS := TempS + '^'+C2+'-';
   DisplayACFlags := TempS;

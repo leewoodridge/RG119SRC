@@ -1,4 +1,4 @@
-{$M 49152,0,65536}
+(*{$M 49152,0,65536}*)
 PROGRAM RGUPDATE;
 
 USES
@@ -16,8 +16,8 @@ CONST
    +---------------------------------------------------+ *)
   
 TYPE
-OldGeneralRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
 
+OldGeneralRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
     ForgotPWQuestion: STRING[70];      { Forgot Password Question }
     QWKWelcome,                        { QWK Welcome Filename }
     QWKNews,                           { QWK News Filename }
@@ -205,8 +205,8 @@ OldGeneralRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
     ShuttleUnvalLogin,                 { Allow UnValidated Users To Logon From Shuttle Menu? } { LeeW: Added }
 	UnUsedBoolean1,					   { UNUSED }
     UnUsedBoolean2: Boolean;           { UNUSED }
-
-    FileArcInfo: ARRAY [1..MaxArcs] OF FileArcInfoRecordType; { Archive Specs }
+	
+    FileArcInfo: ARRAY [1..MaxArcs] OF FileArcInfoRecordType; { Archive Specs } 
 
     FileArcComment: ARRAY [1..3] OF STRING[40]; { BBS Comment Files For Archives }
 
@@ -230,8 +230,12 @@ OldGeneralRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
     DLOneday,                         { Max Download In One Day (#) }
     DLKOneDay: SecurityRangeType;     { Max Download In One Day (K) }
 	
-	ConnectionType: Array [1..2] Of Boolean; { 1 = Modem, 2 = Telnet } { LeeW: cant just add things like this}
-  END;
+	ConnectionType: ARRAY [1..2] OF Boolean; { 1 = Modem, 2 = Telnet }
+
+	LastCallersInLogon,				  { Last Callers Displayed During Logon }
+	OneLinersInLogon,				  { One Liners During Logon }
+	VoteInLogon: BOOLEAN;			  { Voting During Logon }
+	END;
   
 (* +---------------------------------------------------+ 
    |              END OF OLD RENEGADE.DAT              |
@@ -240,9 +244,8 @@ OldGeneralRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
 (* +---------------------------------------------------+ 
    |             START OF OLD USERS.DAT                |
    +---------------------------------------------------+ *)
-(*   
-OldUserRecordType =                     
-  {$IFDEF WIN32} PACKED {$ENDIF} RECORD
+   
+OldUserRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
     Name,                                   { System Name }
     RealName: STRING[36];                   { Real Name }
     Street,                                 { Street Address }
@@ -321,7 +324,7 @@ OldUserRecordType =
     Flags: FlagSet;                         { Flags }
     SFlags: StatusFlagSet;                  { Status Flags }
   END;
-*)
+
 (* +---------------------------------------------------+ 
    |              END OF OLD USERS.DAT                 |
    +---------------------------------------------------+ *)
@@ -580,8 +583,9 @@ BEGIN
     AutoChatOpen := OldGeneral.AutoChatOpen;
     AutoMInLogon := OldGeneral.AutoMInLogon;
     BullInLogon := OldGeneral.BullInLogon;
-(*	LastCallersInLogon := TRUE; { LeeW: Added }
-OneLinerInLogon := TRUE; { LeeW: Added } *)
+	LastCallersInLogon := OldGeneral.LastCallersInLogon; { LeeW: Added }
+    OneLinersInLogon := OldGeneral.OneLinersInLogon; { LeeW: Added } 
+	VoteInLogon := OldGeneral.VoteInLogon; { LeeW: Added }
     YourInfoInLogon := OldGeneral.YourInfoInLogon;
     OffHookLocalLogon := OldGeneral.OffHookLocalLogon;
     ForceVoting := OldGeneral.ForceVoting;
@@ -673,7 +677,7 @@ OneLinerInLogon := TRUE; { LeeW: Added } *)
   ReName(GeneralFile,'RENEGADE.DAT');
   WriteLn('Done');
 END;
-(*
+
 PROCEDURE ConvertUserRec(OldGeneral: OldGeneralRecordType);
 VAR
   OldUserFile: FILE OF OldUserRecordType;
@@ -682,34 +686,204 @@ VAR
   User: UserRecordType;
   Counter,
   Counter1: Integer;
+(*Country: STRING[40]; { LeeW: Added }*)
 BEGIN
   Write('Converting "USERS.DAT" file ... ');
+  Write('[');
   Assign(OldUserFile,OldGeneral.DataPath+'USERS.DAT');
   Reset(OldUserFile);
   Assign(UserFile,OldGeneral.DataPath+'USERS.NEW');
   ReWrite(UserFile);
   Counter := 0;
+(*  CounterA := 0;
+CounterB := 0; *)
   WHILE (Counter <= (FileSize(OldUserFile) - 1)) DO
   BEGIN
     Seek(OldUserFile,Counter);
     Read(OldUserFile,OldUser);
     WITH User DO
     BEGIN
-*)
+
 (* +---------------------------------------------------+ 
    |             START OF NEW USERS.DAT                |
    +---------------------------------------------------+ *)	
 	
+    Name := OldUser.Name;
+    RealName := OldUser.RealName;
+    Street := OldUser.Street;
+    CityState := OldUser.CityState;
+    CallerID := OldUser.CallerID;
+    ZipCode := OldUser.ZipCode;
+    PH := OldUser.PH;
+    ForgotPWAnswer := OldUser.ForgotPWAnswer;
+    FOR Counter1 := 1 TO 3 DO
+	  UsrDefStr[Counter1] := OldUser.UsrDefStr[Counter1];
+    Note := OldUser.Note;
+    LockedFile := OldUser.LockedFile;
+    FOR Counter1 := 1 TO 25 DO
+	  Vote[Counter1] := OldUser.Vote[Counter1];
+    Sex := OldUser.Sex;
+    Subscription := OldUser.Subscription;
+    ExpireTo := OldUser.ExpireTo;
+    LastConf := OldUser.LastConf;
+    UnUsedChar1 := OldUser.UnUsedChar1;
+    UnUsedChar2 := OldUser.UnUsedChar2;
+    SL := OldUser.SL;
+    DSL := OldUser.DSL;
+    Waiting := OldUser.Waiting;
+    LineLen := OldUser.LineLen;
+    PageLen := OldUser.PageLen;
+    OnToday := OldUser.OnToday;
+    Illegal := OldUser.Illegal;
+    DefArcType := OldUser.DefArcType;
+    ColorScheme := OldUser.ColorScheme;
+    UserStartMenu := OldUser.UserStartMenu;
+    UnUsedByte1 := OldUser.UnUsedByte1;
+    UnUsedByte2 := OldUser.UnUsedByte2;
+    BirthDate := OldUser.BirthDate;
+    FirstOn := OldUser.FirstOn;
+    LastOn := OldUser.LastOn;
+    TTimeOn := OldUser.TTimeOn;
+    LastQWK := OldUser.LastQWK;
+    Expiration := OldUser.Expiration;
+    UnUsedUnixTime1 := OldUser.UnUsedUnixTime1;
+    UnUsedUnixTime2 := OldUser.UnUsedUnixTime2;
+    UserID := OldUser.UserID;
+    TLToday := OldUser.TLToday;
+    ForUsr := OldUser.ForUsr;
+    LastMsgArea := OldUser.LastMsgArea;
+    LastFileArea := OldUser.LastFileArea;
+    UnUsedInteger1 := OldUser.UnUsedInteger1;
+    UnUsedInteger2 := OldUser.UnUsedInteger2;
+    PasswordChanged := OldUser.PasswordChanged;
+    UnUsedWord1 := OldUser.UnUsedWord1;
+    UnUsedWord2 := OldUser.UnUsedWord2;
+    lCredit := OldUser.lCredit;
+    Debit := OldUser.Debit;
+    PW := OldUser.PW;
+    Uploads := OldUser.Uploads;
+    Downloads := OldUser.Downloads;
+    UK := OldUser.UK;
+    DK := OldUser.DK;
+    LoggedOn := OldUser.LoggedOn;
+    MsgPost := OldUser.MsgPost;
+    EmailSent := OldUser.EmailSent;
+    FeedBack := OldUser.FeedBack;
+    TimeBank := OldUser.TimeBank;
+    TimeBankAdd := OldUser.TimeBankAdd;
+	TimeBankWith := OldUser.TimeBankWith;
+    DLKToday := OldUser.DLKToday;
+    DLToday := OldUser.DLToday;
+    FilePoints := OldUser.FilePoints;
+    UnUsedLongInt1 := OldUser.UnUsedLongInt1;
+    UnUsedLongInt2 := OldUser.UnUsedLongInt2;
+    TeleConfEcho := OldUser.TeleConfEcho;
+    TeleConfInt := OldUser.TeleConfInt;
+    GetOwnQWK := OldUser.GetOwnQWK;
+    ScanFilesQWK := OldUser.ScanFilesQWK;
+    PrivateQWK := OldUser.PrivateQWK;
+    UnUsedBoolean1 := OldUser.UnUsedBoolean1;
+    UnUsedBoolean2 := OldUser.UnUsedBoolean2;
+	
+	{AR := [];}
+	AR := OldUser.AR;
+	
+	{LeeW: Add AR Flags Here! } {Include(AR,'A');}
+	
+	Flags := [];
+	
+	IF (RLogon IN OldUser.Flags) THEN
+        Include(Flags,RLogon);
+	IF (RChat IN OldUser.Flags) THEN
+        Include(Flags,RChat);
+	IF (RValidate IN OldUser.Flags) THEN
+        Include(Flags,RValidate);
+	IF (RUserList IN OldUser.Flags) THEN
+        Include(Flags,RUserList);
+	IF (RAMsg IN OldUser.Flags) THEN
+        Include(Flags,RAMsg);
+	IF (RPostAn IN OldUser.Flags) THEN
+        Include(Flags,RPostAn);
+	IF (RPost IN OldUser.Flags) THEN
+        Include(Flags,RPost);
+	IF (REmail IN OldUser.Flags) THEN
+        Include(Flags,REmail);
+	IF (RVoting IN OldUser.Flags) THEN
+        Include(Flags,RVoting);
+	IF (RMsg IN OldUser.Flags) THEN
+        Include(Flags,RMsg);
+    
+    IF (FNoDLRatio IN OldUser.Flags) THEN
+      Include(Flags,FNoDLRatio);
+    IF (FNoPostRatio IN OldUser.Flags) THEN
+      Include(Flags,FNoPostRatio);
+    IF (FNoCredits IN OldUser.Flags) THEN
+      Include(Flags,FNoCredits);
+    IF (FNoDeletion IN OldUser.Flags) THEN
+      Include(Flags,FNoDeletion);
 
+	IF (VT100 IN OldUser.Flags) THEN
+      Include(Flags,VT100);
+    IF (HotKey IN OldUser.Flags) THEN
+      Include(Flags,HotKey);
+    IF (Avatar IN OldUser.Flags) THEN
+      Include(Flags,Avatar);
+    IF (Pause IN OldUser.Flags) THEN
+      Include(Flags,Pause);
+    IF (Novice IN OldUser.Flags) THEN
+      Include(Flags,Novice);
+    IF (ANSI IN OldUser.Flags) THEN
+      Include(Flags,ANSI);
+    IF (Color IN OldUser.Flags) THEN
+      Include(Flags,Color);
+    IF (SMW IN OldUser.Flags) THEN
+      Include(Flags,SMW);
+    IF (NoMail IN OldUser.Flags) THEN
+      Include(Flags,NoMail);
+    IF (CLSMsg IN OldUser.Flags) THEN
+      Include(Flags,CLSMsg);
+    IF (RIP IN OldUser.Flags) THEN
+      Include(Flags,RIP);
+    IF (FSEditor IN OldUser.Flags) THEN
+      Include(Flags,FSEditor);
+    IF (AutoDetect IN OldUser.Flags) THEN
+      Include(Flags,AutoDetect);
+    IF (UseLightBars IN OldUser.Flags) THEN
+      Include(Flags,UseLightBars);
+	
+	SFlags := [];
+	
+    IF (LockedOut IN OldUser.SFlags) THEN
+      Include(SFlags,LockedOut);
+    IF (Deleted IN OldUser.SFlags) THEN
+      Include(SFlags,Deleted);
+    IF (TrapActivity IN OldUser.SFlags) THEN
+      Include(SFlags,TrapActivity);
+    IF (TrapSeparate IN OldUser.SFlags) THEN
+      Include(SFlags,TrapSeparate);
+    IF (ChatAuto IN OldUser.SFlags) THEN
+      Include(SFlags,ChatAuto);
+    IF (ChatSeparate IN OldUser.SFlags) THEN
+      Include(SFlags,ChatSeparate);
+    IF (SLogSeparate IN OldUser.SFlags) THEN
+      Include(SFlags,SLogSeparate);
+    IF (Alert IN OldUser.SFlags) THEN
+      Include(SFlags,Alert);
+	
+	Country := 'Country';
+	{FillChar(Country,SizeOf(Country),0);}
 	
 (* +---------------------------------------------------+ 
    |             END OF NEW USERS.DAT                  |
    +---------------------------------------------------+ *)
-(*
+
     END;
     Write(UserFile,User);
+	Write(Counter);
+	Write(',');
     Inc(Counter);
   END;
+  Write(']');
   Close(OldUserFile);
   Close(UserFile);
   Assign(OldUserFile,OldGeneral.DataPath+'USERS.DAT');
@@ -718,7 +892,7 @@ BEGIN
   ReName(UserFile,OldGeneral.DataPath+'USERS.DAT');
   WriteLn('Done');
 END;
-*)
+
 VAR
   OldGeneralFile: FILE OF OldGeneralRecordType;
   OldGeneral: OldGeneralRecordType;
@@ -741,13 +915,13 @@ BEGIN
     Close(OldGeneralFile);
     WriteLn('Done');
     WriteLn;
-(*    IF (Exist(OldGeneral.DataPath+'BATCHDL.DAT')) THEN
+    IF (Exist(OldGeneral.DataPath+'BATCHDL.DAT')) THEN
     BEGIN
       Write('Deleting "BATCHDL.DAT" file ... ');
       Kill(OldGeneral.DataPath+'BATCHDL.DAT');
       WriteLn('Done');
-    END; *)
-(*    ConvertUserRec(OldGeneral); *)
+    END; 
+    ConvertUserRec(OldGeneral);
     ConvertGeneralRec;
   END;
 END.

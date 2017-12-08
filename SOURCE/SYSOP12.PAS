@@ -551,7 +551,7 @@ BEGIN
   REPEAT
     IF (Cmd <> '?') THEN
       DisplayConferenceRecords(RecNumToList,TRUE);
-    LOneK('%LF^0Conference Editor: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
+    LOneK('%LF^0Conference Editor [^1DIMP^0,<^1CR^0>,(^1?^0)Help,(^1Q^0)uit]: ',Cmd,'QDIMP?'^M,TRUE,TRUE);
     CASE Cmd OF
       'D' : DeleteConference(TempConference,RecNumToList);
       'I' : InsertConference(TempConference,Cmd,RecNumToList);

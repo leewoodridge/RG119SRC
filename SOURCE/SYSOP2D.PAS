@@ -170,37 +170,37 @@ PROCEDURE SystemGeneralVariables;
 			CLS;
 			PrintACR(PadLeftStr('^2 '#240' Renegade BBS Configuration : System Variables',80));
 			
-			PrintACR('^0(^1C^0) Max Public Posts   : ^1'+PadLeftStr(AOnOff((MaxPubPost = 0),'Unlimited',
+			PrintACR('^0(^1A^0) Max Public Posts   : ^1'+PadLeftStr(AOnOff((MaxPubPost = 0),'Unlimited',
 														IntToStr(MaxPubPost)+'^0 Per Day'),14)+
-					 '^0(^1X^0) TBank Max Time     : ^1'+PadLeftStr(AOnOff((MaxDepositEver = 0),'Unlimited',
+					 '^0(^1N^0) TBank Max Time     : ^1'+PadLeftStr(AOnOff((MaxDepositEver = 0),'Unlimited',
 														IntToStr(MaxDepositEver)+'^0 '+Plural('Minute',MaxDepositEver)),14));
-			PrintACR('^0(^1A^0) Max Private Msgs   : ^1'+PadLeftStr(IntToStr(MaxPrivPost)+'^0 Per Day',14)+
-					 '^0(^1Y^0) TBank Max Deposit  : ^1'+PadLeftStr(AOnOff((MaxDepositPerDay = 0),'Unlimited',
+			PrintACR('^0(^1B^0) Max Private Msgs   : ^1'+PadLeftStr(IntToStr(MaxPrivPost)+'^0 Per Day',14)+
+					 '^0(^1O^0) TBank Max Deposit  : ^1'+PadLeftStr(AOnOff((MaxDepositPerDay = 0),'Unlimited',
 														IntToStr(MaxDepositPerDay)+'^0 '+Plural('Minute',MaxDepositPerDay)),14));
-			PrintACR('^0(^1B^0) Max Feedback       : ^1'+PadLeftStr(IntToStr(MaxFBack)+'^0 Per Day',14)+
-					 '^0(^1Z^0) TBank Max Withdraw : ^1'+PadLeftStr(AOnOff((MaxWithdrawalPerDay = 0),'Unlimited',
+			PrintACR('^0(^1C^0) Max Feedback       : ^1'+PadLeftStr(IntToStr(MaxFBack)+'^0 Per Day',14)+
+					 '^0(^1P^0) TBank Max Withdraw : ^1'+PadLeftStr(AOnOff((MaxWithdrawalPerDay = 0),'Unlimited',
 														IntToStr(MaxWithdrawalPerDay)+'^0 '+Plural('Minute',MaxWithdrawalPerDay)),14));
-			PrintACR('^0(^1E^0) Max Mail Waiting   : ^1'+PadLeftInt(MaxWaiting,14)+
-					 '^0(^1%^0) Time Limits Are    : ^1'+PadLeftStr(AOnOff((PerCall = FALSE),'Per Day','Per Call'),14));
-			PrintACR('^0(^1G^0) Max Mass Mail List : ^1'+PadLeftStr(IntToStr(MaxMassMailList)+'^0 Users',14)+
-					 '^0(^1&^0) Lightbars          : ^1'+PadLeftStr(AOnOff((UseLightBars),'Enabled','Disabled'),14));
-			PrintACR('^0(^1D^0) Max Chat Attempts  : ^1'+PadLeftStr(IntToStr(MaxChat)+'^0 Per Day',14)+
-					 '^0(^1I^0) SysOp Chat Hours   : ^1'+PadLeftStr(PHours('Any Time',lLowTime,HiTime),14));
-			PrintACR('^0(^1K^0) PW Change Interval : ^1'+PadLeftStr(AOnOff((PasswordChange = 0),'Never',
+			PrintACR('^0(^1D^0) Max Mail Waiting   : ^1'+PadLeftInt(MaxWaiting,14)+
+					 '^0(^1R^0) Time Limits Are    : ^1'+PadLeftStr(AOnOff((PerCall = FALSE),'Per Day','Per Call'),14));
+			PrintACR('^0(^1E^0) Max Mass Mail List : ^1'+PadLeftStr(IntToStr(MaxMassMailList)+'^0 Users',14)+
+					 '^0(^1S^0) Lightbars          : ^1'+PadLeftStr(AOnOff((UseLightBars),'Enabled','Disabled'),14));
+			PrintACR('^0(^1F^0) Max Chat Attempts  : ^1'+PadLeftStr(IntToStr(MaxChat)+'^0 Per Day',14)+
+					 '^0(^1T^0) SysOp Chat Hours   : ^1'+PadLeftStr(PHours('Any Time',lLowTime,HiTime),14));
+			PrintACR('^0(^1G^0) PW Change Interval : ^1'+PadLeftStr(AOnOff((PasswordChange = 0),'Never',
 														IntToStr(PasswordChange)+'^0 '+Plural('Day',PasswordChange)),14)+
-					 '^0(^1L^0) Download Hours     : ^1'+PadLeftStr(PHours('Any Time',DLLowTime,DLHiTime),14));
+					 '^0(^1U^0) Download Hours     : ^1'+PadLeftStr(PHours('Any Time',DLLowTime,DLHiTime),14));
 			PrintACR('^0(^1H^0) BD Check Interval  : ^1'+PadLeftStr(AOnOff((BirthDateCheck = 0),'Never',
 														IntToStr(BirthDateCheck)+'^0 '+Plural('Login',BirthDateCheck)),14)+
-					 '^0(^1M^0) Minimum Baud       : ^1'+PadLeftStr(IntToStr(MinimumBaud),14));
-			PrintACR('^0(^1$^0) PH Check           : ^1'+PadLeftStr(ShowOnOff(PhonePW),14)+
+					 '^0(^1V^0) Minimum Baud       : ^1'+PadLeftStr(IntToStr(MinimumBaud),14));
+			PrintACR('^0(^1I^0) PH Check           : ^1'+PadLeftStr(ShowOnOff(PhonePW),14)+
 					 '^0    Hours For Less     : ^1'+PadLeftStr(PHours('Any Time',MinBaudLowTime,MinBaudHiTime),14)); { min baud hours }
-			PrintACR('^0(^1^^0) SysOp PW Check     : ^1'+PadLeftStr(ShowOnOff(SysOpPWord),14)+
-					 '^0(^1N^0) Minimum Baud To DL : ^1'+PadLeftStr(IntToStr(MinimumDLBaud),14));
-			PrintACR('^0(^1J^0) Max Login Attempts : ^1'+PadLeftInt(MaxLogonTries,14)+
+			PrintACR('^0(^1J^0) SysOp PW Check     : ^1'+PadLeftStr(ShowOnOff(SysOpPWord),14)+
+					 '^0(^1W^0) Minimum Baud To DL : ^1'+PadLeftStr(IntToStr(MinimumDLBaud),14));
+			PrintACR('^0(^1K^0) Max Login Attempts : ^1'+PadLeftInt(MaxLogonTries,14)+
 					 '^0    Hours For Less     : ^1'+PadLeftStr(PHours('Any Time',MinBaudDLLowTime,MinBaudDLHiTime),14));
-			PrintACR('^0(^1@^0) Idle Warn/Timeout  : ^1'+PadLeftStr(TempIdle,14)+
-					 '');
-			PrintACR('^0(^1F^0) Pre-Event Warning  : ^1'+PadLeftStr(AOnOff((EventWarningTime = 0),'None',IntToStr(EventWarningTime)+
+			PrintACR('^0(^1L^0) Idle Warn/Timeout  : ^1'+PadLeftStr(TempIdle,14)+
+					 '^0(^1X^0) Min Free For Posts : ^1'+PadLeftStr(IntToStr(MinSpaceForPost)+'^0 KB',14));
+			PrintACR('^0(^1M^0) Pre-Event Warning  : ^1'+PadLeftStr(AOnOff((EventWarningTime = 0),'None',IntToStr(EventWarningTime)+
 														'^0 '+Plural('Second',EventWarningTime)),14)+
 					 '');
 	  NL;
@@ -215,13 +215,20 @@ PROCEDURE SystemGeneralVariables;
       END;
 	  NL;
       Prt('^0Enter Selection or (^1Q^0) to Quit: ^1');
-      OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ1234567890!@#$%^&',TRUE,TRUE);
+      OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ1234567890',TRUE,TRUE);
       CASE Cmd OF
-	          'I' : IF (InCom) THEN
+		'X' : BEGIN
+				MinInt := 1;
+				MaxInt := 32767;
+				TempI := MinSpaceForPost;
+				InputIntegerWOC('^0%LFNew Value',TempI,[NumbersOnly],MinInt,MaxInt);
+				MinSpaceForPost := TempI;
+			  END;
+		'T' : IF (InCom) THEN
                 RGNoteStr(1,FALSE)
               ELSE
                 GetTimeRange(6,lLowTime,HiTime);
-        'M' : begin
+        'V' : begin
 				MinLongInt := 0;
                 MaxLongInt := 115200;
                 TempL := MinimumBaud;
@@ -229,8 +236,8 @@ PROCEDURE SystemGeneralVariables;
 				MinimumBaud := TempL;
 			    GetTimeRange(7,MinBaudLowTime,MinBaudHiTime);
 			  end;
-        'L' : GetTimeRange(8,DLLowTime,DLHiTime);
-        'N' : BEGIN
+        'U' : GetTimeRange(8,DLLowTime,DLHiTime);
+        'W' : BEGIN
 				MinLongInt := 0;
                 MaxLongInt := 115200;
                 TempL := MinimumDLBaud;
@@ -243,8 +250,8 @@ PROCEDURE SystemGeneralVariables;
 	  
 	  {-=-=}
 	  
-	  'F' : InputByteWOC(RGSysCfgStr(14,TRUE),EventWarningTime,[DisplayValue,NumbersOnly],0,255);
-		'@' : BEGIN
+	  'M' : InputByteWOC(RGSysCfgStr(14,TRUE),EventWarningTime,[DisplayValue,NumbersOnly],0,255);
+		'L' : BEGIN
 			    { LeeW: Set the timeout warning time }
 			    Cmd := #0;
 			    Cmd1 := #0;
@@ -276,7 +283,7 @@ PROCEDURE SystemGeneralVariables;
 				  TimeOut := TempInt;
 			  END;
 		  END;
-			'$' : BEGIN
+			'I' : BEGIN
 					PhonePW := NOT PhonePW;
 					IF (PhonePW) THEN
 					  BEGIN
@@ -287,12 +294,12 @@ PROCEDURE SystemGeneralVariables;
 						PauseScr(False);
 					  END
 				  END;
-			'%' : PerCall := NOT PerCall;
-			'^' : SysOpPWord := NOT SysOpPWord;
-			'&' : UseLightBars := NOT UseLightBars;
+			'R' : PerCall := NOT PerCall;
+			'J' : SysOpPWord := NOT SysOpPWord;
+			'S' : UseLightBars := NOT UseLightBars;
         '0'..'9' :
               MMacroo(Ord(Cmd) - Ord('0'));
-        'I' : BEGIN
+        'T' : BEGIN
 				NL;
                 Print('^0Swap Locations:');
 				NL;
@@ -310,30 +317,30 @@ PROCEDURE SystemGeneralVariables;
                 END;
                 Cmd := #0;
               END;
-        'A'..'H','J'..'P','R'..'Z' :
+        'A'..'F','m','h'{},'g','k','u','v','w'{},'N'..'P' :
               BEGIN
                 CASE Cmd OF
-                  'A' : BEGIN
+                  'B' : BEGIN
                           MinByte := 0;
                           MaxByte := 255;
                           TempB := MaxPrivPost;
                         END;
-                  'B' : BEGIN
+                  'C' : BEGIN
                           MinByte := 0;
                           MaxByte := 255;
                           TempB := MaxFBack;
                         END;
-                  'C' : BEGIN
+                  'A' : BEGIN
                           MinByte := 0;
                           MaxByte := 255;
                           TempB := MaxPubPost;
                         END;
-                  'D' : BEGIN
+                  'F' : BEGIN
                           MinByte := 0;
                           MaxByte := 255;
                           TempB := MaxChat;
                         END;
-                  'E' : BEGIN
+                  'D' : BEGIN
                           MinByte := 0;
                           MaxByte := 255;
                           TempB := MaxWaiting;
@@ -343,7 +350,7 @@ PROCEDURE SystemGeneralVariables;
                           MaxByte := 255;
                           TempB := CSMaxWaiting;
 				  END;*)
-                  'G' : BEGIN
+                  'E' : BEGIN
                           MinByte := 2;
                           MaxByte := 255;
                           TempB := MaxMassMailList;
@@ -353,27 +360,27 @@ PROCEDURE SystemGeneralVariables;
                           MaxInt := 365;
                           TempI := BirthDateCheck;
                         END;
-                  'J' : BEGIN
+                  'K' : BEGIN
                           MinByte := 1;
                           MaxByte := 255;
                           TempB := MaxLogonTries;
                         END;
-                  'K' : BEGIN
+                  'G' : BEGIN
                           MinInt := 0;
                           MaxInt := 32767;
                           TempI := PasswordChange;
                         END;
 
-                  'M' : BEGIN
+                  'V' : BEGIN
                           PauseScr(FALSE);
 						END;
 
-                  'O' : BEGIN
+                 {'O' : BEGIN
                           MinInt := 1;
                           MaxInt := 32767;
                           TempI := MinSpaceForUpload;
-                        END;
-                  'P' : BEGIN
+				 END;}
+                { 'P' : BEGIN
                           MinByte := 1;
                           MaxByte := 255;
                           TempB := BackSysOpLogs;
@@ -392,7 +399,7 @@ PROCEDURE SystemGeneralVariables;
                           MinLongInt := 0;
                           MaxLongInt := 2147483647;
                           TempL := CallerNum;
-                        END;
+				END;}
                   'U' : BEGIN
                           MinLongInt := 0;
                           MaxLongInt := 115200;
@@ -403,28 +410,28 @@ PROCEDURE SystemGeneralVariables;
                           MaxLongInt := 115200;
                           TempL := MinimumDLBaud;
                         END;
-                  'X' : BEGIN
+                  'N' : BEGIN
                           MinLongInt := 0;
                           MaxLongInt := 6000;
                           TempL := MaxDepositEver;
                         END;
-                  'Y' : BEGIN
+                  'O' : BEGIN
                           MinLongInt := 0;
                           MaxLongInt := 6000;
                           TempL := MaxDepositPerDay;
                         END;
-                  'Z' : BEGIN
+                  'P' : BEGIN
                           MinLongInt := 0;
                           MaxLongInt := 6000;
                           TempL := MaxWithdrawalPerDay
                         END;
                 END;
                 CASE Cmd OF
-                  'H','K','N'..'O' :
+                  'G','H','W' :
                         InputIntegerWOC('^0%LFNew Value',TempI,[NumbersOnly],MinInt,MaxInt);
-                  'T'..'V','X'..'Z' :
+                  'N'..'P' :
                         InputLongIntWOC('^0%LFNew Value',TempL,[DisplayValue,NumbersOnly],MinLongInt,MaxLongInt);
-				  'L' : BEGIN
+				  'U' : BEGIN
 						  InputByteWOC('^0%LFSysOp Chat Color',TempB,[NumbersOnly],MinByte,MaxByte);
 						  InputByteWOC('^0%LFUser Chat Color',TempB2,[NumbersOnly],MinByte,MaxByte);
 						END						
@@ -432,33 +439,33 @@ PROCEDURE SystemGeneralVariables;
                   InputByteWOC('^0%LFNew Value',TempB,[NumbersOnly],MinByte,MaxByte);
                 END;
                 CASE Cmd OF
-                  'A' : MaxPrivPost := TempB;
-                  'B' : MaxFBack := TempB;
-                  'C' : MaxPubPost := TempB;
-                  'D' : MaxChat := TempB;
-                  'E' : MaxWaiting := TempB;
+                  'B' : MaxPrivPost := TempB;
+                  'C' : MaxFBack := TempB;
+                  'A' : MaxPubPost := TempB;
+                  'F' : MaxChat := TempB;
+                  'D' : MaxWaiting := TempB;
                   {'F' : CSMaxWaiting := TempB; (* Not Hooked Up *)}
-                  'G' : MaxMassMailList := TempB;
+                  'E' : MaxMassMailList := TempB;
                   'H' : BirthDateCheck := TempI;
-                  'J' : MaxLogonTries := TempB;
-                  'K' : PasswordChange := TempI;
-                  'L' : BEGIN
+                  'K' : MaxLogonTries := TempB;
+                  'G' : PasswordChange := TempI;
+                  'U' : BEGIN
 					      SysOpColor := TempB;
 						  UserColor := TempB2;
 						END;
-                  'M' : PauseScr(FALSE);
-                  'N' : MinSpaceForPost := TempI;
-                  'O' : MinSpaceForUpload := TempI;
+                  {'V' : PauseScr(FALSE);}
+                  'W' : MinSpaceForPost := TempI;
+                  {'O' : MinSpaceForUpload := TempI;
                   'P' : BackSysOpLogs := TempB;
                   'R' : WFCBlankTime := TempB;
                   'S' : AlertBeep := TempB;
-                  'T' : CallerNum := TempL;
+                  'T' : CallerNum := TempL;}
                   'U' : MinimumBaud := TempL;
                   'V' : MinimumDLBaud := TempL;
-                  'W' : SliceTimer := TempB;
-                  'X' : MaxDepositEver := TempL;
-                  'Y' : MaxDepositPerDay := TempL;
-                  'Z' : MaxWithDrawalPerDay := TempL;
+                  {'W' : SliceTimer := TempB;}
+                  'N' : MaxDepositEver := TempL;
+                  'O' : MaxDepositPerDay := TempL;
+                  'P' : MaxWithDrawalPerDay := TempL;
                 END;
               END;
       END;

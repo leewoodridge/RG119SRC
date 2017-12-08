@@ -55,7 +55,7 @@ BEGIN
 	  PrintACR('^0(^1L^0) Offhook In Local Logon    : ^1'+PadLeftStr(ShowOnOff(OffHookLocalLogon),7));
 (* LeeW: Maybe "force batch ul/dl" should be with logon secq *)		  
       NL;
-      Prt('^0Login Sequence Configuration: ');
+      Prt('^0Login Sequence Configuration [^1A^0-^1L^0,(^1Q^0)uit]: ');
       OneK(Cmd,'QABCDEFGHIJKL',TRUE,TRUE);
       CASE Cmd OF
 			'A' : ShuttleLog := NOT ShuttleLog;

@@ -1142,7 +1142,10 @@ BEGIN
           'S' : IF (CPW) THEN
                   SystemConfigurationEditor;
           'U' : IF (CPW) THEN
-                  UserEditor(UserNum);
+				  BEGIN
+					UserEditor(UserNum);
+					{PauseScr(FALSE);}
+				  END;
           'V' : IF (CPW) THEN
                   VotingEditor;
           'W' : IF (CPW) THEN

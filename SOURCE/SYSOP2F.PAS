@@ -53,8 +53,8 @@ PROCEDURE FileSystemConfiguration;
 				   '^0(^1U^0) Force Batch UL At Login  : ^1'+PadLeftStr(ShowOnOff(ForceBatchUL),8));
 		  PrintACR('^0(^1I^0) File Point Ratio         : ^1'+PadLeftStr(IntToStr(FileCreditComp)+'^0:^11',8)+
 				   '^0(^1V^0) Min Free Space For ULs   : ^1'+PadLeftStr(PadLeftStr(IntToStr(MinSpaceForUpload)+'^0 KB',14),8));
-		  PrintACR('^0(^1J^0) KB Per 1 File Point      : ^1'+PadLeftStr(IntToStr(FileCreditCompBaseSize)+'^0 KB',8)+
-				   '^0(^1W^0) Compress F&M Area Nmbrs  : ^1'+PadLeftStr(ShowOnOff(CompressBases),8));
+		  PrintACR('^0(^1J^0) Size Per 1 File Point    : ^1'+PadLeftStr(IntToStr(FileCreditCompBaseSize)+'^0 KB',8)+
+				   '^0(^1W^0) Compress Base Numbers    : ^1'+PadLeftStr(ShowOnOff(CompressBases),8));
 		  PrintACR('^0(^1K^0) Upload Time Refund       : ^1'+PadLeftStr(IntToStr(ULRefund)+'^0%',8)+
 				   '');
 		  PrintACR('^0(^1L^0) "To SysOp" File Area     : ^1'+PadLeftStr(AOnOff(ToSysOpDir = 0,'None',IntToStr(ToSysOpDir)),8)+

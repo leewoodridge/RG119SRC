@@ -30,7 +30,7 @@ USES
   SysOp2N,
   SysOp2X,
   SysOp2O,
-  SysOp2P,
+ {SysOp2P,}
   Maint;
 
 PROCEDURE SystemConfigurationEditor;
@@ -45,14 +45,14 @@ BEGIN
       Abort := FALSE;
       Next := FALSE;
 	  CLS;
-	  Print(PadLeftStr('^2 '#240' Renegade BBS Configuration',70)+PadRightStr('V'+Version+' ',10)+'^0');
+	  Print(PadLeftStr('^2 '#240' Renegade BBS : System Configuration Menu',70)+PadRightStr('V'+Version+' ',10)+'^0');
 	  PrintACR('^0(^1A^0) System Configuration #1                ^0(^1B^0) Modem/Node Configuration');
-	  PrintACR('^0(^1C^0) System ACS Settings                    ^0(^1D^0) System Configuration #2');
-	  PrintACR('^0(^1P^0) Message System                         ^0(^1F^0) File System Configuration');
-	  PrintACR('^0(^1G^0) Subscription/Validation System         ^0(^1H^0) Net/Echo Mail');
-	  PrintACR('^0(^1I^0) Offline Mail                           ^0(^1J^0) Color Schemes');
-	  PrintACR('^0(^1K^0) Archivers                              ^0(^1L^0) Credit System Configuration');
-	  PrintACR('^0(^1M^0) New User Application                   ^0(^1N^0) Login Sequence');
+	  PrintACR('^0(^1C^0) System ACS Configuration               ^0(^1D^0) System Configuration #2');
+	  PrintACR('^0(^1F^0) File System Configuration');
+	  PrintACR('^0(^1G^0) Subscription/Validation Editor         ^0(^1H^0) Net/Echo Mail Configuration');
+	  PrintACR('^0(^1I^0) Offline Mail Configuration             ^0(^1J^0) Color Scheme Editor');
+	  PrintACR('^0(^1K^0) Archiver Editor                        ^0(^1L^0) Credit System Configuration');
+	  PrintACR('^0(^1M^0) New User Configuration                 ^0(^1N^0) Login Sequence Configuration');
 	  NL;
 	  PrintACR('^0(^1!^0) TEST MENU');
 	  NL;
@@ -69,7 +69,6 @@ BEGIN
         'B' : ModemConfiguration;
         'C' : SystemACSSettings;
         'D' : SystemGeneralVariables;
-        {'E' : SystemFlaggedFunctions;}
         'F' : FileSystemConfiguration;
         'G' : ValidationEditor;
         'H' : NetworkConfiguration;
@@ -79,7 +78,6 @@ BEGIN
         'L' : CreditConfiguration;
         'M' : NewUserTogglesConfiguration;
 		'N' : LoginSequence;
-		'P' : MessageSystemConfiguration;
 		'!' : TestMenu;
         '1' : GetSecRange(1,TimeAllow);
         '2' : GetSecRange(2,CallAllow);

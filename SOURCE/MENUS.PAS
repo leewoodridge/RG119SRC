@@ -72,7 +72,7 @@ USES
   SysOp2,
   SysOp2F,
   SysOp2G,
-  SysOp2P,
+{SysOp2P,}
   SysOp3,
   SysOp4,
   SysOp5,
@@ -597,6 +597,9 @@ VAR
   RecNum,			{ Added These For Checking SL, Command 'O3' }
   RecNum1: Integer;
   
+  Lee1,
+  Lee2: string;
+  
 BEGIN
   NewMenuToLoad := FALSE;
   NewMenuCmd := '';
@@ -968,7 +971,7 @@ BEGIN
           END;
     '*' : CASE Cmd[2] OF
             {'=' : ShowCmds(MenuOption);} { What's the purpose of this? }
-			'A' : {UNUSED};
+			'A' : PauseScr(FALSE);
             'B' : IF (CheckPW) THEN
                   BEGIN
                     SysOpLog('* Message Area Editor');
@@ -1013,11 +1016,11 @@ BEGIN
                     SysOpLog('* System Configuration Editor');
                     SystemConfigurationEditor;
                   END;
-			'Q' : IF (CheckPW) THEN
+{			'Q' : IF (CheckPW) THEN
 					BEGIN
 					  SysOpLog('* Message System Configuration');
 					  MessageSystemConfiguration;
-					END;
+					END;}
             'R' : IF (CheckPW) THEN
                   BEGIN
                     SysOpLog('* Conference Editor');

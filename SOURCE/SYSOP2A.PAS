@@ -62,7 +62,7 @@ BEGIN
       Abort := FALSE;
       Next := FALSE;
           CLS;
-          Print(PadLeftStr('^2 '#240' Renegade BBS Configuration : Main',80));	
+          Print(PadLeftStr('^2 '#240' Renegade BBS : Main Configuration',80));	
 		  PrintACR('^0(^1A^0) BBS Name        : ^1'+BBSName);
           PrintACR('^0(^1B^0) Connection Type : ^1'+ConnType);
           PrintACR('^0(^1C^0) SysOp`s Name    : ^1'+PadLeftStr(SysOpName,14));
@@ -88,8 +88,8 @@ BEGIN
 															Plural('Second',SliceTimer),13)+
 				   '^0(^1L^0) Bulletin Prefix      : ^1'+BulletPrefix);
 		  NL;
-          PrintACR('^0(^1I^0) System Passwords...'+'');
-		  PrintACR('^0(^1&^0) System Directories...'+'');
+          PrintACR('^0(^1I^0) System Passwords ...'+'');
+		  PrintACR('^0(^1&^0) System Directories ...'+'');
           NL;
           Prt('^0Main Configuration [^1A^0-^1N^0,^10^0-^18^0,(^1Q^0)uit]: ^1');
 

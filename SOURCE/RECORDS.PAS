@@ -210,7 +210,6 @@ TYPE
     Expiration: UnixTime;                   { Expiration Date }
     UnUsedUnixTime1,
     UnUsedUnixTime2: UnixTime;
-	
     UserID,                                 { Permanent User ID }
     TLToday,                                { # Min Left Today }
     ForUsr,                                 { Forward Mail To }
@@ -221,7 +220,6 @@ TYPE
     PasswordChanged: SmallWord;             { Numeric Date PW Changed (Was UnixTime) }
     UnUsedWord1,
     UnUsedWord2: SmallWord;
-	
     lCredit,                                { Amount Of Credit }
     Debit,                                  { Amount Of Debit }
     PW,                                     { Password }
@@ -239,9 +237,8 @@ TYPE
     DLKToday,                               { kB Downloaded Today }
     DLToday,                                { # Files Downloaded Today }
     FilePoints: LongInt;					{ File Points }
-    UnUsedLongInt1,
-    UnUsedLongInt2: LongInt;
-	
+    UnUsedLongInt1,							{ }
+    UnUsedLongInt2: LongInt;				{ }
     TeleConfEcho,                           { Teleconf Echo? }
     TeleConfInt,                            { Teleconf Interrupt }
     GetOwnQWK,                              { QWK: Get Own Messages? }
@@ -249,11 +246,10 @@ TYPE
     PrivateQWK: Boolean;                    { QWK: Get Own Private Mail? }
     UnUsedBoolean1,							{  }
     UnUsedBoolean2: Boolean;				{  }
-	
     AR: ARFlagSet;                          { AR Flags }
-    Flags: FlagSet;                         { Flags }
+    Flags: FlagSet;                         { AC Flags }
     SFlags: StatusFlagSet;                  { Status Flags }
-(*	Country: Byte;							{ Country } *)
+	Country: STRING[40];					{ Country }
   END;
 
   MsgStatusR =
@@ -267,15 +263,15 @@ TYPE
      Junked);
 
   FromToInfo = {$IFDEF WIN32} PACKED {$ENDIF} RECORD { From/To Information For MHeaderRec }
-    Anon: Byte;			{  }
+    Anon: Byte;			{ Anonymous }
     UserNum: SmallWord;	{ User Number }
     A1S: STRING[36];	{ Posted As }
     Real: STRING[36];	{ Real Name }
     Name: STRING[36];	{ System Name }
-    Zone,				{  }
-    Net,				{  }
-    Node,				{  }
-    Point: SmallWord;	{  }
+    Zone,				{ NetMail Address }
+    Net,				{ NetMail Address }
+    Node,				{ NetMail Address }
+    Point: SmallWord;	{ NetMail Address }
   END;
 
   MHeaderRec = {$IFDEF WIN32} PACKED {$ENDIF} RECORD

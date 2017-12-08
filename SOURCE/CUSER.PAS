@@ -1,8 +1,11 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
+(*
+things that req country should enable it in options toggles
+	- CityState
+	- Phone
+	- ZipCode
+
+*)
 UNIT CUser;
 
 INTERFACE
@@ -11,6 +14,8 @@ USES
   Common;
 
 PROCEDURE CStuff(Which,How: Byte; VAR User: UserRecordType);
+PROCEDURE UpString (VAR S : String); 
+FUNCTION SearchFile (VAR Name, Find : STRING) : String; 
 
 IMPLEMENTATION
 
@@ -21,9 +26,46 @@ USES
   MiscUser,
   SysOp12;
 
-VAR
-  CountryNum: Integer;
+{VAR
+  CountryNum: Integer;}
 
+PROCEDURE UpString (VAR S : String); { LeeW: Convert a string to uppercase }
+VAR 
+  P : Byte; 
+BEGIN 
+  FOR P := 1 TO Length(S) DO
+    S[P] := UpCase(S[P]); 
+end; 
+
+FUNCTION SearchFile (VAR Name, Find : String) : String; { LeeW: Search a plaintext file for matching string }
+VAR
+  FS : Text; 
+  RD : String; 
+  Line : LongInt; 
+BEGIN
+  Line := 0; 
+  SearchFile := ''; 
+  UpString(Find); 
+  Assign(FS,Name); 
+  Reset(FS); 
+    REPEAT
+      ReadLn(FS,RD); 
+      Inc(Line); 
+      UpString(RD); 
+      IF Pos(Find,RD)>0 THEN
+		BEGIN
+		  IF PYNQ('"'+RD+'" Is This Correct? ',0,FALSE) THEN
+		  { LeeW: ^ XY positioning to stop from writing a million lines? }
+		    BEGIN
+			  SearchFile := RD;
+			  Close(FS);
+			  Exit;
+			END;
+		END;
+    UNTIL EOF(FS) OR (HangUp);
+  Close(FS);
+END; 
+  
 PROCEDURE CStuff(Which,How: Byte; VAR User: UserRecordType);
 VAR
   Try: Byte;
@@ -31,6 +73,46 @@ VAR
   Done1: Boolean;
 
   PROCEDURE DoCountry;
+  VAR
+	TextFile,
+	TempCountryNameIn,
+	TempCountryNameOut,
+	TempCountryNameOld: String;
+  BEGIN
+	TextFile := 'DATA\COUNTRY.TXT';
+	TempCountryNameIn := '';
+	TempCountryNameOut := '';
+	TempCountryNameOld := User.Country;
+	IF How = 1 THEN
+	  BEGIN
+		REPEAT
+		  Prt('^0What country are you calling from? ');
+		  MPL(30);
+		  Input(TempCountryNameIn,30);
+		  TempCountryNameOut := SearchFile(TextFile,TempCountryNameIn);
+		UNTIL (TempCountryNameOut <> '') OR (HangUp);
+	  END
+	ELSE
+	  BEGIN
+		Prt('^0What country are you calling from? ');
+		MPL(30);
+		Input(TempCountryNameIn,30);
+		TempCountryNameOut := SearchFile(TextFile,TempCountryNameIn);
+	  END;
+	IF (TempCountryNameOut <> '') THEN
+	  BEGIN
+		User.Country := TempCountryNameOut;
+		Done1 := TRUE;
+		IF How = 2 THEN
+		  SL1('Changed Country from '+TempCountryNameOld+' to '+TempCountryNameOut);
+	  END;
+	TextFile := ''; { LeeW: Clear variables }
+	TempCountryNameIn := ''; 
+	TempCountryNameOut := '';
+	TempCountryNameOld := '';
+  END;
+  
+  {PROCEDURE DoCountry;
   VAR
     Cmd: Char;
   BEGIN
@@ -44,7 +126,7 @@ VAR
     OneK(Cmd,'123',TRUE,TRUE);
     CountryNum := (Ord(Cmd) - 48);
     Done1 := TRUE;
-  END;
+  END;}
 
   PROCEDURE ConfigureQWK;
   VAR
@@ -72,20 +154,19 @@ VAR
       AType := ArcType('F.'+ArcExt);
     IF (AType > 0) AND (AType < MaxArcs) THEN
       User.DefArcType := AType;
-    Done1 := TRUE;
     NL;
     User.GetOwnQWK := PYNQ('Do you want your own replies in your QWK packet? ',0,FALSE);
     NL;
     User.ScanFilesQWK := PYNQ('Would you like a new files listing in your QWK packet? ',0,FALSE);
     NL;
     User.PrivateQWK := PYNQ('Do you want your private mail in your QWK packet? ',0,FALSE);
+	Done1 := TRUE;
   END;
 
   PROCEDURE DoAddress;
   VAR
     TempStreet: Str30;
   BEGIN
-    {Print('Enter your street address:');}
     Prt('Enter your street address: ');
     MPL((SizeOf(User.Street) - 1));
     IF (How = 3) THEN
@@ -118,7 +199,6 @@ VAR
     END;
     REPEAT
       Redo := False;
-      {Print('Enter your date of birth (mm/dd/yyyy):');}
       Prt('Enter your date of birth (MM/DD/YYYY): ');
       InputFormatted('',TempDate,'##/##/####',(How = 3));
       IF (TempDate <> '') THEN
@@ -127,7 +207,7 @@ VAR
         TempDay := StrToInt(Copy(TempDate,4,2));
         TempYear := StrToInt(Copy(TempDate,7,4));
         IF (TempMonth = 0) OR (TempDay = 0) OR (TempYear = 0) THEN
-          ReDo := TRUE;
+          Redo := TRUE;
         IF (TempMonth > 12) THEN
           Redo := TRUE;
         IF (TempMonth IN [1,3,5,7,8,10,12]) AND (TempDay > 31) THEN
@@ -166,70 +246,63 @@ VAR
     s2: AStr;
   BEGIN
     CASE How OF
-      2 : BEGIN
-			DoCountry; {LeeW: if it's not set already}
-	      END;
-      3 : CountryNum := 1;
-    END;
-    IF (CountryNum <> 3) THEN
-    BEGIN
-      IF (How = 3) THEN
-      BEGIN
-        {Print('Enter new city & state abbreviation:');}
-        Prt('Enter your city & state abbreviation: ');
-        MPL((SizeOf(User.CityState) - 1));
-        InputL(s,(SizeOf(User.CityState) - 1));
-        IF (s <> '') THEN
-          User.CityState := s;
-        Done1 := TRUE;
+      2,3 : IF User.Country = '' THEN
+			  DoCountry;
+	END;
+	IF ((Pos('UNITED STATES',User.Country) > 0) OR (Pos('CANADA',User.Country) > 0)) THEN
+	  BEGIN
+		IF (How = 3) THEN
+		  BEGIN
+			Prt('Enter your city & '+AOnOff((Pos('UNITED STATES',User.Country) > 0),'state','province')+' abbreviation: ');
+			MPL((SizeOf(User.CityState) - 1));
+			InputL(s,(SizeOf(User.CityState) - 1));
+			IF (s <> '') THEN
+			  User.CityState := s;
+			Done1 := TRUE;
+			Exit;
+		  END;
+		Prt('Enter your city: ');
+		MPL(((SizeOf(User.CityState) - 1) - 4));
+		InputCaps(s,((SizeOf(User.CityState) - 1) - 4));
+		IF (Pos(',',s) <> 0) THEN
+		  BEGIN
+			NL;
+			Print('^8Enter only your city name.^1');
+			Exit;
+		  END;
+		NL;
+		IF (Length(s) < 3) THEN
         Exit;
-      END;
-
-      {Print('Enter only your city:');}
-      Prt('Enter your city: ');
-      MPL(((SizeOf(User.CityState) - 1) - 4));
-      InputCaps(s,((SizeOf(User.CityState) - 1) - 4));
-      IF (Pos(',',s) <> 0) THEN
-      BEGIN
-        NL;
-        Print('^8Enter only your city name.^1');
-        Exit;
-      END;
-      NL;
-      IF (Length(s) < 3) THEN
-        Exit;
-      Prompt('Enter your '+AOnOff((CountryNum = 1),'state','province')+' abbreviation: ');
-      MPL(2);
-      Input(s1,2);
-      User.CityState := s+', '+s1;
-      Done1 := TRUE;
-    END
-    ELSE
-    BEGIN
-      {Print('First enter your city name only:');}
-      Prt('Enter your city: ');
-      MPL(26);
-      InputCaps(s1,26);
-      IF (Length(s1) < 2) THEN
-        Exit;
-       NL;
-      {Print('Now enter your country name:');}
-      Prt('Enter your country: ');
-      MPL(26);
-      InputCaps(s2,26);
-      IF (Length(s2) < 2) THEN
-        Exit;
-       s := s1+', '+s2;
-       IF (Length(s) > 30) THEN
-      BEGIN
-        Print('^8Max total Length is 30 characters!^1');
-        Exit;
-      END;
-       IF (How = 2) AND (User.CityState <> s) THEN
-        SysOpLog('Changed City/State from '+User.CityState+' to '+s);
-       User.CityState := s;
-      Done1 := TRUE;
-    END;
+		Prt('Enter your '+AOnOff((Pos('UNITED STATES',User.Country) > 0),'state','province')+' abbreviation: ');
+		MPL(2);
+		Input(s1,2);
+		User.CityState := s+', '+s1;
+		Done1 := TRUE;
+	  END
+	ELSE
+	  BEGIN
+		Prt('Enter your city: ');
+		MPL(26);
+		InputCaps(s1,26);
+		IF (Length(s1) < 2) THEN
+		  Exit;
+		NL;
+		Prt('Enter your country: ');
+		MPL(26);
+		InputCaps(s2,26);
+		IF (Length(s2) < 2) THEN
+		  Exit;
+		s := s1+', '+s2;
+		IF (Length(s) > 30) THEN
+		  BEGIN
+			Print('^8Max total Length is 30 characters!^1');
+			Exit;
+		  END;
+		IF (How = 2) AND (User.CityState <> s) THEN
+		  SysOpLog('Changed City/State from '+User.CityState+' to '+s);
+		User.CityState := s;
+		Done1 := TRUE;
+	  END;
   END;
 
   PROCEDURE DoUserDef(QuestionNum: Byte);
@@ -367,36 +440,35 @@ VAR
     CASE How OF
       1 : BEGIN
             IF (IEMSIRec.Ph <> '') THEN
-            BEGIN
-              Buf := IEMSIRec.Ph;
-              IEMSIRec.Ph := '';
-            END;
+              BEGIN
+                Buf := IEMSIRec.Ph;
+                IEMSIRec.Ph := '';
+              END;
           END;
-      {2 : DoCountry;
-      3 : CountryNum := 1;}
+      2,3 : IF User.Country = '' THEN
+			  DoCountry;
     END;
-    {Print('Enter your phone number:');}
     Prt('Enter your phone number: ');
-    IF (((How = 1) AND (CountryNum = 3)) OR (How = 3)) THEN
-    BEGIN
-      MPL(12);
-      Input(TempPhone,12);
-      IF (Length(TempPhone) > 5) THEN
-      BEGIN
-        User.Ph := TempPhone;
-        Done1 := TRUE;
-      END;
-    END
-    ELSE
-    BEGIN
-      InputFormatted('',TempPhone,'(###)###-####',FALSE);
-      TempPhone[5] := '-';
-      TempPhone := Copy(TempPhone,2,(Length(TempPhone) - 1));
-      IF (How = 2) AND (User.Ph <> TempPhone) THEN
-        SysOpLog('Changed phone from '+User.Ph+' to '+TempPhone);
-      User.Ph := TempPhone;
-      Done1 := TRUE;
-    END;
+	IF (Pos('UNITED STATES',User.Country) > 0) OR (Pos('CANADA',User.Country) > 0) THEN	
+	  BEGIN { If Canada Or United States }
+		InputFormatted('',TempPhone,'(###)###-####',FALSE);
+		TempPhone[5] := '-';
+		TempPhone := Copy(TempPhone,2,(Length(TempPhone) - 1));
+		IF (How = 2) AND (User.Ph <> TempPhone) THEN
+		  SysOpLog('Changed phone from '+User.Ph+' to '+TempPhone);
+		User.Ph := TempPhone;
+		Done1 := TRUE;
+	  END
+	ELSE
+	  BEGIN { If Other Country }
+		MPL(12);
+		Input(TempPhone,12);
+		IF (Length(TempPhone) > 5) THEN
+		  BEGIN
+			User.Ph := TempPhone;
+			Done1 := TRUE;
+		  END;
+	  END;
   END;
 
   PROCEDURE DoPW;
@@ -521,7 +593,7 @@ VAR
         IEMSIRec.UserName := '';
       END;
     {Print('Enter your real first & last name:');}
-    Prt('Enter your REAL first & last name: ');
+    Prt('^0Enter your REAL first & last name: ');
     MPL((SizeOf(User.RealName) - 1));
     IF (How = 3) THEN
       InputL(TempRealName,(SizeOf(User.RealName) - 1))
@@ -565,9 +637,9 @@ VAR
 
   PROCEDURE DoScreen; { Would be nice if defaults were in the input field }
   BEGIN
-    InputByteWOC('How wide is your screen',User.LineLen,[DisplayValue,NumbersOnly],32,132);
-	Nl;
-    InputByteWOC('How many lines per page',User.PageLen,[DisplayValue,NumbersOnly],4,50);
+    InputByteWOC('^0How wide is your screen',User.LineLen,[{DisplayValue,}NumbersOnly,InterActiveEdit],32,132);
+	NL;
+    InputByteWOC('^0How many lines per page',User.PageLen,[{DisplayValue,}NumbersOnly,InterActiveEdit],4,50);
     Done1 := TRUE;
   END;
 
@@ -595,44 +667,52 @@ VAR
     Done1 := TRUE;
   END;
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
   PROCEDURE DoZipCode;
   VAR
     TempZipCode: Str10;
   BEGIN
-    IF (How = 3) THEN
-    BEGIN
-      DoCountry;
-      NL;
-    END;
-    CASE CountryNum OF
-      1 : BEGIN
-            {Print('Enter your zipcode (#####-####):');}
-            Prt('Enter your zip code (#####-####): ');
-            InputFormatted('',TempZipCode,'#####-####',(How = 3));
-            IF (TempZipCode <> '') THEN
-              User.ZipCode := TempZipCode;
-            Done1 := TRUE;
-          END;
-      2 : BEGIN
-            {Print('Enter your postal code (LNLNLN format)');}
-            Prt('Enter your postal code (LNLNLN): ');
-            InputFormatted('',TempZipCode,'@#@#@#',(How = 3));
-            IF (TempZipCode <> '') THEN
-              User.ZipCode := TempZipCode;
-            Done1 := TRUE
-          END;
-      3 : BEGIN
-            {Print('Enter your postal code:');}
-            Prt('Enter your postal code: ');
-            MPL((SizeOf(User.ZipCode) - 1));
-            Input(TempZipCode,(SizeOf(User.ZipCode) - 1));
-            IF (Length(TempZipCode) > 2) THEN
-            BEGIN
-              User.ZipCode := TempZipCode;
-              Done1 := TRUE;
-            END;
-          END;
-    END;
+(*	IF User.Country = '' THEN 
+	  DoCountry; *)
+	IF (Pos('UNITED STATES',User.Country) > 0) THEN
+	  BEGIN
+		Prt('Enter your zip code (#####-####): ');
+		InputFormatted('',TempZipCode,'#####-####',(How = 3));
+		  IF (TempZipCode <> '') THEN
+			BEGIN
+			  User.ZipCode := TempZipCode;
+			  Done1 := TRUE;
+			END;
+	  END
+	ELSE IF (Pos('CANADA',User.Country) > 0) THEN
+      BEGIN
+        Prt('Enter your postal code (LNLNLN): ');
+		InputFormatted('',TempZipCode,'@#@#@#',(How = 3));
+		IF (TempZipCode <> '') THEN
+		  BEGIN
+			User.ZipCode := TempZipCode;
+			Done1 := TRUE
+		END;
+	  END
+	ELSE
+	  BEGIN
+		Prt('Enter your postal code: ');
+		MPL((SizeOf(User.ZipCode) - 1));
+		Input(TempZipCode,(SizeOf(User.ZipCode) - 1));
+		IF (Length(TempZipCode) > 2) THEN
+		  BEGIN
+			User.ZipCode := TempZipCode;
+			Done1 := TRUE;
+		  END;
+	  END;
   END;
 
   PROCEDURE ForwardMail;
@@ -830,7 +910,7 @@ VAR
     Done1 := TRUE;
   END;
 
-  PROCEDURE DoColorScheme; { Would be nice if ENTER selected default (#1) }
+  PROCEDURE DoColorScheme;
   VAR
     AScheme: SchemeRec;
     i,
@@ -839,11 +919,12 @@ VAR
     Reset(SchemeFile);
     Abort := FALSE;
     Next := FALSE;
+	CLS;
     PrintACR('^0Available Color Schemes:');
     NL;
-	PrintACR('^4+----+------------------------------------+');
-	PrintACR('^4| ^3## ^4| ^3Description                        ^4|');
-	PrintACR('^4+----+------------------------------------+');
+	PrintACR('^4+----+---------------------------------+----+---------------------------------+');
+	PrintACR('^4| ^3## ^4| ^3Description                     ^4| ^3## ^4| ^3Description                     ^4|');
+	PrintACR('^4+----+---------------------------------+----+---------------------------------+');
     i := 1;
     Onlin := 0;
     Seek(SchemeFile,0);
@@ -851,7 +932,7 @@ VAR
     BEGIN
       Read(SchemeFile,AScheme);
       Inc(Onlin);
-      Prompt('^1  '+PadLeftInt(i,3)+'^0  '+PadLeftStr(AScheme.Description,35));
+      Prompt('^1  '+PadLeftInt(i,3)+'^0  '+PadLeftStr(AScheme.Description,32));
       IF (OnLin = 2) THEN
       BEGIN
         NL;
@@ -862,9 +943,9 @@ VAR
     END;
     Abort := FALSE;
     Next := FALSE;
+	i := 1; { LeeW: Reset, so default choice is 1 }
     NL;
     InputIntegerWOC('^0%LFSelect A Color Scheme',i,[NumbersOnly,InterActiveEdit],1,FileSize(SchemeFile));
-	{ LeeW: "2" is default choice -- fix }
     IF (i >= 1) AND (i <= FileSize(SchemeFile)) THEN
     BEGIN
       ThisUser.ColorScheme := i;
@@ -1022,7 +1103,9 @@ VAR
         26 : Toggle_LightBars;	{ Use LightBars? }
     End;
   End;
-
+  
+  { // }
+  
 Begin
   Try := 0;
   Done1 := False;
@@ -1042,16 +1125,16 @@ End;
 
 (*
   Procedure Toggle_Template;
-    Begin
-      If How = 2 Then
-        Begin
-         { for 2 }
-        End
-      Else
-        Begin
-          { for not 2 }
-        End
-    End;
+    BEGIN
+      IF How = 2 THEN 
+        BEGIN { From Menu Command }
+         { For 2 }
+        END
+      ELSE
+        BEGIN { From New User Application / User Editor / Maint }
+          { For Not 2 }
+        END
+    END;
 *)
 
 End.
