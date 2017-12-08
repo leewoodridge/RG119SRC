@@ -36,6 +36,9 @@ Updates
 - Fixing indents
 - Added toggles to show Voting, LastCallers, and OneLiners during logon, rather than having them in start menu since they're pretty standard
 - Voting prompt during logon about unanswered questions now gives you the option to vote on them now
+- Added user 'Country' field
+- Country is selected from list of COUNTRY.TXT file
+- User editor redesign
 
 Renegade v1.19
 ==============
