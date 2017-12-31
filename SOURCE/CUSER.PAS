@@ -1,18 +1,23 @@
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
 (*
-things that req country should enable it in options toggles
-	- CityState
-	- Phone
-	- ZipCode
+finish converting all strings to lang file!!!
 
+not all procs have input validation/error checking or output sysop log entry
+
+blank country = " ", this is set up to check for ""
+
+add try to all procs and disconn if too many, use same as max logon
+
+if no color, dont do color scheme?? -- depends if we plan to put more than colors in scheme data
 *)
 UNIT CUser;
 
 INTERFACE
 
 USES
-  Common;
-
+  Common,
+  Common3;
+  
 PROCEDURE CStuff(Which,How: Byte; VAR User: UserRecordType);
 PROCEDURE UpString (VAR S : String); 
 FUNCTION SearchFile (VAR Name, Find : STRING) : String; 
@@ -37,10 +42,10 @@ BEGIN
     S[P] := UpCase(S[P]); 
 end; 
 
-FUNCTION SearchFile (VAR Name, Find : String) : String; { LeeW: Search a plaintext file for matching string }
+FUNCTION SearchFile (VAR Name, Find : String) : String; { LeeW: Search a text file for matching string }
 VAR
   FS : Text; 
-  RD : String; 
+  RD : String; { Matched string }
   Line : LongInt; 
 BEGIN
   Line := 0; 
@@ -50,9 +55,8 @@ BEGIN
   Reset(FS); 
     REPEAT
       ReadLn(FS,RD); 
-      Inc(Line); 
-      UpString(RD); 
-      IF Pos(Find,RD)>0 THEN
+      Inc(Line);
+      IF Pos(Find,AllCaps(RD))>0 THEN
 		BEGIN
 		  IF PYNQ('"'+RD+'" Is This Correct? ',0,FALSE) THEN
 		  { LeeW: ^ XY positioning to stop from writing a million lines? }
@@ -66,68 +70,14 @@ BEGIN
   Close(FS);
 END; 
   
+  { // }
+  
 PROCEDURE CStuff(Which,How: Byte; VAR User: UserRecordType);
 VAR
   Try: Byte;
   Done,
   Done1: Boolean;
-
-  PROCEDURE DoCountry;
-  VAR
-	TextFile,
-	TempCountryNameIn,
-	TempCountryNameOut,
-	TempCountryNameOld: String;
-  BEGIN
-	TextFile := 'DATA\COUNTRY.TXT';
-	TempCountryNameIn := '';
-	TempCountryNameOut := '';
-	TempCountryNameOld := User.Country;
-	IF How = 1 THEN
-	  BEGIN
-		REPEAT
-		  Prt('^0What country are you calling from? ');
-		  MPL(30);
-		  Input(TempCountryNameIn,30);
-		  TempCountryNameOut := SearchFile(TextFile,TempCountryNameIn);
-		UNTIL (TempCountryNameOut <> '') OR (HangUp);
-	  END
-	ELSE
-	  BEGIN
-		Prt('^0What country are you calling from? ');
-		MPL(30);
-		Input(TempCountryNameIn,30);
-		TempCountryNameOut := SearchFile(TextFile,TempCountryNameIn);
-	  END;
-	IF (TempCountryNameOut <> '') THEN
-	  BEGIN
-		User.Country := TempCountryNameOut;
-		Done1 := TRUE;
-		IF How = 2 THEN
-		  SL1('Changed Country from '+TempCountryNameOld+' to '+TempCountryNameOut);
-	  END;
-	TextFile := ''; { LeeW: Clear variables }
-	TempCountryNameIn := ''; 
-	TempCountryNameOut := '';
-	TempCountryNameOld := '';
-  END;
   
-  {PROCEDURE DoCountry;
-  VAR
-    Cmd: Char;
-  BEGIN
-    Print('Which country are you calling from?');
-    NL;
-    Print('(1) US of A');
-    Print('(2) Canada');
-    Print('(3) Other Country');
-    NL;
-    Prt('Select (123): ');
-    OneK(Cmd,'123',TRUE,TRUE);
-    CountryNum := (Ord(Cmd) - 48);
-    Done1 := TRUE;
-  END;}
-
   PROCEDURE ConfigureQWK;
   VAR
     ArcExt: Str3;
@@ -142,18 +92,23 @@ VAR
       MPL(3);
       Input(ArcExt,3);
       IF (ArcExt = '?') THEN
-      BEGIN
-        NL;
-        ListArcTypes;
-        NL;
-      END;
+		BEGIN
+		  NL;
+		  ListArcTypes;
+		  NL;
+		END;
     UNTIL (ArcExt <> '?') OR (HangUp);
+	IF (ArcExt = '') THEN
+	  BEGIN
+	  NL;
+	  Print('^1'+General.FileArcInfo[User.DefArcType].Ext+'^0 selected'); {Aborted}
+	  END;
     IF (StrToInt(ArcExt) <> 0) THEN
       AType := StrToInt(ArcExt)
     ELSE
       AType := ArcType('F.'+ArcExt);
     IF (AType > 0) AND (AType < MaxArcs) THEN
-      User.DefArcType := AType;
+      User.DefArcType := AType;	
     NL;
     User.GetOwnQWK := PYNQ('Do you want your own replies in your QWK packet? ',0,FALSE);
     NL;
@@ -162,563 +117,16 @@ VAR
     User.PrivateQWK := PYNQ('Do you want your private mail in your QWK packet? ',0,FALSE);
 	Done1 := TRUE;
   END;
-
-  PROCEDURE DoAddress;
-  VAR
-    TempStreet: Str30;
-  BEGIN
-    Prt('Enter your street address: ');
-    MPL((SizeOf(User.Street) - 1));
-    IF (How = 3) THEN
-      InputL(TempStreet,(SizeOf(User.Street) - 1))
-    ELSE
-      InputCaps(TempStreet,(SizeOf(User.Street) - 1));
-    IF (TempStreet <> '') THEN
-    BEGIN
-      IF (How = 2) THEN
-        SysOpLog('Changed address from '+User.Street+' to '+TempStreet);
-      User.Street := TempStreet;
-      Done1 := TRUE;
-    END;
-  END;
-
-  PROCEDURE DoAge;
-  VAR
-    TempDate: Str10;
-    TempDay,
-    TempMonth,
-    TempYear,
-    CurYear: Word;
-    Redo: Boolean;
-  BEGIN
-    GetYear(CurYear);
-    IF (How = 1) AND (IEMSIRec.BDate <> '') THEN
-    BEGIN
-      Buf := IEMSIRec.BDate;
-      IEMSIRec.BDate := '';
-    END;
-    REPEAT
-      Redo := False;
-      Prt('Enter your date of birth (MM/DD/YYYY): ');
-      InputFormatted('',TempDate,'##/##/####',(How = 3));
-      IF (TempDate <> '') THEN
-      BEGIN
-        TempMonth := StrToInt(Copy(TempDate,1,2));
-        TempDay := StrToInt(Copy(TempDate,4,2));
-        TempYear := StrToInt(Copy(TempDate,7,4));
-        IF (TempMonth = 0) OR (TempDay = 0) OR (TempYear = 0) THEN
-          Redo := TRUE;
-        IF (TempMonth > 12) THEN
-          Redo := TRUE;
-        IF (TempMonth IN [1,3,5,7,8,10,12]) AND (TempDay > 31) THEN
-          Redo := TRUE;
-        IF (TempMonth IN [4,6,9,11]) AND (TempDay > 30) THEN
-          Redo := TRUE;
-        IF (TempMonth = 2) AND ((TempYear MOD 4) <> 0) AND (TempDay > 28) THEN
-          Redo := TRUE;
-        IF (TempMonth = 2) AND ((TempYear MOD 4) = 0) AND (TempDay > 29) THEN
-          Redo := TRUE;
-        IF (TempYear >= CurYear) THEN
-          Redo := TRUE;
-        IF (TempYear < (CurYear - 100)) THEN
-          Redo := TRUE;
-        IF (Redo) THEN
-        BEGIN
-          NL;
-          Print('^8You entered an invalid date of birth!^0');
-          NL;
-        END;
-      END;
-    UNTIL (NOT Redo) OR (HangUp);
-    IF (TempDate <> '') THEN
-    BEGIN
-      IF (How = 2) THEN
-        SysOpLog('Changed birthdate from '+PD2Date(User.BirthDate)+' to '+TempDate);
-      User.BirthDate := Date2PD(TempDate);
-    END;
-    Done1 := TRUE;
-  END;
-
-  PROCEDURE DoCityState;
-  VAR
-    s,
-    s1,
-    s2: AStr;
-  BEGIN
-    CASE How OF
-      2,3 : IF User.Country = '' THEN
-			  DoCountry;
-	END;
-	IF ((Pos('UNITED STATES',User.Country) > 0) OR (Pos('CANADA',User.Country) > 0)) THEN
-	  BEGIN
-		IF (How = 3) THEN
-		  BEGIN
-			Prt('Enter your city & '+AOnOff((Pos('UNITED STATES',User.Country) > 0),'state','province')+' abbreviation: ');
-			MPL((SizeOf(User.CityState) - 1));
-			InputL(s,(SizeOf(User.CityState) - 1));
-			IF (s <> '') THEN
-			  User.CityState := s;
-			Done1 := TRUE;
-			Exit;
-		  END;
-		Prt('Enter your city: ');
-		MPL(((SizeOf(User.CityState) - 1) - 4));
-		InputCaps(s,((SizeOf(User.CityState) - 1) - 4));
-		IF (Pos(',',s) <> 0) THEN
-		  BEGIN
-			NL;
-			Print('^8Enter only your city name.^1');
-			Exit;
-		  END;
-		NL;
-		IF (Length(s) < 3) THEN
-        Exit;
-		Prt('Enter your '+AOnOff((Pos('UNITED STATES',User.Country) > 0),'state','province')+' abbreviation: ');
-		MPL(2);
-		Input(s1,2);
-		User.CityState := s+', '+s1;
-		Done1 := TRUE;
-	  END
-	ELSE
-	  BEGIN
-		Prt('Enter your city: ');
-		MPL(26);
-		InputCaps(s1,26);
-		IF (Length(s1) < 2) THEN
-		  Exit;
-		NL;
-		Prt('Enter your country: ');
-		MPL(26);
-		InputCaps(s2,26);
-		IF (Length(s2) < 2) THEN
-		  Exit;
-		s := s1+', '+s2;
-		IF (Length(s) > 30) THEN
-		  BEGIN
-			Print('^8Max total Length is 30 characters!^1');
-			Exit;
-		  END;
-		IF (How = 2) AND (User.CityState <> s) THEN
-		  SysOpLog('Changed City/State from '+User.CityState+' to '+s);
-		User.CityState := s;
-		Done1 := TRUE;
-	  END;
-  END;
-
-  PROCEDURE DoUserDef(QuestionNum: Byte);
-  VAR
-    UserDefQues: STRING[80];
-    s: Str35;
-  BEGIN
-    CASE QuestionNum OF
-      1 : UserDefQues := lRGLngStr(38,TRUE); { SysOp Defined Question #1 }
-      2 : UserDefQues := lRGLngStr(39,TRUE);                        { #2 }
-      3 : UserDefQues := lRGLngStr(40,TRUE);                        { #3 }
-    END;
-    IF (UserDefQues = '') THEN
-    BEGIN
-      User.UsrDefStr[QuestionNum] := '';
-      Done1 := TRUE;
-      Exit;
-    END;
-    Print(UserDefQues);
-    Prt(': ');
-    MPL((SizeOf(User.UsrDefStr[QuestionNum]) - 1));
-    InputL(s,(SizeOf(User.UsrDefStr[QuestionNum]) - 1));
-    IF (s <> '') THEN
-    BEGIN
-      User.UsrDefStr[QuestionNum] := s;
-      Done1 := TRUE;
-    END;
-  END;
-
-  PROCEDURE DoName;
-  VAR
-    TextFile: Text;
-    s,
-    s1,
-    s2: AStr;
-    UNum: Integer;
-  BEGIN
-    IF (How = 1) THEN
-      IF (General.AllowAlias) AND (IEMSIRec.Handle <> '') THEN
-      BEGIN
-        Buf := IEMSIRec.Handle;
-        IEMSIRec.Handle := '';
-      END
-      ELSE IF (IEMSIRec.UserName <> '') THEN
-      BEGIN
-        Buf := IEMSIRec.UserName;
-        IEMSIRec.UserName := '';
-      END;
-    IF (General.AllowAlias) THEN
-    BEGIN
-      Print('Enter your handle, or your real first & last');
-      Print('names if you don''t want to use one.')
-    END
-    ELSE
-    BEGIN
-      Print('Enter your first & last Name.');
-      Print('Handles are not allowed.');
-    END;
-    Prt(': ');
-    MPL((SizeOf(User.Name) - 1));
-    Input(s,(SizeOf(User.Name) -1));
-    Done1 := FALSE;
-    WHILE (s[1] IN [' ','0'..'9']) AND (Length(s) > 0) do
-      Delete(s,1,1);
-    WHILE (s[Length(s)] = ' ') do
-      Dec(s[0]);
-    IF ((Pos(' ',s) = 0) AND (How <> 3) AND NOT (General.AllowAlias)) THEN
-    BEGIN
-      NL;
-      Print('^8Enter your first AND last Name!');
-      s := '';
-    END;
-    IF (s <> '') THEN
-    BEGIN
-      Done1 := TRUE;
-      UNum := SearchUser(s,TRUE);
-      IF (UNum > 0) AND (UNum <> UserNum) THEN
-      BEGIN
-        Done1 := FALSE;
-        NL;
-        Print('^8That name is in use.^1');
-      END;
-    END;
-    Assign(TextFile,General.MiscPath+'TRASHCAN.TXT');
-    Reset(TextFile);
-    IF (IOResult = 0) THEN
-    BEGIN
-      s2 := ' '+s+' ';
-      WHILE NOT EOF(TextFile) do
-      BEGIN
-        ReadLn(TextFile,s1);
-        IF (s1[Length(s1)] = #1) THEN
-          s1[Length(s1)] := ' '
-        ELSE
-          s1 := s1 + ' ';
-        s1 := ' ' + s1;
-        S1 := AllCaps(S1);
-        IF (Pos(s1,s2) <> 0) THEN
-          Done1 := FALSE;
-      END;
-      Close(TextFile);
-      LastError := IOResult;
-    END;
-    IF (NOT Done1) AND (NOT HangUp) THEN
-    BEGIN
-      NL;
-      Print(^G'^8Sorry, can''t use that name.^1');
-      Inc(Try);
-      sl1('Unacceptable Name : '+s);
-    END;
-    IF (Try >= 3) AND (How = 1) THEN
-      HangUp := TRUE;
-
-    IF ((Done) AND (How = 1) AND (NOT General.AllowAlias)) THEN
-      User.RealName := Caps(s);
-
-    IF (Done1) THEN
-    BEGIN
-      IF (How = 2) AND (UserNum > -1) THEN  { Don't do index on unregged users! }
-      BEGIN
-        SysOpLog('Changed name from '+User.Name+' to '+s);
-        InsertIndex(User.Name,UserNum,FALSE,TRUE);
-        User.Name := s;
-        InsertIndex(User.Name,UserNum,FALSE,FALSE);
-      END
-      ELSE
-        User.Name := s;
-    END;
-  END;
-
- PROCEDURE DoPhone;
-  VAR
-    TempPhone: AStr;
-  BEGIN
-    CASE How OF
-      1 : BEGIN
-            IF (IEMSIRec.Ph <> '') THEN
-              BEGIN
-                Buf := IEMSIRec.Ph;
-                IEMSIRec.Ph := '';
-              END;
-          END;
-      2,3 : IF User.Country = '' THEN
-			  DoCountry;
-    END;
-    Prt('Enter your phone number: ');
-	IF (Pos('UNITED STATES',User.Country) > 0) OR (Pos('CANADA',User.Country) > 0) THEN	
-	  BEGIN { If Canada Or United States }
-		InputFormatted('',TempPhone,'(###)###-####',FALSE);
-		TempPhone[5] := '-';
-		TempPhone := Copy(TempPhone,2,(Length(TempPhone) - 1));
-		IF (How = 2) AND (User.Ph <> TempPhone) THEN
-		  SysOpLog('Changed phone from '+User.Ph+' to '+TempPhone);
-		User.Ph := TempPhone;
-		Done1 := TRUE;
-	  END
-	ELSE
-	  BEGIN { If Other Country }
-		MPL(12);
-		Input(TempPhone,12);
-		IF (Length(TempPhone) > 5) THEN
-		  BEGIN
-			User.Ph := TempPhone;
-			Done1 := TRUE;
-		  END;
-	  END;
-  END;
-
-  PROCEDURE DoPW;
-  VAR
-    s,
-    s2: STRING[20];
-    SavePW: LongInt;
-  BEGIN
-    IF (How = 1) AND (IEMSIRec.PW <> '') THEN
-    BEGIN
-      Buf := IEMSIRec.PW;
-      IEMSIRec.PW := '';
-    END;
-    SavePW := User.PW;
-    IF (How = 2) THEN
-    BEGIN
-      Print('^5Enter your current password:');
-      NL;
-      Prompt('Password: ^5');
-      GetPassword(s,20);
-      IF (CRC32(s) <> User.PW) THEN
-      BEGIN
-        NL;
-        Print('^8Wrong!');
-        NL;
-        Exit;
-      END;
-    END;
-    REPEAT
-      REPEAT
-        Print('Enter your desired password for access.');
-        Print('It must be between 4 and 20 characters in length.');
-        NL;
-        Prompt('Password: ');
-        MPL(20);
-        GetPassword(s,20);
-        NL;
-        IF (Length(s) < 4) THEN
-        BEGIN
-          Print('^8Must be at least 4 characters long!^1');
-          NL;
-        END
-        ELSE IF (Length(s) > 20) THEN
-        BEGIN
-          Print('^8Must be no more than 20 characters long.^1');
-          NL;
-        END
-        ELSE IF (How = 3) AND (CRC32(s) = SavePW) THEN
-        BEGIN
-          Print('^8Must be different from your old password!^1');
-          NL;
-          s := '';
-        END
-        ELSE IF (s = ThisUser.Name) OR (s = ThisUser.RealName) THEN
-        BEGIN
-          Print('^8You cannot use that password!^1');
-          NL;
-          s := '';
-        END;
-      UNTIL (((Length(s) > 3) AND (Length(s) < 21)) OR (HangUp));
-      Print('Enter your password again for verification:');
-      NL;
-      Prompt('Password: ');
-      MPL(20);
-      GetPassword(s2,20);
-      IF (s2 <> s) THEN
-      BEGIN
-        NL;
-        Print('^8Passwords do not match!^1');
-        NL;
-      END;
-    UNTIL ((s2 = s) OR (HangUp));
-    IF (HangUp) AND (How = 3) THEN
-      User.PW := SavePW
-    ELSE
-      User.PW := CRC32(s);
-    User.PasswordChanged := DayNum(DateStr);
-    IF (How = 2) THEN
-    BEGIN
-      NL;
-      Print('Password changed.');
-      SysOpLog('Changed password.');
-    END;
-    Done1 := TRUE;
-  END;
-
-  PROCEDURE DoForgotPW;
-  VAR
-    s: AStr;
-  BEGIN
-    IF (How IN [1..2]) THEN
-    BEGIN
-      REPEAT
-        s := '';
-        Print('^0This question will be asked should you ever forget your password.');
-        NL;
-        Print(General.forgotpwquestion);
-        Prt(': ');
-        MPL(40);
-        Input(s,40);
-      UNTIL (s <> '') OR (HangUp);
-      User.ForgotPWAnswer := s;
-      Done1 := TRUE;
-    END;
-  END;
-
-  PROCEDURE DoRealName;
-  VAR
-    TempRealName: AStr;
-    UNum: Integer;
-  BEGIN
-    IF (How = 1) THEN
-      IF (NOT General.AllowAlias) THEN
-      BEGIN
-        User.RealName := Caps(User.Name);
-        Done1 := TRUE;
-        Exit;
-      END
-      ELSE IF (IEMSIRec.UserName <> '') THEN
-      BEGIN
-        Buf := IEMSIRec.UserName;
-        IEMSIRec.UserName := '';
-      END;
-    {Print('Enter your real first & last name:');}
-    Prt('^0Enter your REAL first & last name: ');
-    MPL((SizeOf(User.RealName) - 1));
-    IF (How = 3) THEN
-      InputL(TempRealName,(SizeOf(User.RealName) - 1))
-    ELSE
-      InputCaps(TempRealName,(SizeOf(User.RealName) - 1));
-    WHILE (TempRealName[1] IN [' ','0'..'9']) AND (Length(TempRealName) > 0) do
-      Delete(TempRealName,1,1);
-    WHILE (TempRealName[Length(TempRealName)] = ' ') do
-      Dec(TempRealName[0]);
-    IF (Pos(' ',TempRealName) = 0) AND (How <> 3) THEN
-    BEGIN
-      NL;
-      Print('^8Enter your first AND last name!');
-      TempRealName := '';
-    END;
-    IF (TempRealName <> '') THEN
-    BEGIN
-      Done1 := TRUE;
-      UNum := SearchUser(TempRealName,TRUE);
-      IF (UNum > 0) AND (UNum <> UserNum) THEN
-      BEGIN
-        Done1 := FALSE;
-        NL;
-        Print('^8That name is already in use^0');
-      END;
-    END;
-    IF (Done1) THEN
-    BEGIN
-      IF (How = 2) AND (UserNum > -1) THEN { don't do index on unregged users! }
-      BEGIN
-        SysOpLog('Changed real name from '+User.RealName+' to '+TempRealName);
-        InsertIndex(User.RealName,UserNum,TRUE,TRUE);
-        User.RealName := TempRealName;
-        InsertIndex(User.RealName,UserNum,TRUE,FALSE);
-      END
-      ELSE
-        User.RealName := TempRealName;
-      Done1 := TRUE;
-    END;
-  END;
-
-  PROCEDURE DoScreen; { Would be nice if defaults were in the input field }
-  BEGIN
-    InputByteWOC('^0How wide is your screen',User.LineLen,[{DisplayValue,}NumbersOnly,InterActiveEdit],32,132);
-	NL;
-    InputByteWOC('^0How many lines per page',User.PageLen,[{DisplayValue,}NumbersOnly,InterActiveEdit],4,50);
-    Done1 := TRUE;
-  END;
-
-  PROCEDURE DoSex; { Simplified this a bit, check to see if it's ok }
-  VAR
-    Cmd: Char;
-  BEGIN
-    Print('^0What''s your gender identity?');
-    Nl;
-    Print('^0(^1M^0) Male');
-    Print('^0(^1F^0) Female');
-    Print('^0(^1O^0) Other/Non-Binary');
-    Nl;
-    Prt('Select (MFO): ');
-    IF (How = 3) THEN
-      BEGIN
-      OneK(Cmd,'MFO'^M,TRUE,TRUE);
-      IF (Cmd IN ['M','F','O']) THEN
-      User.Sex := Cmd;
-      END
-    ELSE
-      BEGIN
-        OneK(User.Sex,'MFO',TRUE,TRUE);
-      END;
-    Done1 := TRUE;
-  END;
-
   
-  
-  
-  
-  
-  
-  
-  
-  
-  PROCEDURE DoZipCode;
-  VAR
-    TempZipCode: Str10;
-  BEGIN
-(*	IF User.Country = '' THEN 
-	  DoCountry; *)
-	IF (Pos('UNITED STATES',User.Country) > 0) THEN
-	  BEGIN
-		Prt('Enter your zip code (#####-####): ');
-		InputFormatted('',TempZipCode,'#####-####',(How = 3));
-		  IF (TempZipCode <> '') THEN
-			BEGIN
-			  User.ZipCode := TempZipCode;
-			  Done1 := TRUE;
-			END;
-	  END
-	ELSE IF (Pos('CANADA',User.Country) > 0) THEN
-      BEGIN
-        Prt('Enter your postal code (LNLNLN): ');
-		InputFormatted('',TempZipCode,'@#@#@#',(How = 3));
-		IF (TempZipCode <> '') THEN
-		  BEGIN
-			User.ZipCode := TempZipCode;
-			Done1 := TRUE
-		END;
-	  END
-	ELSE
-	  BEGIN
-		Prt('Enter your postal code: ');
-		MPL((SizeOf(User.ZipCode) - 1));
-		Input(TempZipCode,(SizeOf(User.ZipCode) - 1));
-		IF (Length(TempZipCode) > 2) THEN
-		  BEGIN
-			User.ZipCode := TempZipCode;
-			Done1 := TRUE;
-		  END;
-	  END;
-  END;
+  { ------------------------------------------------------------------- }
+  { everything below here is pretty much good to go                     }
+  { just fix the formatting 											}
+  { ------------------------------------------------------------------- }
 
   PROCEDURE ForwardMail;
   VAR
     User1: UserRecordType;
-    Unum: Integer;
+    UNum: Integer;
   BEGIN
     NL;
     Print('^0If you forward your mail, all email sent to your account');
@@ -732,41 +140,34 @@ VAR
     ELSE
     BEGIN
       LoadURec(User1,UNum);
-      IF (User.Name = User1.Name) OR (LockedOut IN User1.SFlags) OR
-         (Deleted IN User1.SFlags) OR (NoMail IN User1.Flags) THEN
+      IF (User.Name = User1.Name) OR (LockedOut IN User1.SFlags) OR (Deleted IN User1.SFlags) OR (NoMail IN User1.Flags) THEN
       BEGIN
         NL;
-        Print('^8You can not forward mail to that user!^1');
+        Print('^8You can not forward mail to that user!^0');
       END
       ELSE
       BEGIN
         User.ForUsr := UNum;
         NL;
-        Print('^0Forwarding mail to: ^1'+Caps(User1.Name)+' #'+IntToStr(UNum)+'^0');
-        SysOpLog('Forwarding mail to: '+Caps(User1.Name)+' #'+IntToStr(UNum));
+        Print('^0Forwarding mail to ^1'+Caps(User1.Name)+'^0 (#^1'+IntToStr(UNum)+'^0)');
+        SysOpLog(User.Name+' is forwarding their mail to '+Caps(User1.Name)+' (#'+IntToStr(UNum)+')');
       END;
     END;
-    IF (How = 3) THEN
-      PauseScr(FALSE);
   END;
-
+  
   PROCEDURE Mailbox;
   BEGIN
     IF (NoMail IN User.Flags) THEN
     BEGIN
       Exclude(User.Flags,NoMail);
       Print('^0Your mailbox is open');
-      IF (How = 3) THEN
-        PauseScr(FALSE);
-      {SysOpLog('Mail box is now open.');}
+      SysOpLog(User.Name+' opened their mailbox');
     END
     ELSE IF (User.ForUsr <> 0) THEN
     BEGIN
       User.ForUsr := 0;
       Print('^0Your mail is no longer being forwarded');
-      IF (How = 3) THEN
-        PauseSCr(FALSE);
-      {SysOpLog('Mail forwarding ended.');}
+      SysOpLog(User.Name+' stopped forwarding their mail');
     END
     ELSE
     BEGIN
@@ -775,122 +176,832 @@ VAR
         Include(User.Flags,NoMail);
         NL;
         Print('Your mailbox is closed');
-        IF (How = 3) THEN
-          PauseScr(FALSE);
-        {SysOpLog('Your Mailbox is closed');}
+        SysOpLog(User.Name+' closed their mailbox');
       END
       ELSE
-      BEGIN { LeeW: Should this only prompt if you say no to close mailbox? }
+      BEGIN
         NL;
         IF PYNQ('^0Do you want to forward your mail? ',0,FALSE) THEN
           ForwardMail;
       END;
     END;
-    Done1 := TRUE;
+    {Done1 := TRUE;}
+  END;
+ 
+ PROCEDURE DoColorScheme;
+  VAR
+    AScheme: SchemeRec;
+	TempScheme,
+    Counter,
+    OnLine: SmallInt;
+  BEGIN
+	Reset(SchemeFile);
+	IF NOT (Color In User.Flags) OR NOT ((ANSI IN User.Flags) XOR (VT100 IN User.Flags)) THEN
+	  BEGIN
+		{ Don't prompt if the users terminal doesn't support color }
+		Print('^0Default color scheme selected');
+		TempScheme := 1;
+	  END
+	ELSE IF FileSize(SchemeFile) = 1 THEN
+	  BEGIN
+		{ Don't prompt if there's only one scheme }
+	    Print('^0Default color scheme selected');
+		TempScheme := 1;
+	  END
+	ELSE
+	  BEGIN
+		IF NOT (How = 1) THEN { Don't clear screen for new user application }
+		  CLS;
+		PrintACR('^0Available Color Schemes:');
+		NL;
+		PrintACR('^4+----+---------------------------------+----+---------------------------------+');
+		PrintACR('^4| ^3## ^4| ^3Description                     ^4| ^3## ^4| ^3Description                     ^4|');
+		PrintACR('^4+----+---------------------------------+----+---------------------------------+');
+		Counter := 1;
+		OnLine := 0;
+		Seek(SchemeFile,0);
+		WHILE (FilePos(SchemeFile) < FileSize(SchemeFile)) AND (NOT Abort) AND (NOT HangUp) DO
+		  BEGIN
+		    Read(SchemeFile,AScheme);
+			Inc(OnLine);
+			Prompt('^1  '+PadLeftInt(Counter,3)+'^0  '+PadLeftStr(AScheme.Description,32));
+			IF (OnLine = 2) THEN
+			  BEGIN
+				IF (Counter <> FileSize(SchemeFile)) THEN { Don't add line unless there's more to list }
+				  NL;
+				OnLine := 0;
+			  END;
+			WKey;
+			Inc(Counter);
+		  END;
+		NL;
+		TempScheme := ThisUser.ColorScheme;
+		InputIntegerWOC('^0%LFSelect A Color Scheme',TempScheme,[NumbersOnly,InterActiveEdit],1,FileSize(SchemeFile){,Changed});
+	  END;
+	IF (TempScheme = 0) THEN
+	  BEGIN
+		NL;
+		IF PYNQ('^0Use the default color scheme? ',0,TRUE) THEN
+		  BEGIN
+			TempScheme := 1;
+		  END
+	  END;
+	IF (TempScheme >= 1) AND (TempScheme <= FileSize(SchemeFile)) THEN
+	  BEGIN
+		IF (How = 2) AND (TempScheme <> ThisUser.ColorScheme) THEN
+		  SysOpLog('Changed color scheme from '+IntToStr(ThisUser.ColorScheme)+' to '+IntToStr(TempScheme));
+		ThisUser.ColorScheme := TempScheme;
+		Seek(SchemeFile,(TempScheme - 1));
+		Read(SchemeFile,Scheme);
+		Done1 := TRUE;
+	  END
+	ELSE
+      Close(SchemeFile);
+    {
+	LastError := IOResult;
+	}
+  END;
+  
+  PROCEDURE DoScreen;
+  VAR
+	TempLineLen,
+	TempPageLen: Byte;
+	DoneLine,
+	DonePage: Boolean;
+  BEGIN
+	TempLineLen := User.LineLen;
+	TempPageLen := User.PageLen;
+	REPEAT
+	  BEGIN
+		InputByteWOC(lRGLngStr(119,TRUE){ "How many characters wide is your screen?" },
+		TempLineLen,[NumbersOnly,InterActiveEdit],32,132);
+		IF (TempLineLen >= 32) AND (TempLineLen <= 132) THEN
+		  BEGIN
+			IF (How = 2) AND (TempLineLen <> User.LineLen) THEN
+			  SysOpLog('Changed screen width from '+IntToStr(User.LineLen)+' to '+IntToStr(TempLineLen));
+			User.LineLen := TempLineLen;
+			DoneLine := TRUE;
+		  END
+		ELSE IF (TempLineLen = 31) THEN { If 1 less than minimum, input was invalid }
+		  BEGIN
+			IF PYNQ('^0Use the default of 80? ',0,TRUE) THEN
+			  BEGIN
+				User.LineLen := 80;
+				DoneLine := TRUE;
+			  END
+			ELSE
+			  BEGIN
+				TempLineLen := 80; { Reset to default }
+			  END;
+			NL;
+		  END;
+	  END;
+	UNTIL (DoneLine = TRUE) OR (How = 2) OR (How = 3);
+	REPEAT
+	  BEGIN
+		InputByteWOC(lRGLngStr(120,TRUE){ "How many characters tall is your screen?" },
+		TempPageLen,[NumbersOnly,InterActiveEdit],4,50);
+		IF (TempPageLen >= 4) AND (TempPageLen <= 50) THEN
+		  BEGIN
+			IF (How = 2) AND (TempPageLen <> User.PageLen) THEN
+			  SysOpLog('Changed screen length from '+IntToStr(User.PageLen)+' to '+IntToStr(TempPageLen));
+			User.PageLen := TempPageLen;
+			DonePage := TRUE;
+		  END
+		ELSE IF (TempPageLen = 3) THEN { If 1 less than minimum, input was invalid }
+		  BEGIN
+			IF PYNQ('^0Use the default of 24? ',0,TRUE) THEN
+			  BEGIN
+				User.PageLen := 24;
+				DonePage := TRUE;
+			  END
+			ELSE
+			  BEGIN
+				TempPageLen := 24; { Reset to default }
+				NL;
+			  END;
+		  END;
+	  END;
+	UNTIL (DonePage = TRUE) OR (How = 2) OR (How = 3);
+	IF (DoneLine = TRUE) AND (DonePage = TRUE) THEN
+	  Done1 := TRUE
+	ELSE
+	  Done1 := FALSE;
+  END;
+  
+  PROCEDURE DoName;
+  VAR
+    TextFile: Text;
+    s,
+    s1,
+    s2: AStr;
+    UNum: Integer;
+  BEGIN
+	IF (How = 1) THEN
+	  IF (General.AllowAlias) AND (IEMSIRec.Handle <> '') THEN
+		BEGIN
+		  Buf := IEMSIRec.Handle;
+		  IEMSIRec.Handle := '';
+		END
+	  ELSE IF (IEMSIRec.UserName <> '') THEN
+		BEGIN
+		  Buf := IEMSIRec.UserName;
+		  IEMSIRec.UserName := '';
+		END;
+	  IF (General.AllowAlias) THEN
+		BEGIN
+		  lRGLngStr(102,FALSE);
+		  { "Enter your handle, or your real first & last
+		  names if you don't want to use one." }
+		END
+	  ELSE
+		BEGIN
+		  lRGLngStr(103,FALSE);
+		  { "Enter your first and last name,
+		  handles are not allowed." }
+		END;
+    {Prt(': ');}
+    MPL((SizeOf(User.Name) - 1));
+    Input(s,(SizeOf(User.Name) -1));
+    Done1 := FALSE;
+    WHILE (s[1] IN [' ','0'..'9']) AND (Length(s) > 0) DO
+      Delete(s,1,1);
+    WHILE (s[Length(s)] = ' ') DO
+      Dec(s[0]);
+    IF ((Pos(' ',s) = 0) AND (How <> 3) AND NOT (General.AllowAlias)) THEN
+	  BEGIN
+		NL;
+		lRGLngStr(104,FALSE); { "Enter your first AND last name" }
+		s := '';
+	  END;
+    IF (s <> '') THEN
+	  BEGIN
+		Done1 := TRUE;
+		UNum := SearchUser(s,TRUE);
+		IF (UNum > 0) AND (UNum <> UserNum) THEN
+		  BEGIN
+			Done1 := FALSE;
+			NL;
+			lRGLngStr(105,FALSE); { "That name is already in use" }
+		  END;
+	  END;
+	Assign(TextFile,General.MiscPath+'TRASHCAN.TXT');
+	Reset(TextFile);
+	IF (IOResult = 0) THEN
+	  BEGIN
+		s2 := ' '+s+' ';
+		WHILE NOT EOF(TextFile) DO
+		  BEGIN
+			ReadLn(TextFile,s1);
+			IF (s1[Length(s1)] = #1) THEN
+			  s1[Length(s1)] := ' '
+			ELSE
+			  s1 := s1 + ' ';
+			s1 := ' ' + s1;
+			S1 := AllCaps(S1);
+			IF (Pos(s1,s2) <> 0) THEN
+			  Done1 := FALSE;
+		  END;
+		Close(TextFile);
+		LastError := IOResult;
+	  END;
+    IF (NOT Done1) AND (NOT HangUp) THEN
+	  BEGIN
+		NL;
+		lRGLngStr(106,FALSE); { "Invalid name" }
+		{Inc(Try);}
+		sl1('Unacceptable Name : '+s);
+	  END;
+	  {
+	IF (Try >= 3) AND (How = 1) THEN
+      HangUp := TRUE;
+	  }
+    IF ((Done) AND (How = 1) AND (NOT General.AllowAlias)) THEN {done is nothing!!!!!!!!!!!!!!!!!!!!!!!!!}
+      User.RealName := Caps(s);
+    IF (Done1) THEN
+	  BEGIN
+		IF (How = 2) AND (UserNum > -1) THEN  { Don't do index on unregged users! }
+		  BEGIN
+			IF (User.Name <> s) THEN
+			  SysOpLog('Changed name from '+User.Name+' to '+s);
+			InsertIndex(User.Name,UserNum,FALSE,TRUE);
+			User.Name := s;
+			InsertIndex(User.Name,UserNum,FALSE,FALSE);
+		  END
+		ELSE
+		  User.Name := s;
+	  END;
+  END;
+  
+  PROCEDURE DoRealName;
+  VAR
+    TempRealName: AStr;
+    UNum: Integer;
+  BEGIN
+    IF (How = 1) THEN
+      IF (NOT General.AllowAlias) THEN
+		BEGIN
+		  User.RealName := Caps(User.Name);
+		  Done1 := TRUE;
+		  EXIT;
+		END
+      ELSE IF (IEMSIRec.UserName <> '') THEN
+		BEGIN
+          Buf := IEMSIRec.UserName;
+          IEMSIRec.UserName := '';
+		END;
+	  Prt(lRGLngStr(118,TRUE)); { "Enter your REAL first and last name" }
+	  MPL((SizeOf(User.RealName) - 1));
+	  InputCaps(TempRealName,(SizeOf(User.RealName) - 1));
+	  WHILE (TempRealName[1] IN [' ','0'..'9']) AND (Length(TempRealName) > 0) DO
+		Delete(TempRealName,1,1);
+	  WHILE (TempRealName[Length(TempRealName)] = ' ') DO
+		Dec(TempRealName[0]);
+	  IF (Pos(' ',TempRealName) = 0) (*AND (How <> 3)*) THEN
+		BEGIN
+		  NL;
+		  Print(lRGLngStr(104,TRUE)); { "Enter your first AND last name" }
+		  TempRealName := '';
+		END;
+	  IF (TempRealName <> '') THEN
+		BEGIN
+		  Done1 := TRUE;
+		  UNum := SearchUser(TempRealName,TRUE);
+		  IF (UNum > 0) AND (UNum <> UserNum) THEN
+			BEGIN
+			  Done1 := FALSE;
+			  NL;
+			  Print(lRGLngStr(105,TRUE)); { "That name is already in use" }
+			END;
+		END;
+		IF (Done1) THEN
+		  BEGIN
+		    Done1 := TRUE;
+			IF (How = 2) AND (UserNum > -1) THEN { don't do index on unregged users! }
+			  BEGIN
+				IF (User.RealName <> TempRealName) THEN
+				  SysOpLog('Changed real name from '+User.RealName+' to '+TempRealName);
+				InsertIndex(User.RealName,UserNum,TRUE,TRUE);
+				User.RealName := TempRealName;
+				InsertIndex(User.RealName,UserNum,TRUE,FALSE);
+			  END
+			ELSE
+			  User.RealName := TempRealName;
+		  END;
+  END;
+  
+  PROCEDURE DoCountry;
+  VAR
+	TextFile,
+	TempCountryNameIn,
+	TempCountryNameOut: String;
+  BEGIN
+	TextFile := 'DATA\COUNTRY.TXT';
+	TempCountryNameIn := '';
+	TempCountryNameOut := '';
+	IF How = 1 THEN
+	  BEGIN
+		REPEAT
+		  Prt(lRGLngStr(99,TRUE)); { "Enter your country: " }
+		  MPL(30);
+		  InputCaps(TempCountryNameIn,30);
+		  TempCountryNameOut := SearchFile(TextFile,TempCountryNameIn);
+		  IF TempCountryNameOut = '' THEN
+		    lRGLngStr(154,FALSE); { "Invalid country" }
+		UNTIL (TempCountryNameOut <> '') OR (HangUp);
+	  END
+	ELSE
+	  BEGIN
+		Prt(lRGLngStr(99,TRUE)); { "Enter your country: " }
+		MPL(30);
+		InputCaps(TempCountryNameIn,30);
+		TempCountryNameOut := SearchFile(TextFile,TempCountryNameIn);
+	  END;
+	IF (TempCountryNameOut <> '') THEN
+	  BEGIN
+		Done1 := TRUE;
+		IF (How = 2) AND (User.Country <> TempCountryNameOut) THEN
+		  SL1('Changed Country from '+User.Country+' to '+TempCountryNameOut);
+		User.Country := TempCountryNameOut;
+	  END;
+	(*
+	TextFile := ''; { LeeW: Clear variables }
+	TempCountryNameIn := ''; 
+	TempCountryNameOut := '';
+	*)
+  END;
+  
+  PROCEDURE DoPW;
+  VAR
+    s,
+    s2: STRING[20];
+    SavePW: LongInt;
+  BEGIN
+	IF (How = 1) AND (IEMSIRec.PW <> '') THEN
+	  BEGIN
+		Buf := IEMSIRec.PW;
+		IEMSIRec.PW := '';
+	  END;
+    SavePW := User.PW;
+	IF (How = 2) THEN
+	  BEGIN
+		Print(lRGLngStr(108,TRUE)); { "Enter your current password: " }
+		NL;
+		Prompt(lRGLngStr(109,TRUE)); { "Password: " }
+		MPL(20);
+		GetPassword(s,20);
+		IF (CRC32(s) <> User.PW) THEN
+		  BEGIN
+			NL;
+			Print('^8Wrong!'); { "Incorrect password" }
+			NL;
+			EXIT;
+		  END;
+	  END;
+    REPEAT
+      REPEAT
+		lRGLngStr(110,FALSE);
+		{ "Enter your desired password,
+		   it must be between 4 and 20 characters in length" }
+        NL;
+		Prompt(lRGLngStr(109,TRUE)); { "Password: " }
+        MPL(20);
+        GetPassword(s,20);
+        NL;
+		IF (s = '') AND (How = 2) THEN { LeeW: Added in case user wants to abort password change }
+			Exit;
+		IF (Length(s) < 4) THEN
+		  BEGIN
+			Print(lRGLngStr(111,TRUE)); { "4 characters minimum" }
+			NL;
+		  END
+		  (* { it can't be over 20 chars, input field is only 20 }
+        ELSE IF (Length(s) > 20) THEN
+		  BEGIN
+			Print(lRGLngStr(112,TRUE)); { "20 characters maximum" }
+			NL;
+		  END
+		  *)
+        ELSE IF (How = 3) AND (CRC32(s) = SavePW) THEN
+		  BEGIN
+			Print(lRGLngStr(113,TRUE)); { "Must be different from your old password" }
+			NL;
+			s := '';
+		  END
+        ELSE IF (s = ThisUser.Name) OR (s = ThisUser.RealName) THEN
+		  BEGIN
+			Print(lRGLngStr(114,TRUE)); { "Invalid password" }
+			NL;
+			s := '';
+		  END;
+	  UNTIL (((Length(s) > 3) AND (Length(s) < 21)) OR (HangUp));
+	  Print(lRGLngStr(115,TRUE)); { "Enter your password again for verification" }
+      NL;
+	  Prompt(lRGLngStr(109,TRUE)); { "Password: " }
+      MPL(20);
+      GetPassword(s2,20);
+      IF (s2 <> s) THEN
+		BEGIN
+		  NL;
+		  Print(lRGLngStr(116,TRUE)); { "Passwords do not match" }
+		  NL;
+		END;
+    UNTIL ((s2 = s) OR (HangUp));	  
+	IF (s2 = s) THEN { LeeW: I think this is correct for testing for successful password change }
+	  BEGIN
+		IF (HangUp) AND (How = 3) THEN
+		  User.PW := SavePW
+		ELSE
+		  User.PW := CRC32(s);
+		Done1 := TRUE;
+		User.PasswordChanged := DayNum(DateStr);
+		IF (How = 2) THEN
+		  BEGIN
+			NL;
+			Print(lRGLngStr(117,TRUE)); { "Password changed" }
+			SysOpLog(User.Name+' changed their password');
+		  END;
+	  END;
   END;
 
+  PROCEDURE DoForgotPW;
+  VAR
+    TempForgotPWAnswer: AStr;
+  BEGIN
+	Print('^0This question will be asked should you ever forget your password.');
+	NL;
+	Print(General.ForgotPWQuestion);
+	Prt(': ');
+	MPL(40);
+	Input(TempForgotPWAnswer,40);
+	IF (TempForgotPWAnswer = '') AND ((How = 2) OR (How = 3)) THEN
+	  Exit;
+	IF (Length(TempForgotPWAnswer) >= 3) THEN
+	  BEGIN
+		Done1 := TRUE;
+		IF (TempForgotPWAnswer <> User.ForgotPWAnswer) AND (How = 2) THEN
+		  SysOpLog('Changed forgot password answer');
+		User.ForgotPWAnswer := TempForgotPWAnswer;
+	  END
+	ELSE
+	  BEGIN
+		Print('^8Forgot password answer must be 3 characters minimum');
+	  END;
+  END;
+  
+  PROCEDURE DoAddress;
+  VAR
+    Counter: Integer;
+	IsLetter,
+	IsNumber,
+	IsSpace: Boolean;
+	TempStreet: Str30;
+  BEGIN
+	IsLetter := FALSE;
+	IsNumber := FALSE;
+	IsSpace := FALSE; { Reset }
+	Prt(lRGLngStr(100,TRUE)); { "Enter your address: " }
+	MPL((SizeOf(User.Street) - 1));
+	InputCaps(TempStreet,(SizeOf(User.Street) - 1));
+	{ Check for "A-Z","0-9"," " }
+	{
+		There's got to be a way better method of doing this -- please fix
+	}
+	FOR Counter := 1 TO Length(TempStreet) DO
+	  IF (TempStreet[Counter] IN ['A'..'Z']) THEN
+		BEGIN
+		  IsLetter := TRUE;
+		  Break;
+		END;
+	FOR Counter := 1 TO Length(TempStreet) DO
+	  IF (TempStreet[Counter] IN ['0'..'9']) THEN
+		BEGIN
+		  IsNumber := TRUE;
+		  Break;
+		END;
+	FOR Counter := 1 TO Length(TempStreet) DO
+	  IF (TempStreet[Counter] IN [' ']) THEN
+		BEGIN
+		  IsSpace := TRUE;
+		  Break;
+		END;
+	IF NOT (IsLetter) OR NOT (IsNumber) OR NOT (IsSpace) THEN
+	    BEGIN
+		  Print('^8Invalid address!'); { "Invalid address" }
+		END
+	ELSE
+	  BEGIN
+		IF (How = 2) AND (TempStreet <> User.Street) THEN
+		  SysOpLog('Changed address from '+User.Street+' to '+TempStreet);
+		User.Street := TempStreet;
+		Done1 := TRUE;
+	  END;
+  END;
+  
+  PROCEDURE DoCityState;
+  VAR
+    TempCity,
+    TempState: AStr;
+  BEGIN
+	IF (User.Country = '') AND (How = 1) THEN
+	  DoCountry;
+	IF ((Pos('United States',User.Country) > 0) OR (Pos('Canada',User.Country) > 0)) THEN
+	  BEGIN
+		Prt(lRGLngStr(149,TRUE)); { "Enter your city: " }
+		MPL(((SizeOf(User.CityState) - 1) - 4));
+		InputCaps(TempCity,((SizeOf(User.CityState) - 1) - 4));
+		IF (Pos(',',TempCity) <> 0) THEN
+		  BEGIN
+			NL;
+			lRGLngStr(150,FALSE); { "Enter ONLY your city" }
+			Exit;
+		  END;
+		NL;
+		IF (Length(TempCity) < 3) THEN
+		  BEGIN
+			Print('^8Invalid city name'); { "Invalid city name" }
+			Exit;
+		  END;
+		Prt(lRGLngStr(151,TRUE){ "Enter the abbreviation of your " }
+		+AOnOff((Pos('United States',User.Country) > 0),lRGLngStr(152,TRUE){ "state: " },lRGLngStr(153,TRUE){" province: " }));
+		MPL(2);
+		Input(TempState,2);
+		IF (Length(TempState) < 2) THEN { LeeW: Also check that its alpha-only }
+		  BEGIN
+			Print('^8Invalid state/province abbreviation'); { "Invalid state/province name" }
+			Exit;
+		  END
+		ELSE
+		  BEGIN
+			Done1 := TRUE;
+			IF (How = 2) AND (User.CityState <> TempCity+', '+TempState) THEN
+			  SysOpLog('Changed City/State from '+User.CityState+' to '+TempCity+', '+TempState);
+			User.CityState := TempCity+', '+TempState;
+		  END;
+	  END
+	ELSE
+	  BEGIN
+		Prt(lRGLngStr(149,TRUE)); { "Enter your city: " }
+		MPL(26);
+		InputCaps(TempCity,(SizeOf(User.CityState) - 1));
+		IF (Length(TempCity) < 2) THEN { LeeW: Also check that its alpha-only }
+		  BEGIN
+			Print('^8Invalid city name'); { "Invalid city name" }
+			Exit;
+		  END
+		ELSE
+		  BEGIN
+			Done1 := TRUE;
+			IF (How = 2) AND (User.CityState <> TempCity) THEN
+			  SysOpLog('Changed City/State from '+User.CityState+' to '+TempCity);
+			User.CityState := TempCity;
+		END;
+	  END;
+  END;
+  
+  PROCEDURE DoPhone;
+  VAR
+    TempPhone: AStr;
+  BEGIN
+    CASE How OF
+      1 : BEGIN
+            IF (IEMSIRec.Ph <> '') THEN
+              BEGIN
+                Buf := IEMSIRec.Ph;
+                IEMSIRec.Ph := '';
+              END;
+          END;
+    END;
+	IF (User.Country = ' ') AND (How = 1) THEN
+	  DoCountry;
+	IF (Pos('United States',User.Country) > 0) OR (Pos('Canada',User.Country) > 0) THEN	
+	  BEGIN { If Canada Or United States }
+		InputFormatted(lRGLngStr(107,TRUE),TempPhone,'(###)###-####',(How = 3));
+		TempPhone := Copy(TempPhone,2,3)+Copy(TempPhone,6,3)+Copy(TempPhone,10,4); { Remove Formatting }
+		IF (Length(TempPhone) = 10) THEN
+		  BEGIN
+			Done1 := TRUE;
+			IF (How = 2) AND (User.Ph <> TempPhone) THEN
+			  SysOpLog('Changed phone from '+User.Ph+' to '+TempPhone);
+			User.Ph := TempPhone;
+		  END
+		ELSE
+		  BEGIN
+			Print('^8Invalid phone number');
+		  END;
+	  END
+	ELSE
+	  BEGIN { If Other Country }
+	    Prt(lRGLngStr(107,TRUE));
+		MPL(12);
+		Input(TempPhone,12); { LeeW: Should only be accepting numbers }
+		IF (Length(TempPhone) > 5) THEN  
+		  BEGIN
+			Done1 := TRUE;
+			IF (How = 2) AND (User.Ph <> TempPhone) THEN
+			  SysOpLog('Changed phone from '+User.Ph+' to '+TempPhone);
+			User.Ph := TempPhone;
+		  END
+		ELSE
+		  BEGIN
+			Print('^8Invalid phone number');
+		  END;
+	  END;
+  END;
+  
+  PROCEDURE DoAge;
+  VAR
+    TempDate: Str10;
+    TempDay,
+    TempMonth,
+    TempYear,
+    CurYear: Word;
+    Redo: Boolean;
+  BEGIN
+	GetYear(CurYear);
+	IF (How = 1) AND (IEMSIRec.BDate <> '') THEN
+	  BEGIN
+		Buf := IEMSIRec.BDate;
+		IEMSIRec.BDate := '';
+	  END;
+	REPEAT
+	  Redo := FALSE;
+	  Prt(lRGLngStr(101,TRUE)); { "Enter your birthdate (MM/DD/YYYY): " }
+	  InputFormatted('',TempDate,'##/##/####',(How = 3));
+	  IF (TempDate <> '') THEN
+		BEGIN
+		  TempMonth := StrToInt(Copy(TempDate,1,2));
+		  TempDay := StrToInt(Copy(TempDate,4,2));
+		  TempYear := StrToInt(Copy(TempDate,7,4));
+		  IF (TempMonth = 0) OR (TempDay = 0) OR (TempYear = 0) THEN
+			Redo := TRUE;
+		  IF (TempMonth > 12) THEN
+			Redo := TRUE;
+		  IF (TempMonth IN [1,3,5,7,8,10,12]) AND (TempDay > 31) THEN
+			Redo := TRUE;
+		  IF (TempMonth IN [4,6,9,11]) AND (TempDay > 30) THEN
+			Redo := TRUE;
+		  IF (TempMonth = 2) AND ((TempYear MOD 4) <> 0) AND (TempDay > 28) THEN
+			Redo := TRUE;
+		  IF (TempMonth = 2) AND ((TempYear MOD 4) = 0) AND (TempDay > 29) THEN
+			Redo := TRUE;
+		  IF (TempYear >= CurYear) THEN
+			Redo := TRUE;
+		  IF (TempYear < (CurYear - 100)) THEN
+			Redo := TRUE;
+		  IF (Redo) THEN
+			BEGIN
+			  NL;
+			  lRGLngStr(148,FALSE); { "Invalid birthdate" }
+			  Exit;
+			END
+		  ELSE
+		    BEGIN
+			  Done1 := TRUE;
+			  IF (How = 2) (*AND ({ LeeW: How to check for difference? })*) THEN 
+				SysOpLog('Changed birthdate from '+PD2Date(User.BirthDate)+' to '+TempDate);
+			  User.BirthDate := Date2PD(TempDate);
+			END;
+		END;
+    UNTIL (NOT Redo) OR (HangUp);
+  END;
+  
+  PROCEDURE DoSex;
+  VAR
+    TempSex: Char;
+  BEGIN
+	lRGLngStr(121,FALSE); { "(M)ale, (F)emale, or (O)ther/Non-Binary" }
+	Prt(lRGLngStr(122,TRUE)); { Prompt }
+    IF (How = 3) OR (How = 2) THEN
+	  OneK(TempSex,'MFO'^M,TRUE,TRUE)
+    ELSE
+	  OneK(TempSex,'MFO',TRUE,TRUE);
+	IF (TempSex IN ['M','F','O']) THEN
+	  BEGIN
+		Done1 := TRUE;
+		IF (User.Sex <> TempSex) AND (How = 2) THEN
+		  SL1(User.Name+' changed their gender from '+User.Sex+' to '+TempSex);
+		User.Sex := TempSex;
+	  END;
+  END;
+  
+  PROCEDURE DoZipCode;
+  VAR
+    TempZipCode: Str10;
+  BEGIN
+	IF User.Country = '' THEN 
+	  DoCountry;
+	IF (Pos('United States',User.Country) > 0) THEN
+	  BEGIN
+		Prt(lRGLngStr(123,TRUE)); { "Enter your zip code (#####-####): " }
+		InputFormatted('',TempZipCode,'#####-####',(How = 3));
+	  END
+	ELSE IF (Pos('Canada',User.Country) > 0) THEN
+      BEGIN
+		Prt(lRGLngStr(124,TRUE)); { "Enter your postal code (LNLNLN): " }
+		InputFormatted('',TempZipCode,'@#@#@#',(How = 3));
+	  END
+	ELSE
+	  BEGIN
+		Prt(lRGLngStr(125,TRUE)); { "Enter your postal code: " }
+		MPL((SizeOf(User.ZipCode) - 1));
+		Input(TempZipCode,(SizeOf(User.ZipCode) - 1));
+	  END;
+	IF (Length(TempZipCode) > 2) AND (TempZipCode <> '') THEN 
+	  BEGIN
+		Done1 := TRUE;
+		IF (User.ZipCode <> TempZipCode) AND (How = 2) THEN
+		  SL1(User.Name+' changed their zip/postal code from '+User.ZipCode+' to '+TempZipCode);
+		User.ZipCode := TempZipCode;		
+	  END;
+  END;
+  
   PROCEDURE DoTermEmu;
   VAR
     Cmd: Char;
   BEGIN
     PrintF('TERMINAL');
-    Print('^0Which emulation does your terminal client support?');
-    NL;
-    Print('^0(^11^0) None');
-    Print('^0(^12^0) ANSI');
-    Print('^0(^13^0) Avatar');
-    Print('^0(^14^0) VT-100');
-    Print('^0(^15^0) RIP');
-    NL;
-    Prt('^0Select [^112345^0]: ');
-    OneK(Cmd,'12345',TRUE,TRUE);
+	lRGLngStr(126,FALSE); { "(1) None (2) ANSI (3) Avatar (4) VT-100 (5) RIP" }
+	Prt(lRGLngStr(127,TRUE)); { Prompt }
+    
+	If (How = 2) OR (How = 3) THEN
+	  OneK(Cmd,'12345'^M,TRUE,TRUE)
+	ELSE 
+	  OneK(Cmd,'12345',TRUE,TRUE);
+	
     Exclude(User.Flags,ANSI);
     Exclude(User.Flags,Avatar);
     Exclude(User.Flags,VT100);
     Exclude(User.Flags,RIP);
     CASE Cmd OF
-      '2' : Include(User.Flags,ANSI);
+      '2' : BEGIN
+			  Include(User.Flags,ANSI);
+			END;
       '3' : BEGIN
               Include(User.Flags,Avatar);
               NL;
-              IF PYNQ('Does your terminal client support ANSI fallback? ',0,TRUE) THEN
+              IF PYNQ(lRGLngStr(128,TRUE){ "Does your terminal client support ANSI fallback?" },0,TRUE) THEN
                 Include(User.Flags,ANSI);
             END;
-      '4' : Include(User.Flags,VT100);
+      '4' : BEGIN
+			  Include(User.Flags,VT100);
+			END;
       '5' : BEGIN
               Include(User.Flags,ANSI);
               Include(User.Flags,RIP);
             END;
     END;
-    IF (ANSI IN User.Flags) OR (Avatar IN User.Flags) OR (VT100 IN User.Flags) THEN
+    NL;
+	IF Cmd <> ^M THEN
+	  BEGIN
+		IF (PYNQ(lRGLngStr(129,TRUE){ "Would you like this auto-detected in the future?" },0,TRUE)) THEN
+		  Include(User.Flags,AutoDetect)
+		ELSE
+		  Exclude(User.Flags,AutoDetect);
+		Done1 := TRUE;
+	  END;
+	{ LeeW: Enable or disable fullscreen editor based on terminal emulation }
+    IF (ANSI IN User.Flags) OR {(Avatar IN User.Flags) OR} (VT100 IN User.Flags) THEN
       Include(User.Flags,FSEditor)
     ELSE
       Exclude(User.Flags,FSEditor);
-    NL;
-    IF (PYNQ('^0Would you like this to be auto-detected in the future? ',0,TRUE)) THEN
-      Include(User.Flags,AutoDetect)
-    ELSE
-      Exclude(User.Flags,AutoDetect);
-    Done1 := TRUE;
+	{ LeeW: how to do sysoplog for this one? }
   END;
- 
-  Procedure Toggle_Color;
-  Begin
-    If How = 2 Then
-      Begin
-        IF (Color In User.Flags) Then
-          Begin
-            Exclude(User.Flags,Color);
-            Print('^0ANSI color disabled');
-          End
-        Else
-          Begin
-          Include(User.Flags,Color);
-          Print('^0ANSI color enabled');
-          End;
-	    Done1 := True;
-	    PauseScr(False);
-	  End
-    Else
-      Begin
-        If PYNQ('^0Enable ANSI Colors? ',0,True) Then
-          Include(User.Flags,Color)
-        Else
-          Exclude(User.Flags,Color);
-        Done1 := TRUE;
-{ LeeW: Text color bug happening if select no -- investigate }
-      End
-  End;
-
-  Procedure Toggle_Editor;
-    Begin
-      Done1 := True;
-      If (Not (ANSI In User.Flags)) And (Not (Avatar In User.Flags)) Then
-        Begin
-          Print('^0Your terminal client must support ANSI to use the full screen editor');
-          Exclude(User.Flags,FSEditor);
-          Exit;
-        End;
-      If (FSEditor In User.Flags) Then
-        Begin
-          Exclude(User.Flags,FSEditor);
-          Print('^0Line editor enabled');
-        End
-      Else
-        Begin
-          Include(User.Flags,FSEditor);
-          Print('^0Full screen editor enabled');
-        End;
-	  PauseScr(False);
-    End;
-
+  
+  PROCEDURE DoUserDef(QuestionNum: Byte);
+  VAR
+    UserDefQues: STRING[80];
+    s: Str35;
+  BEGIN
+    CASE QuestionNum OF
+      1 : UserDefQues := lRGLngStr(38,TRUE); 
+      2 : UserDefQues := lRGLngStr(39,TRUE); 
+      3 : UserDefQues := lRGLngStr(40,TRUE); 
+    END;
+    IF (UserDefQues = '') THEN
+    BEGIN
+      User.UsrDefStr[QuestionNum] := '';
+      Done1 := TRUE;
+      Exit;
+    END;
+    Print(UserDefQues);
+    Prt(': '); {tolang}
+    MPL((SizeOf(User.UsrDefStr[QuestionNum]) - 1));
+    InputL(s,(SizeOf(User.UsrDefStr[QuestionNum]) - 1));
+    IF (s <> '') THEN
+    BEGIN
+      User.UsrDefStr[QuestionNum] := s;
+      Done1 := TRUE;
+	  {add sysoplog}
+    END;
+  END;
+  
   PROCEDURE Toggle_LightBars;
   BEGIN
     IF (NOT General.UseLightBars) THEN
     BEGIN
       NL;
       Print('^0SysOp has disabled lightbars');
-	  PauseScr(False);
     END
     ELSE
     BEGIN
@@ -898,65 +1009,82 @@ VAR
       BEGIN
         Exclude(ThisUser.Flags,UseLightBars);
         Print('^0Lightbars disabled');
-		PauseScr(False);
+		SysOpLog(User.Name+' disabled lightbars');
       END
       ELSE
       BEGIN
         Include(ThisUser.Flags,UseLightBars);
         Print('^0Lightbars enabled');
-		PauseScr(False);
+		SysOpLog(User.Name+' enabled lightbars');
       END;
     END;
     Done1 := TRUE;
   END;
+  
+  Procedure Toggle_Color;
+  (*
+  LeeW: Text color bug happening if select no -- investigate 
+  *)
+  Begin
+    If How = 2 Then
+      Begin
+        IF (Color In User.Flags) Then
+          Begin
+			Exclude(User.Flags,Color);
+			lRGLngStr(132,FALSE); { "ANSI color disabled" }
+			SysOpLog(User.Name+' disabled ansi color');
+          End
+        Else
+          Begin
+			Include(User.Flags,Color);
+			lRGLngStr(131,FALSE); { "ANSI color enabled" }
+			SysOpLog(User.Name+' enabled ansi color');
+          End;
+	  End
+    Else
+      Begin
+        If PYNQ(lRGLngStr(130,TRUE){ "Enable ANSI colors?" },0,True) Then
+          Include(User.Flags,Color)
+        Else
+          Exclude(User.Flags,Color);
+      End;
+	Done1 := TRUE;
+  End;
 
-  PROCEDURE DoColorScheme;
-  VAR
-    AScheme: SchemeRec;
-    i,
-    Onlin: SmallInt;
-  BEGIN
-    Reset(SchemeFile);
-    Abort := FALSE;
-    Next := FALSE;
-	CLS;
-    PrintACR('^0Available Color Schemes:');
-    NL;
-	PrintACR('^4+----+---------------------------------+----+---------------------------------+');
-	PrintACR('^4| ^3## ^4| ^3Description                     ^4| ^3## ^4| ^3Description                     ^4|');
-	PrintACR('^4+----+---------------------------------+----+---------------------------------+');
-    i := 1;
-    Onlin := 0;
-    Seek(SchemeFile,0);
-    WHILE (FilePos(SchemeFile) < FileSize(SchemeFile)) AND (NOT Abort) AND (NOT HangUp) do
-    BEGIN
-      Read(SchemeFile,AScheme);
-      Inc(Onlin);
-      Prompt('^1  '+PadLeftInt(i,3)+'^0  '+PadLeftStr(AScheme.Description,32));
-      IF (OnLin = 2) THEN
-      BEGIN
-        NL;
-        Onlin := 0;
-      END;
-      WKey;
-      Inc(i);
-    END;
-    Abort := FALSE;
-    Next := FALSE;
-	i := 1; { LeeW: Reset, so default choice is 1 }
-    NL;
-    InputIntegerWOC('^0%LFSelect A Color Scheme',i,[NumbersOnly,InterActiveEdit],1,FileSize(SchemeFile));
-    IF (i >= 1) AND (i <= FileSize(SchemeFile)) THEN
-    BEGIN
-      ThisUser.ColorScheme := i;
-      Seek(SchemeFile,(i - 1));
-      Read(SchemeFile,Scheme);
-      Done1 := TRUE;
-    END;
-    Close(SchemeFile);
-    LastError := IOResult;
-  END;
-
+  Procedure Toggle_Editor;
+	Begin
+	  If How = 2 Then
+		BEGIN
+		  If (Not (ANSI In User.Flags)) And (Not (Avatar In User.Flags)) Then
+			Begin
+			  lRGLngStr(133,FALSE); { "Your terminal client must support ANSI to use the fullscreen editor" }
+			  Exclude(User.Flags,FSEditor);
+			  SysOpLog(User.Name+' couldn''t enable fullscreen editor because they don''t support ANSI emulation');
+			  {Exit;}
+			End;
+		  If (FSEditor In User.Flags) Then
+			Begin
+			  Exclude(User.Flags,FSEditor);
+			  lRGLngStr(134,FALSE); { "Line editor enabled" }
+			  SysOpLog(User.Name+' enabled line editor');
+			End
+		  Else
+			Begin
+			  Include(User.Flags,FSEditor);
+			  lRGLngStr(135,FALSE); { "Fullscreen editor enabled" }
+			  SysOpLog(User.Name+' enabled fullscreen editor');
+			End;
+		END
+	  Else
+		Begin
+		  If PYNQ('^0Use fullscreen editor? '{ "Use fullscreen editor?" },0,True) Then
+		   Include(User.Flags,FSEditor)
+		  Else
+			Exclude(User.Flags,FSEditor);
+		End;
+	  Done1 := True;
+	End;
+ 
   Procedure Toggle_Pause;
     Begin
       If How = 2 Then
@@ -964,19 +1092,20 @@ VAR
           If (Pause In User.Flags) Then
             Begin
               Exclude(User.Flags,Pause);
-              Print('^0Pause after each screen disabled');
+			  lRGLngStr(138,FALSE); { "Screen pausing disabled" }
+			  SysOpLog(User.Name+' enabled screen pausing');
             End
           Else
             Begin
               Include(User.Flags,Pause);
-              Print('^0Pause after each screen enabled');
+			  lRGLngStr(137,FALSE); { "Screen pausing enabled" }
+			  SysOpLog(User.Name+' disabled screen pausing');
             End;
           Done1 := True;
-	      PauseScr(False);
         End
       Else
         Begin
-          If PYNQ('^0Pause after each screen? ',0,True) Then
+          If PYNQ(lRGLngStr(136,TRUE){ "Pause after each screen?" },0,True) Then
             Include(User.Flags,Pause)
           Else
             Exclude(User.Flags,Pause);
@@ -991,19 +1120,20 @@ VAR
           If (HotKey In User.Flags) Then
             Begin
               Exclude(User.Flags,HotKey);
-              Print('^0Full line input enabled');
+			  lRGLngStr(147,FALSE); { "Full line input enabled" }
+			  SysOpLog(User.Name+' enabled full line input');
             End
           Else
             Begin
               Include(User.Flags,HotKey);
-              Print('^0Hot key input enabled');
+			  lRGLngStr(146,FALSE); { "Hotkeys enabled" }
+			  SysOpLog(User.Name+' enabled hotkeys');
             End;
           Done1 := True;
-          PauseScr(False);
         End
       Else
         Begin
-          If PYNQ('^0Do you want to use Hot Keys? ',0,True) Then
+          If PYNQ(lRGLngStr(145,TRUE){ "Do you want to use hotkeys?" },0,True) Then
             Include(User.Flags,HotKey)
           Else
             Exclude(User.Flags,HotKey);
@@ -1019,23 +1149,30 @@ VAR
             Begin
               Exclude(User.Flags,Novice);
               CurHelpLevel := 1;
-              Print('^0Expert mode enabled');
+			  lRGLngStr(143,FALSE); { "Expert mode enabled" }
+			  SysOpLog(User.Name+' enabled expert mode');
             End
           Else
             Begin
               Include(User.Flags,Novice);
               CurHelpLevel := 2;
-              Print('^0Expert mode disabled');
+			  lRGLngStr(144,FALSE); { "Expert mode disabled" }
+			  SysOpLog(User.Name+' disabled expert mode');
             End;
           Done1 := True;
-	      PauseScr(False);
         End
       Else
         Begin
-          If PYNQ('^0Do you want to be in expert mode? ',0,False) Then
-            Exclude(User.Flags,Novice)
+          If PYNQ(lRGLngStr(142,TRUE){ "Do you want to be in expert mode?" },0,False) Then
+		    BEGIN
+			  CurHelpLevel := 1;
+			  Exclude(User.Flags,Novice);
+			END
           Else
-            Include(User.Flags,Novice);
+		    BEGIN
+			  CurHelpLevel := 2;
+              Include(User.Flags,Novice);
+			END;
           Done1 := True;
         End
     End;
@@ -1047,53 +1184,56 @@ VAR
           If (CLSMsg In User.Flags) Then
             Begin
               Exclude(User.Flags,CLSMsg);
-              Print('^0Screen clearing disabled');
+			  lRGLngStr(141,FALSE); { "Screen clearing disabled" }
+			  SysOpLog(User.Name+' disabled screen clearing');
             End
           Else
             Begin
               Include(User.Flags,CLSMsg);
-              Print('^0Screen clearing enabled');
+			  lRGLngStr(140,FALSE); { "Screen clearing enabled" }
+			  SysOpLog(User.Name+' enabled screen clearing');
             End;
           Done1 := True;
-          PauseScr(False);
         End
       Else
         Begin
-          If PYNQ('^0Clear screen before each message read? ',0,True) Then
+          If PYNQ(lRGLngStr(139,TRUE){ "Clear screen before each message read?" },0,True) Then
             Include(User.Flags,CLSMsg)
           ELSE
             Exclude(User.Flags,CLSMsg);
           Done1 := True;
         End
     End;
-	
-  Procedure WW(www: Byte);
-  Begin
-    Nl;
-    Case www Of
-        01 : DoName;            { (!) Handle, Or Real Name *MANDATORY* }
-        02 : DoRealName;        { (A) Real Name }
-        03 : DoCountry;         { (B) Country }
-        04 : DoCityState;       { (C) City State }
-        05 : DoAddress;         { (D) Address }
-        06 : DoZipCode;         { (E) Zip Code }
-        07 : DoPhone;           { (F) Phone Number }
-        08 : DoAge;             { (G) Birthdate }
-        09 : DoSex;             { (H) Gender Identity }
-        10 : DoUserDef(1);      { (I) Sysop Defined Question #1 }
-        11 : DoUserDef(2);      { (J) Sysop Defined Question #2 }
-        12 : DoUserDef(3);      { (K) Sysop Defined Question #3 }
-        13 : DoTermEmu;         { (L) Terminal Emulation }
-        14 : Toggle_Color;      { (M) ANSI Colors }
-        15 : DoColorScheme;     { (N) Color Scheme }
-        16 : DoScreen;          { (O) Screen Size }
-        17 : Toggle_Clear;      { (P) Screen Clearing }
-        18 : Toggle_Pause;      { (R) Screen Pause }
-        19 : Toggle_HotKey;     { (S) Use Hot Keys? }
-        20 : ConfigureQWK;      { (T) QWK Configuration }
-        21 : Toggle_Expert;     { (U) Use Expert Mode? }
-        22 : DoPW;              { (!) Password *MANDATORY* }
-        23 : DoForgotPW;        { (V) Forgot Password Answer }
+  
+  { ------------------------------------------------------------------- }
+  
+  PROCEDURE WW(www: Byte);
+  BEGIN
+    NL;
+    CASE www OF
+        01 : DoName;            { Handle, Or Real Name *MANDATORY* }
+        02 : DoRealName;        { Real Name }
+        03 : DoCountry;         { Country }
+        04 : DoCityState;       { City State }
+        05 : DoAddress;         { Address }
+        06 : DoZipCode;         { Zip Code }
+        07 : DoPhone;           { Phone Number }
+        08 : DoAge;             { Birthdate }
+        09 : DoSex;             { Gender Identity }
+        10 : DoUserDef(1);      { SysOp Defined Question #1 }
+        11 : DoUserDef(2);      { SysOp Defined Question #2 }
+        12 : DoUserDef(3);      { SysOp Defined Question #3 }
+        13 : DoTermEmu;         { Terminal Emulation }
+        14 : Toggle_Color;      { ANSI Colors }
+        15 : DoColorScheme;     { Color Scheme }
+        16 : DoScreen;          { Screen Size }
+        17 : Toggle_Clear;      { Screen Clearing }
+        18 : Toggle_Pause;      { Screen Pause }
+        19 : Toggle_HotKey;     { Hot Keys }
+        20 : Toggle_Expert;		{ FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!}
+        21 : Toggle_Expert;     { Expert Mode }
+        22 : DoPW;              { Password *MANDATORY* }
+        23 : DoForgotPW;        { Forgot Password Answer }
 
 {       Commands above can be toggled on or off for new user application,
         Commands below are accessible through account settings menu and user editor }
@@ -1101,40 +1241,37 @@ VAR
         24 : Mailbox;			{ Mailbox / Mail Forwarding }
         25 : Toggle_Editor;		{ Fullscreen Or Line Editor }
         26 : Toggle_LightBars;	{ Use LightBars? }
-    End;
-  End;
+		27 : ConfigureQWK;      { QWK Configuration }
+		28 : PauseScr(FALSE);	{ }
+		29 : PauseScr(FALSE);	{ }
+		30 : PauseScr(FALSE);	{ }
+    END;
+  END;
   
   { // }
   
-Begin
+BEGIN
   Try := 0;
   Done1 := False;
-  Case How Of
-    1 : Repeat { 1 = New User Application }
-          WW(Which)
-        Until (Done1) Or (HangUp);
-    2,3 :
-        Begin { 2 = Menu Command OP, 3 = User Editor, Maint }
+  CASE How OF
+    1 : REPEAT { 1 = New User Application }
           WW(Which);
-          If (Not Done1) Then
+		  Inc(Try);
+		  IF (Try >= 5) THEN { make this custo }
+		    BEGIN
+			  NL;
+			  Print('^8Exceeded maximum number of retries. Disconnecting.'); { this too }
+			  HangUp := TRUE;
+			END;
+        UNTIL (Done1) OR (HangUp);
+    2,3 :
+        BEGIN { 2 = Menu Command "OP", 3 = User Editor, Maint }
+          WW(Which);
+          IF (NOT Done1) THEN
             Print('^8Function aborted!');
-			PauseScr(FALSE);
-        End;
-  End;
-End;
+		  PauseScr(FALSE);
+        END;
+  END;
+  END;
 
-(*
-  Procedure Toggle_Template;
-    BEGIN
-      IF How = 2 THEN 
-        BEGIN { From Menu Command }
-         { For 2 }
-        END
-      ELSE
-        BEGIN { From New User Application / User Editor / Maint }
-          { For Not 2 }
-        END
-    END;
-*)
-
-End.
+END.

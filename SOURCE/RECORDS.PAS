@@ -182,7 +182,7 @@ TYPE
     ForgotPWAnswer: STRING[40];             { Forgot Password Answer }
     UsrDefStr: ARRAY [1..3] OF STRING[35];	{ Definable Strings }
     Note: STRING[35];                       { SysOp Note }
-    LockedFile: STRING[8];                  { Print Lockout Message }
+    LockedFile: STRING[8];                  { File To Display If User Locked Out }
     Vote: ARRAY [1..25] OF Byte;            { Voting Data }
     Sex,                                    { Gender }
     Subscription,                           { Their Subscription }
@@ -574,7 +574,7 @@ TYPE
       Point: SmallWord;
     END;
 
-    NewUserToggles: ARRAY [1..27] OF Boolean; { LeeW: New User Application Toggles }
+    NewUserToggles: ARRAY [1..30] OF Boolean; { LeeW: New User Application Toggles }
 	
     Macro: ARRAY [0..9] OF STRING[100]; { SysOp Macros }
 

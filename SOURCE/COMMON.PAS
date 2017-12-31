@@ -18,31 +18,31 @@ CONST
 TYPE
   MCIFunctionType = FUNCTION(CONST s: AStr; Data1, Data2: Pointer): STRING;
 
-  MemMenuRec = RECORD                     { Menu Record }
-    LDesc: ARRAY[1..3] OF STRING[100];    { menu name }
-    ACS: ACString;                        { access requirements }
-    NodeActivityDesc: STRING[50];
-    MenuFlags: MenuFlagSet;               { menu status variables }
-    LongMenu: STRING[12];                 { displayed IN place OF long menu }
-    MenuNum: Byte;                        { menu  number }
-    MenuPrompt: STRING[120];              { menu Prompt }
-    Password: STRING[20];                 { password required }
-    FallBack: Byte;                       { fallback menu }
-    Directive: STRING[12];
-    ForceHelpLevel: Byte;                 { forced help Level FOR menu }
-    GenCols: Byte;                        { generic menus: # OF columns }
-    GCol: ARRAY[1..3] OF Byte;            { generic menus: colors }
+  MemMenuRec = RECORD					{ MENU RECORD }
+    LDesc: ARRAY[1..3] OF STRING[100];	{ Menu Description }
+    ACS: ACString;						{ ACS Requirements }
+    NodeActivityDesc: STRING[50];		{ Node Activity Description }
+    MenuFlags: MenuFlagSet;				{ menu status variables }
+    LongMenu: STRING[12];				{ displayed IN place OF long menu ?? }
+    MenuNum: Byte;						{ Menu Number }
+    MenuPrompt: STRING[120];			{ Menu Prompt }
+    Password: STRING[20];				{ Password Required }
+    FallBack: Byte;						{ FallBack Menu }
+    Directive: STRING[12];				{ }
+    ForceHelpLevel: Byte;				{ Forced Help Level }
+    GenCols: Byte;						{ Generic Menu: Number Of Columns }
+    GCol: ARRAY[1..3] OF Byte;			{ Generic Menu: Colors }
   END;
 
-  MemCmdRec = RECORD                      { Command records }
-    LDesc: STRING[100];                   { long command description }
-    ACS: ACString;                        { access requirements }
-    NodeActivityDesc: STRING[50];
-    CmdFlags: CmdFlagSet;                 { command status variables }
-    SDesc: STRING[35];                    { short command description }
-    CKeys: STRING[14];                    { command-execution keys }
-    CmdKeys: STRING[2];                   { command keys: type OF command }
-    Options: STRING[50];                  { MString: command data }
+  MemCmdRec = RECORD					{ COMMAND RECORD }
+    LDesc: STRING[100];					{ Long Command Description }
+    ACS: ACString;						{ ACS Requirements }
+    NodeActivityDesc: STRING[50];		{ Node Activity Description }
+    CmdFlags: CmdFlagSet;				{ command status variables }
+    SDesc: STRING[35];					{ Short Command Description }
+    CKeys: STRING[14];					{ Keys To Execute Command }
+    CmdKeys: STRING[2];					{ Command }
+    Options: STRING[50];				{ Command Options/Parameters }
   END;
 
   LightBarRecordType = RECORD
@@ -192,78 +192,81 @@ CONST
   DisplayingMenu: Boolean = FALSE;	{ Are We Displaying A Menu? }
   InVisEdit: Boolean = FALSE;		{ Are We In The Visual Editor? }
   MenuAborted: Boolean = FALSE;		{ was the menu Aborted? }
-  AllowAbort: Boolean = TRUE;		{ are Aborts allowed?          }
+  AllowAbort: Boolean = TRUE;		{ are Aborts allowed? }
   MCIAllowed: Boolean = TRUE;		{ is mci allowed? }
   ColorAllowed: Boolean = TRUE;		{ is color allowed? }
-  Echo: Boolean = TRUE;				{ is Text being echoed? (FALSE=use echo Chr)}
-  HangUp: Boolean = TRUE;			{ is User offline now?         }
-  TimedOut: Boolean = FALSE;		{ has he timed out?           }
-  NoFile: Boolean = TRUE;			{ did last pfl() FILE NOT Exist?        }
-  SLogging: Boolean = TRUE;			{ are we outputting TO the SysOp log?  }
-  SysOpOn: Boolean = TRUE;			{ is SysOp logged onto the WFC menu?  }
-  WantOut: Boolean = TRUE;			{ output Text locally?         }
+  Echo: Boolean = TRUE;				{ is Text being echoed? (FALSE=use echo Chr) }
+  HangUp: Boolean = TRUE;			{ is User offline now? }
+  TimedOut: Boolean = FALSE;		{ has he timed out? }
+  NoFile: Boolean = TRUE;			{ did last pfl() FILE NOT Exist? }
+  SLogging: Boolean = TRUE;			{ are we outputting TO the SysOp log? }
+  SysOpOn: Boolean = TRUE;			{ is SysOp logged onto the WFC menu? }
+  WantOut: Boolean = TRUE;			{ output Text locally? }
   WColor: Boolean = TRUE;			{ IN chat: was last key pressed by SysOp? }
-  BadDLPath: Boolean = FALSE;		{ is the current DL path BAD?      }
-  BadUlPath: Boolean = FALSE;		{ is the current UL path BAD?      }
+  BadDLPath: Boolean = FALSE;		{ is the current DL path BAD? }
+  BadUlPath: Boolean = FALSE;		{ is the current UL path BAD? }
   BeepEnd: Boolean = FALSE;			{ whether TO beep after caller logs off }
-  FileAreaNameDisplayed: Boolean = FALSE;	{ was FILE area name printed yet?    }
-  CFO: Boolean = FALSE;				{ is chat FILE open?          }
-  InChat: Boolean = FALSE;			{ are we IN chat Mode?         }
-  ChatCall: Boolean = FALSE;		{ is the chat call "noise" on?          }
-  ContList: Boolean = FALSE;		{ continuous message listing Mode on?  }
-  CROff: Boolean = FALSE;			{ are CRs turned off?          }
-  CtrlJOff: Boolean = FALSE;		{ turn color TO #1 after ^Js??     }
-  DoneAfterNext: Boolean = FALSE;	{ offhook AND Exit after Next logoff?  }
+  FileAreaNameDisplayed: 
+	Boolean = FALSE;				{ was FILE area name printed yet? }
+  CFO: Boolean = FALSE;				{ is chat FILE open? }
+  InChat: Boolean = FALSE;			{ are we IN chat Mode? }
+  ChatCall: Boolean = FALSE;		{ is the chat call "noise" on? }
+  ContList: Boolean = FALSE;		{ continuous message listing Mode on? }
+  CROff: Boolean = FALSE;			{ are CRs turned off? }
+  CtrlJOff: Boolean = FALSE;		{ turn color TO #1 after ^Js?? }
+  DoneAfterNext: Boolean = FALSE;	{ offhook AND Exit after Next logoff? }
   DoneDay: Boolean = FALSE;			{ are we done now? ready TO drop TO DOS?}
   DOSANSIOn: Boolean = FALSE;		{ output chrs TO DOS FOR ANSI codes?!!? }
-  FastLogon: Boolean = FALSE;		{ IF a FAST LOGON is requested     }
-  HungUp: Boolean = FALSE;			{ did User drop carrier?        }
-  InCom: Boolean = FALSE;			{ accepting input from com?       }
-  InWFCMenu: Boolean = FALSE;		{ are we IN the WFC menu?        }
-  LastCommandGood: Boolean = FALSE;	{ was last command a REAL command?   }
-  LastCommandOvr: Boolean = FALSE;	{ override Pause? (NO Pause?)      }
-  LocalIOOnly: Boolean = FALSE;		{ local I/O ONLY?            }
-  MakeQWKFor: Integer = 0;			{ make a qwk packet ONLY?        }
-  UpQWKFor: Integer = 0;			{ upload a qwk packet ONLY?       }
-  RoomNumber: Integer = 0;			{ Room OF teleconference                }
-  PackBasesOnly: Boolean = FALSE;	{ pack message bases ONLY?       }
-  SortFilesOnly: Boolean = FALSE;	{ sort FILE bases ONLY?         }
+  FastLogon: Boolean = FALSE;		{ IF a FAST LOGON is requested }
+  HungUp: Boolean = FALSE;			{ did User drop carrier? }
+  InCom: Boolean = FALSE;			{ accepting input from com? }
+  InWFCMenu: Boolean = FALSE;		{ are we IN the WFC menu? }
+  LastCommandGood: Boolean = FALSE;	{ was last command a REAL command? }
+  LastCommandOvr: Boolean = FALSE;	{ override Pause? (NO Pause?) }
+  LocalIOOnly: Boolean = FALSE;		{ local I/O ONLY? }
+  MakeQWKFor: Integer = 0;			{ make a qwk packet ONLY? }
+  UpQWKFor: Integer = 0;			{ upload a qwk packet ONLY? }
+  RoomNumber: Integer = 0;			{ Room OF teleconference }
+  PackBasesOnly: Boolean = FALSE;	{ pack message bases ONLY? }
+  SortFilesOnly: Boolean = FALSE;	{ sort FILE bases ONLY? }
   FileBBSOnly: Boolean = FALSE;		{  }
   NewMenuToLoad: Boolean = FALSE;	{ menu command returns TRUE IF new menu TO load }
   OvrUseEMS: Boolean = TRUE;		{  }
-  OverLayLocation: Byte = 0;		{ 0=Normal, 1=EMS, 2=XMS                }
-  OutCom: Boolean = FALSE;			{ outputting TO com?          }
+  OverLayLocation: Byte = 0;		{ 0=Normal, 1=EMS, 2=XMS }
+  OutCom: Boolean = FALSE;			{ outputting TO com? }
   DirFileopen1: Boolean = TRUE;		{ whether DirFile has been opened before }
   ExtFileOpen1: Boolean = TRUE;		{  }
-  PrintingFile: Boolean = FALSE;	{ are we printing a FILE?        }
-  AllowContinue: Boolean = FALSE;	{ Allow Continue prompts?        }
-  QuitAfterDone: Boolean = FALSE;	{ quit after Next User logs off?    }
-  Reading_A_Msg: Boolean = FALSE;	{ is User reading a message?      }
-  ReadingMail: Boolean = FALSE;		{ reading private mail?         }
+  PrintingFile: Boolean = FALSE;	{ are we printing a FILE? }
+  AllowContinue: Boolean = FALSE;	{ Allow Continue prompts? }
+  QuitAfterDone: Boolean = FALSE;	{ quit after Next User logs off? }
+  Reading_A_Msg: Boolean = FALSE;	{ is User reading a message? }
+  ReadingMail: Boolean = FALSE;		{ reading private mail? }
   ShutUpChatCall: Boolean = FALSE;	{ was chat call "SHUT UP" FOR this call? }
-  Trapping: Boolean = FALSE;		{ are we Trapping users Text?      }
-  UserOn: Boolean = FALSE;			{ is there a User on right now?     }
-  WasNewUser: Boolean = FALSE;		{ did a NEW User log on?        }
-  Write_Msg: Boolean = FALSE;		{ is User writing a message?      }
-  NewEchoMail: Boolean = FALSE;		{ has new echomail been entered?    }
+  Trapping: Boolean = FALSE;		{ are we Trapping users Text? }
+  UserOn: Boolean = FALSE;			{ is there a User on right now? }
+  WasNewUser: Boolean = FALSE;		{ did a NEW User log on? }
+  Write_Msg: Boolean = FALSE;		{ is User writing a message? }
+  NewEchoMail: Boolean = FALSE;		{ has new echomail been entered? }
   TimeWarn: Boolean = FALSE;		{ has User been warned OF time shortage? }
   TellUserEvent: Byte = 0;			{ has User been told about the up-coming event? }
-  ExitErrors: Byte = 1;				{ errorLEVEL FOR Critical error Exit  }
-  ExitNormal: Byte = 0;				{ errorLEVEL FOR Normal Exit      }
+  ExitErrors: Byte = 1;				{ errorLEVEL FOR Critical error Exit }
+  ExitNormal: Byte = 0;				{ errorLEVEL FOR Normal Exit }
   TodayCallers: Integer = 0;		{ new system callers }
   lTodaynumUsers: Integer = 0;		{ new number OF users }
   ThisNode: Byte = 0;				{ node number }
-  AnswerBaud: LongInt = 0;			{ baud rate TO answer the phone at   }
-  ExtEventTime: Word = 0;			{ # minutes before External event    }
+  AnswerBaud: LongInt = 0;			{ baud rate TO answer the phone at }
+  ExtEventTime: Word = 0;			{ # minutes before External event }
   IsInvisible: Boolean = FALSE;		{ Run IN invisible Mode? }
-  SaveNDescription: STRING[50] = 'Miscellaneous';
-  SaveNAvail: Boolean = FALSE;
-  LastWFCX: Byte = 1;
-  LastWFCY: Byte = 1;
-  ANSIDetected: Boolean = FALSE;
+  SaveNDescription: STRING[50] 		{ }
+	= 'Miscellaneous';
+  SaveNAvail: Boolean = FALSE;		{ }
+  LastWFCX: Byte = 1;				{ }
+  LastWFCY: Byte = 1;				{ }
+  ANSIDetected: Boolean = FALSE;	{ }
 { Added June 21, 2013 //sk5 }
   PauseIsNull : Boolean = FALSE;	{ Added for null pause }
-  BuildDate   : Array [1..5] of Word = ( 5, 27, 2013, 9, 19 );	{ Build date MM, DD, YYYY, HR, MIN }
+  BuildDate   : ARRAY [1..5] OF
+	Word = ( 5, 27, 2013, 9, 19 );	{ Build date MM, DD, YYYY, HR, MIN }
 
 VAR
   LightBarArray: ARRAY[1..50] OF LightBarRecordType;
@@ -276,9 +279,9 @@ VAR
 
   DatFilePath: STRING[40];
   Interrupt14: Pointer;			{ far ptr TO interrupt 14 }
-{$IFDEF MSDOS}
+  {$IFDEF MSDOS}
   Ticks: LongInt ABSOLUTE $0040:$006C;
-{$ENDIF}
+  {$ENDIF}
   IEMSIRec: IEMSIRecord;
   FossilPort: Word;
   SockHandle: STRING;			{ Telnet Handle }
@@ -292,7 +295,7 @@ VAR
 
   DirInfo: SearchRec;
 
-  { LastCallers }
+  { Last Callers }
   LastCallerFile : FILE OF LastCallerRec;
   LastCallers    : LastCallerRec;
 
@@ -323,6 +326,7 @@ VAR
 
   NumArcs: Byte;
 
+  { Multi Node Variables }
   NodeFile: FILE OF NodeRecordType;	{ multi node FILE }
   NodeR: NodeRecordType;			{  }
   NodeChatLastRec: LongInt;			{ last record IN group chat FILE Read }
@@ -331,30 +335,31 @@ VAR
 
   SysOpLogFile,		{ SYSOP.LOG }
   SysOpLogFile1,	{ SLOGXXXX.LOG }
-  TrapFile,			{ TRAP*.MSG }
-  ChatFile: Text;	{ CHAT*.MSG }
+  TrapFile,			{ TRAP#.MSG }
+  ChatFile: Text;	{ CHAT#.MSG }
 
 
   { User Variables }
-  UserFile: FILE OF UserRecordType;	{ User.LST }
-  UserIDXFile: FILE OF UserIDXRec;	{ User.IDX }
-  ThisUser: UserRecordType;			{ User's account records }
+  UserFile: FILE OF UserRecordType;					{ User.LST }
+  UserIDXFile: FILE OF UserIDXRec;					{ User.IDX }
+  ThisUser: UserRecordType;							{ User's account records }
 
   { Color Scheme Variables }
-  SchemeFile: FILE OF SchemeRec; { SCHEME.DAT }
+  SchemeFile: FILE OF SchemeRec;					{ SCHEME.DAT }
   Scheme: SchemeRec;
   NumSchemes: Integer;
 
   { Event Variables }
-  EventFile: FILE OF EventRecordType;
-  MemEventArray: ARRAY [1..MaxEvents] OF ^EventRecordType;
-  Event: EventRecordType;
-  NumEvents: Integer;              { # OF events    }
+  EventFile: FILE OF EventRecordType;				{ }
+  MemEventArray:									{ }
+	ARRAY [1..MaxEvents] OF ^EventRecordType;
+  Event: EventRecordType;							{ }
+  NumEvents: Integer;								{ # OF events    }
 
   { Protocol Variables }
-  ProtocolFile: FILE OF ProtocolRecordType;	{ PROTOCOL.DAT }
-  Protocol: ProtocolRecordType;				{ protocol IN memory }
-  NumProtocols: Integer;					{  }
+  ProtocolFile: FILE OF ProtocolRecordType;			{ PROTOCOL.DAT }
+  Protocol: ProtocolRecordType;						{ protocol IN memory }
+  NumProtocols: Integer;							{  }
 
   { File Variables }
   FileAreaFile: FILE OF FileAreaRecordType; { FBASES.DAT              }
@@ -384,33 +389,33 @@ VAR
   BatchULFile: FILE OF BatchULRecordType;
   BatchULF: FILE;
   BatchUL: BatchULRecordType;
-  NumBatchULFiles: Byte;                     { Number Of Files In Batch UL Queue }
+  NumBatchULFiles: Byte;							{ Number Of Files In Batch UL Queue }
 
   { Message Variables }
-  EmailFile: FILE OF MessageAreaRecordType;
-  MsgAreaFile: FILE OF MessageAreaRecordType; { MBASES.DAT              }
-  MemMsgArea: MessageAreaRecordType;          { MsgArea IN memory            }
-  MsgHdrF: FILE OF MHeaderRec;                { *.HDR                 }
-  MsgTxtF: FILE;                              { *.DAT                 }
+  EmailFile: FILE OF MessageAreaRecordType;		
+  MsgAreaFile: FILE OF MessageAreaRecordType;		{ MBASES.DAT }
+  MemMsgArea: MessageAreaRecordType;				{ MsgArea IN memory }
+  MsgHdrF: FILE OF MHeaderRec;						{ *.HDR }
+  MsgTxtF: FILE;									{ *.DAT }
   LastReadRecord: ScanRec;
-  LastAuthor,                                 { Author # OF the last message     }
-  NumMsgAreas,                                { Max number OF msg bases        }
+  LastAuthor,										{ Author # OF the last message }
+  NumMsgAreas,										{ Max number OF msg bases }
   MsgArea,
   ReadMsgArea,
   LowMsgArea,
   HighMsgArea: Integer;
-  Msg_On: Word;                               { current message being Read }
+  Msg_On: Word;										{ current message being Read }
 
   { Menu Variables }
   MenuFile: FILE OF MenuRec;
   MenuR: MenuRec;
-  MemMenu: MemMenuRec;                             { menu information }
-  MemCmd: MemCmdPointer;                           { Command information }
-  MenuRecNumArray: ARRAY [1..MaxMenus] OF Integer;
+  MemMenu: MemMenuRec;								{ menu information }
+  MemCmd: MemCmdPointer;							{ Command information }
+  MenuRecNumArray: ARRAY [1..MaxMenus] OF Integer;	{ }
   CmdNumArray: ARRAY [1..MaxMenus] OF Byte;
-  MenuStack: ARRAY [1..MaxMenus] OF Byte;          { menu stack }
-  MenuKeys: AStr;                                  { keys TO Abort menu display WITH }
-  NumMenus,
+  MenuStack: ARRAY [1..MaxMenus] OF Byte;			{ menu stack }
+  MenuKeys: AStr;									{ keys TO Abort menu display WITH }
+  NumMenus,											{ }
   NumCmds,
   GlobalCmds,
   MenuStackPtr,
@@ -418,57 +423,57 @@ VAR
   CurMenu,
   CurHelpLevel: Byte;
 
-  Buf: STRING[255];       { macro buffer }
-  MLC: STRING[255];       { multiline FOR chat }
+  Buf: STRING[255];			{ macro buffer }
+  MLC: STRING[255];			{ multiline FOR chat }
 
-  ChatReason,                { last chat reason           }
-  LastLineStr,                   { "last-line" STRING FOR Word-wrapping  }
-  StartDir: AStr;      { Directory BBS was executed from    }
+  ChatReason,				{ last chat reason           }
+  LastLineStr,				{ "last-line" STRING FOR Word-wrapping  }
+  StartDir: AStr;			{ Directory BBS was executed from    }
 
-  TempDir,      { Temporary Directory base name }
-  InResponseTo: STRING[40];  { reason FOR reply           }
+  TempDir,					{ Temporary Directory base name }
+  InResponseTo: STRING[40];	{ reason FOR reply           }
 
-  LastDIRFileName: Str12;          { last filename FOR recno/nrecno    }
+  LastDIRFileName: Str12;	{ last filename FOR recno/nrecno    }
 
-  CurrentColor,            { current ANSI color          }
-  ExiterrorLevel,            { errorLEVEL TO Exit WITH        }
-  TShuttleLogon,      { type OF special Shuttle Logon command }
-  TFilePrompt,       { type OF special FILE Prompt command  }
-  TReadPrompt,       { type OF special Read Prompt command  }
+  CurrentColor,				{ current ANSI color          }
+  ExitErrorLevel,			{ errorLEVEL TO Exit WITH        }
+  TShuttleLogon,			{ type OF special Shuttle Logon command }
+  TFilePrompt,				{ type OF special FILE Prompt command  }
+  TReadPrompt,				{ type OF special Read Prompt command  }
 
-  PublicPostsToday,          { posts made by User this call     }
-  FeedBackPostsToday,        { feedback sent by User this call    }
-  PrivatePostsToday: Byte;   { E-mail sent by User this call     }
+  PublicPostsToday,			{ posts made by User this call     }
+  FeedBackPostsToday,		{ feedback sent by User this call    }
+  PrivatePostsToday: Byte;	{ E-mail sent by User this call     }
 
-  LastDIRRecNum,             { last record # FOR recno/nrecno    }
-  ChatAttempts,            { number chat attempts made by User   }
-  LIL,             { lines on screen since last PauseScr() }
+  LastDIRRecNum,			{ last record # FOR recno/nrecno    }
+  ChatAttempts,				{ number chat attempts made by User   }
+  LIL,						{ lines on screen since last PauseScr() }
 
-  PublicReadThisCall,        { # public messages has Read this call }
+  PublicReadThisCall,		{ # public messages has Read this call }
 
-  UserNum: Integer;       { User's User number                    }
+  UserNum: Integer;			{ User's User number                    }
 
-  Rate: Word;          { cps FOR FILE transfers }
+  Rate: Word;				{ cps FOR FILE transfers }
 
-  NewFileDate,                      { NewScan Pointer date         }
+  NewFileDate,				{ NewScan Pointer date         }
 
-  DownloadsToday,                       { download sent TO User this call       }
-  UploadsToday,                       { uploads sent by User this call        }
-  DownloadKBytesToday,                      { download k by User this call          }
-  UploadKBytesToday,              { upload k by User this call            }
+  DownloadsToday,			{ download sent TO User this call       }
+  UploadsToday,				{ uploads sent by User this call        }
+  DownloadKBytesToday,		{ download k by User this call          }
+  UploadKBytesToday,		{ upload k by User this call            }
 
-  CreditsLastUpdated,   { Time Credits last updated }
-  TimeOn,      { time User logged on          }
+  CreditsLastUpdated,		{ Time Credits last updated }
+  TimeOn,					{ time User logged on          }
   LastBeep,
   LastKeyHit,
-  ChopTime,           { time TO chop off FOR system events  }
-  ExtraTime,          { extra time - given by F7/F8, etc   }
-  CreditTime,          { credit time adjustment }
-  FreeTime: LongInt;       { free time               }
+  ChopTime,					{ time TO chop off FOR system events  }
+  ExtraTime,				{ extra time - given by F7/F8, etc   }
+  CreditTime,				{ credit time adjustment }
+  FreeTime: LongInt;		{ free time               }
 
-  BlankMenuNow,         { is the wfcmenu blanked out? }
+  BlankMenuNow,				{ is the wfcmenu blanked out? }
   Abort,
-  Next,      { global Abort AND Next }
+  Next,						{ global Abort AND Next }
   RQArea,
   FQArea,
   MQArea,
@@ -478,6 +483,7 @@ VAR
 procedure Sound(hz: Word; duration: Word);
 function Ticks: LongInt;
 {$ENDIF}
+FUNCTION NewYN(CONST Q: AStr; YN: Boolean): Boolean; { LeeW: New Y/N Question Prompt }
 FUNCTION GetC(c: Byte): STRING;
 PROCEDURE ShowColors;
 FUNCTION CheckDriveSpace(S,Path: AStr; MinSpace: Integer): Boolean;
@@ -2678,7 +2684,7 @@ BEGIN
     Write(TrapFile,c);
   IF (IOResult <> 0) THEN
   BEGIN
-    SysOpLog('Error writing to trap file.');
+    SysOpLog('^8Error writing to trap file.');
     Trapping := FALSE;
   END;
 END;
@@ -2690,7 +2696,7 @@ BEGIN
   IF (NOT Echo) THEN
     IF (General.LocalSec) AND (c IN [#32..#255]) THEN
     BEGIN
-      s := lRGLNGStr(1,TRUE); {FString.EchoC;}
+      s := lRGLngStr(1,TRUE); { Echo Char }
       c := s[1];
     END;
   IF (c IN [#27,^V,^y]) THEN
@@ -2710,7 +2716,7 @@ BEGIN
 
   IF (NOT Echo) AND (c IN [#32..#255]) THEN
   BEGIN
-    S := lRGLNGStr(1,TRUE); {FString.EchoC;}
+    S := lRGLNGStr(1,TRUE); { Echo Char }
     c := S[1];
   END;
 
@@ -3134,6 +3140,75 @@ BEGIN
     ShowYesNo := 'No';
 END;
 
+FUNCTION NewYN(CONST Q: AStr; YN: Boolean): Boolean; { LeeW: New Yes/No Question Prompt }
+(*
+	Add checking for ANSI, if not use regular PYNQ
+*)
+VAR
+  W: Word; { Keyboard Input }
+  YesY, { X&Y Positions }
+  YesX,
+  NoY,
+  NoX: Integer;
+BEGIN
+  Prt('^0'+Q+' ');
+  YesY := WhereY;
+  YesX := WhereX;
+  IF YN = TRUE THEN 
+	Prt(lRGLngStr(96,TRUE))
+  ELSE
+	Prt(lRGLngStr(95,TRUE));
+  Prt(' ');
+  NoY := WhereY;
+  NoX := WhereX;
+  IF YN = FALSE THEN
+	Prt(lRGLngStr(98,TRUE))
+  ELSE
+	Prt(lRGLngStr(97,TRUE));
+  REPEAT
+	W := GetKey;
+	IF ((W = F_LEFT) AND (YN = FALSE)) OR ((W = F_RIGHT) AND (YN = TRUE)) THEN {LEFT/RIGHT ARROWS}
+	  BEGIN
+		GoToXY(YesX,YesY);
+		IF YN = TRUE THEN
+		  Prt(lRGLngStr(95,TRUE))
+		ELSE
+		  Prt(lRGLngStr(96,TRUE));
+		GoToXY(NoX,NoY);
+		IF YN = TRUE THEN
+		  Prt(lRGLngStr(98,TRUE))
+		ELSE
+		  Prt(lRGLngStr(97,TRUE));
+		YN := NOT YN;
+	  END;
+	IF (W = 89) OR (W = 121) THEN {89/121=Y}
+	  BEGIN
+	    IF YN = FALSE THEN 
+		  BEGIN
+			YN := TRUE;
+			GoToXY(YesX,YesY);
+			Prt(lRGLngStr(96,TRUE));
+			GoToXY(NoX,NoY);
+			Prt(lRGLngStr(97,TRUE));
+		  END;
+		Break;
+	  END;
+	IF (W = 78) OR (W = 110) THEN {78/110=N}
+	  BEGIN
+	    IF YN = TRUE THEN 
+		  BEGIN
+			YN := FALSE;
+			GoToXY(YesX,YesY);
+			Prt(lRGLngStr(95,TRUE));
+			GoToXY(NoX,NoY);
+			Prt(lRGLngStr(98,TRUE));
+		  END;
+		Break;
+	  END;
+  UNTIL (W = 13) OR (HangUp); {13=ENTER}
+  NewYN := YN;
+END;
+
 FUNCTION YN(Len: Byte; DYNY: Boolean): Boolean;
 VAR
   Cmd: Char;
@@ -3144,8 +3219,8 @@ BEGIN
     Prompt(SQOutSp(ShowYesNo(DYNY)));
     REPEAT
       Cmd := UpCase(Char(GetKey));
-    UNTIL (Cmd IN ['Y','N',^M]) OR (HangUp);
-    IF (DYNY) AND (Cmd <> 'N') THEN
+    UNTIL (Cmd IN ['Y','N','X',^M]) OR (HangUp);
+	IF (DYNY) AND (Cmd <> 'N') THEN
       Cmd := 'Y';
     IF (DYNY) AND (Cmd = 'N') THEN
       Prompt(#8#8#8'^1No ')
@@ -3160,9 +3235,9 @@ BEGIN
   END;
 END;
 
-FUNCTION PYNQ(CONST InString: AStr; MaxLen: Byte; DYNY: Boolean): Boolean;
+FUNCTION PYNQ(CONST InString: AStr; MaxLen: Byte; DYNY: Boolean): Boolean; {DYNY: default choice}
 BEGIN
-  UserColor(0); { LeeW: ? }
+  UserColor(0);
   Prompt(InString);
   PYNQ := YN(MaxLen,DYNY);
 END;
@@ -4726,7 +4801,7 @@ BEGIN
                           Add := Conference.Name
                         ELSE
                           Add:= '*None*';
-				(*  'O' : Add := ThisUser.Country; { LeeW: Country } *)
+				  'O' : Add := ThisUser.Country; { LeeW: Country }
                   'R' : Add := FormatNumber(lCredit);
                   'S' : Add := PHours('Always allowed',General.lLowTime,General.HiTime);
                   'T' : Add := LastConf; { Conference Key }
@@ -4787,7 +4862,7 @@ BEGIN
                   'N' : {AOnOff((Sex = 'M'),'Mr.','Ms.');}
                         If (Sex = 'M') Then Add := 'Mr.' Else
                         If (Sex = 'F') Then Add := 'Ms.' Else
-                        If (Sex = 'O') Then Add := '';
+                        If (Sex = 'O') Then Add := 'Mx.';
                 END;
           'H' : CASE UpCase(S[Index + 2]) OF
                   '1' : Add := CTim(General.lLowTime);  (* Verify All CTim *)
@@ -4967,13 +5042,12 @@ BEGIN
                         END;
                   'T' : Add := FormatNumber(TTimeOn);
                   'U' : BEGIN
-				  Assign(USERFile,General.DataPath+'USERs.DAT');
-					Reset(UserFile);
-				  
-				  Add := IntToStr(FileSize(USERFile));
-				  { LeeW: Added +1, doesn't count SysOp } { should count filesize of userdat}
-				  Close(UserFile);
-				  END;
+						  Assign(USERFile,General.DataPath+'USERS.DAT');
+						  Reset(UserFile);
+						  Add := IntToStr(FileSize(USERFile));
+						  { LeeW: Added +1, doesn't count SysOp } { should count filesize of userdat}
+						  Close(UserFile);
+						END;
                 END;
           'U' : CASE UpCase(S[Index + 2]) OF
                   'A' : Add := IntToStr(AgeUser(BirthDate));

@@ -12,7 +12,7 @@ USES
   Common;
 
 PROCEDURE LoadMenu;
-PROCEDURE ShowCmds(MenuOption: Str50);
+(*PROCEDURE ShowCmds(MenuOption: Str50);*)
 FUNCTION OkSecurity(CmdToExec: Byte; VAR CmdNotHid: Boolean): Boolean;
 PROCEDURE GenericMenu(ListType: Byte);
 PROCEDURE ShowThisMenu;
@@ -47,7 +47,7 @@ BEGIN
   IF (NOT FoundMenu) THEN
   BEGIN
     NL;
-    Print('That menu is missing, dropping to fallback ...');
+    Print('^0That menu is missing, dropping to fallback ...');
     SysOpLog('Menu #'+IntToStr(CurMenu)+' is missing - Dropping to FallBack #'+IntToStr(FallBackMenu));
     IF (FallBackMenu > 0) THEN
     BEGIN
@@ -70,9 +70,9 @@ BEGIN
     IF (FallBackMenu = 0) OR (NOT FoundMenu) THEN
     BEGIN
       NL;
-      Print('Emergency System shutdown. Please call back later.');
+      Print('^8Emergency System shutdown. Please call back later.');
       NL;
-      Print('Critical error; hanging up.');
+      Print('^0Critical error; hanging up.');
       IF (FallBackMenu = 0) THEN
         SysOpLog('FallBack menu is set to ZERO - Hung user up.')
       ELSE
@@ -161,7 +161,7 @@ BEGIN
     Inc(NumCmds,GlobalCmds);
   END;
 END;
-
+(*
 PROCEDURE ShowCmds(MenuOption: Str50);
 VAR
   TempStr,
@@ -236,7 +236,7 @@ BEGIN
     MCIAllowed := TRUE;
   END;
 END;
-
+*)
 FUNCTION OkSecurity(CmdToExec: Byte; VAR CmdNotHid: Boolean): Boolean;
 BEGIN
   OkSecurity := FALSE;
@@ -337,8 +337,6 @@ VAR
     IF (ClrScrBefore IN MemMenu.MenuFlags) THEN
     BEGIN
       CLS;
-      NL;
-      NL;
     END;
     IF (NOT (NoMenuTitle IN MemMenu.MenuFlags)) THEN
     BEGIN
@@ -461,7 +459,7 @@ BEGIN
   NumCols := MemMenu.GenCols;
   CASE NumCols OF
     2 : ColSiz := 39;
-    3 : ColSiz := 25;
+    3 : ColSiz := 26; { LeeW: Was '25', Fixed }
     4 : ColSiz := 19;
     5 : ColSiz := 16;
     6 : ColSiz := 12;

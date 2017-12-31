@@ -49,15 +49,14 @@ BEGIN
     IF (Reason <> '') THEN
     BEGIN
       Inc(ChatAttempts);
-      SysOpLog('^4Chat attempt:');
-      SL1(Reason);
+      SysOpLog('^0Chat attempt: '+Reason);
+      (*SL1(Reason);*)
       IF (NOT SysOpAvailable) AND AACS(General.OverRideChat) THEN
         PrintF('CHATOVR');
       IF (SysOpAvailable) OR (AACS(General.OverRideChat) AND PYNQ(^M^J'SysOp is not available. Override? ',0,FALSE)) THEN
       BEGIN
         lStatus_Screen(100,'Press [SPACE] to chat or [ENTER] for silence.',FALSE,Reason);
-        { Print(FString.ChatCall1); }
-        lRGLngStr(14,FALSE);
+        lRGLngStr(14,FALSE); { Print(FString.ChatCall1); }
         Counter := 0;
         Abort := FALSE;
         NL;
@@ -66,8 +65,7 @@ BEGIN
           WKey;
           IF (OutCom) THEN
             Com_Send(^G);
-          { Prompt(FString.ChatCall2); }
-          lRGLngStr(15,FALSE);
+          lRGLngStr(15,FALSE); { Prompt(FString.ChatCall2); }
           IF (OutCom) THEN
             Com_Send(^G);
           IF (ShutUpChatCall) THEN

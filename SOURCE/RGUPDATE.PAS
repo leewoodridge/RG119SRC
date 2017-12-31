@@ -323,6 +323,7 @@ OldUserRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
     AR: ARFlagSet;                          { AR Flags }
     Flags: FlagSet;                         { Flags }
     SFlags: StatusFlagSet;                  { Status Flags }
+	Country: STRING[40];
   END;
 
 (* +---------------------------------------------------+ 
@@ -644,7 +645,7 @@ BEGIN
         Point := OldGeneral.AKA[Counter].Point;
       END;
 
-	FOR Counter := 1 TO 27 DO
+	FOR Counter := 1 TO 30 DO
       NewUserToggles[Counter] := OldGeneral.NewUserToggles[Counter];
 
     FOR Counter := 0 TO 9 DO
@@ -686,7 +687,7 @@ VAR
   User: UserRecordType;
   Counter,
   Counter1: Integer;
-(*Country: STRING[40]; { LeeW: Added }*)
+  PH: STRING[13];
 BEGIN
   Write('Converting "USERS.DAT" file ... ');
   Write('[');
@@ -695,8 +696,6 @@ BEGIN
   Assign(UserFile,OldGeneral.DataPath+'USERS.NEW');
   ReWrite(UserFile);
   Counter := 0;
-(*  CounterA := 0;
-CounterB := 0; *)
   WHILE (Counter <= (FileSize(OldUserFile) - 1)) DO
   BEGIN
     Seek(OldUserFile,Counter);
@@ -714,7 +713,7 @@ CounterB := 0; *)
     CityState := OldUser.CityState;
     CallerID := OldUser.CallerID;
     ZipCode := OldUser.ZipCode;
-    PH := OldUser.PH;
+    PH := '1234567890123';
     ForgotPWAnswer := OldUser.ForgotPWAnswer;
     FOR Counter1 := 1 TO 3 DO
 	  UsrDefStr[Counter1] := OldUser.UsrDefStr[Counter1];
@@ -870,8 +869,7 @@ CounterB := 0; *)
     IF (Alert IN OldUser.SFlags) THEN
       Include(SFlags,Alert);
 	
-	Country := 'Country';
-	{FillChar(Country,SizeOf(Country),0);}
+	Country := OldUser.Country;
 	
 (* +---------------------------------------------------+ 
    |             END OF NEW USERS.DAT                  |

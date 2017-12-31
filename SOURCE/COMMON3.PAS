@@ -1,10 +1,6 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S-,V-,X-}
 
-UNIT Common3;
+UNIT Common3; { INPUT }
 
 INTERFACE
 
@@ -230,7 +226,8 @@ BEGIN
     BEGIN
       NL;
       Print('^8ERROR: Valid range is between '+IntToStr(LowNum)+' and '+IntToStr(HighNum)+'!^1'); { LeeW: Word this better }
-      PauseScr(FALSE);
+	  IF (LowNum >= 1) THEN
+		I := (LowNum - 1); { set b to 1 less than min so we can detect if input failed }
     END;
   END;
   IF (SaveI <> I) THEN
@@ -268,7 +265,9 @@ BEGIN
     BEGIN
       NL;
       Print('^8ERROR: Valid range is between '+IntToStr(LowNum)+' and '+IntToStr(HighNum)+'!^0');
-      PauseScr(FALSE);
+	  NL;
+	  IF (LowNum >= 1) THEN
+		B := (LowNum - 1); { set b to 1 less than min so we can detect if input failed }
     END;
   END;
   IF (SaveB <> B) THEN

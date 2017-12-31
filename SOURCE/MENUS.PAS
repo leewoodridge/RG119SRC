@@ -1,10 +1,5 @@
 {$A+,B-,D+,E-,F+,I-,L+,N-,O-,R-,S+,V-}
 
-(*
-	add sysop cmd to go to file config menu for fileop and msg config menu for msg op then put in each menu
-	
-*)
-
 UNIT Menus;
 
 INTERFACE

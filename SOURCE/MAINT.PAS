@@ -312,9 +312,11 @@ BEGIN
     Close(SysOpLogFile1);
   END;
 
-  TempStr := '^3'+IntToStr(General.CallerNum)+'^4 -- ^0'+Caps(ThisUser.Name)+'^4 -- ^3'+'Today '+IntToStr(ThisUser.OnToday);
+  (*TempStr := ''+IntToStr(General.CallerNum)+' -- '+Caps(ThisUser.Name)+' -- '+'Today '+IntToStr(ThisUser.OnToday);*)
+  TempStr := '^0Caller Num: ^1'+IntToStr(General.CallerNum)+' ^4| ^0User: ^1'+Caps(ThisUser.Name)+
+	' ^0(Call # ^1'+IntToStr(ThisUser.OnToday)+'^0)';
   IF (Trapping) THEN
-    TempStr := TempStr + '^0*';
+    TempStr := TempStr + ' ^8[TRAPPING]^0';
   SL1(TempStr);
   SaveGeneral(FALSE);
   LastError := IOResult;
@@ -645,14 +647,14 @@ BEGIN
       SaveURec(ThisUser,UserNum);
 
     IF (HungUp) THEN
-      SL1('^8 Hung Up ');
+      SL1('^0 Hung Up ');
 
-    SL1('^4Read: ^3'+IntToStr(PublicReadThisCall)+'^4 / Time on: ^3'+IntToStr(TotTimeOn));
+    SL1('^0Read: ^1'+IntToStr(PublicReadThisCall)+'^0 / Time on: ^1'+IntToStr(TotTimeOn)); { call stats }
 
   END;
   LastError := IOResult;
 
-  SL1('^3Logoff node '+IntToStr(ThisNode)+' ^5'+'['+Dat+']');
+  SL1('^0Logoff node ^1'+IntToStr(ThisNode)+' '+'['+Dat+']');
 
   Assign(HistoryFile,General.DataPath+'HISTORY.DAT');
   Reset(HistoryFile);

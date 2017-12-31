@@ -169,7 +169,7 @@ BEGIN
       IF (RecNum1 = 1) THEN
         Prompt('^0Available Archive Formats: ')
       ELSE
-        Prompt('^0,');
+        Prompt('^0, ');
       Prompt('^1'+General.FileArcInfo[RecNum].Ext+'^0');
     END;
     Inc(RecNum);

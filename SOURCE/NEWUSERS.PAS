@@ -52,17 +52,11 @@ BEGIN
     NewUserPassword := '';
     WHILE ((NewUserPassword <> General.NewUserPW) AND (PasswordAttemps < General.MaxLogonTries) AND (NOT HangUp)) DO
     BEGIN
-      (*
-      Prt(FString.NewUserPassword);
-      *)
       RGMainStr(10,FALSE); { New User Password }
       GetPassword(NewUserPassword,20);
       IF ((NewUserPassword <> '') AND (General.NewUserPW <> NewUserPassword)) THEN
       BEGIN
-        (*
-        Print('Invalid password, keep trying ...');
-        *)
-        RGNoteStr(38,FALSE);
+        RGNoteStr(38,FALSE);(*        Print('Invalid password, keep trying ...');        *)
         SL1('* Invalid new user password: '+NewUserPassword);
         Inc(PasswordAttemps);
       END;
@@ -71,10 +65,7 @@ BEGIN
     BEGIN
       PrintF('NUPWFAIL');
       IF (NoFile) THEN
-        (*
-        Print('You have exceeded the maximum new user logon attempts, hanging up ...');
-        *)
-        RGNoteStr(39,FALSE);
+        RGNoteStr(39,FALSE);(*Print('You have exceeded the maximum new user logon attempts, hanging up ...*)
       SL1('* Maximum new user logon attempts exceeded - hung user up.');
       HangUp := TRUE;
     END;
@@ -86,7 +77,7 @@ BEGIN
     Counter := 1;
     WHILE (Counter <= 23) AND (NOT HangUp) DO
     BEGIN
-      IF (General.NewUserToggles[Counter] = True) THEN
+      IF (General.NewUserToggles[Counter] = TRUE) THEN
       BEGIN
         Update_Screen;
         CStuff(Counter,1,ThisUser);
@@ -129,10 +120,7 @@ BEGIN
   END;
   IF (NOT HangUp) THEN
   BEGIN
-    (*
-    Prompt('Saving your information ... ');
-    *)
-    RGNoteStr(40,FALSE);
+    RGNoteStr(40,FALSE);(*    Prompt('Saving your information ... ');    *)
     SysOpLog('Saving new user information ...');
     Counter1 := 0;
     Counter := 1;
@@ -173,10 +161,7 @@ BEGIN
     InsertIndex(ThisUser.Realname,UserNum,TRUE,FALSE);
     Inc(lTodayNumUsers);
     SaveGeneral(TRUE);
-    (*
-    Print('^3Saved.');
-    *)
-    RGNoteStr(41,FALSE);
+    RGNoteStr(41,FALSE);(*    Print('^3Saved.');    *)
     SysOpLog('Saved as user #'+IntToStr(UserNum));
     UserOn := TRUE;
     WasNewUser := TRUE;
@@ -201,10 +186,7 @@ BEGIN
     BEGIN
       PrintF('NEWAPP');
       IF (NoFile) THEN
-        (*
-        Print('You must now send a new user application letter to the SysOp.');
-        *)
-        RGNoteStr(42,FALSE);
+        RGNoteStr(42,FALSE);(*Print('You must now send a new user application letter to the SysOp.');*)
       InResponseTo := '\'+#1+RGNoteStr(43,TRUE); { 'New User Application' }
       MHeader.Status := [];
       SeMail(TempNewApp,MHeader);
@@ -256,10 +238,7 @@ BEGIN
   BEGIN
     PrintF('NONEWUSR');
     IF (NoFile) THEN
-      (*
-      Print('This BBS is currently not accepting new users, hanging up ...');
-      *)
-      RGNoteStr(32,FALSE);
+      RGNoteStr(32,FALSE);(*Print('This BBS is currently not accepting new users, hanging up ...'); *)
     SL1('* Attempted logon when BBS closed to new users - hung user up.');
     HangUp := TRUE;
   END

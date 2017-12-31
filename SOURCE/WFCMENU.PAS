@@ -1,7 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
 
 UNIT WFCMenu;
@@ -1062,7 +1058,12 @@ BEGIN
                   Write('Talking To Modem ...');
                   RedrawWFC := FALSE;
                 END;
-
+		  '&' : BEGIN { LeeW: TESTING!!!!!!!!!!!!!!!!!!!!!!!! }
+				  cls;
+				  Print('starts out true');
+				  IF NewYN('Test Question?', TRUE) THEN print('It`s true!') else print('It`s NOT True!');
+				  PauseScr(FALSE);
+				END;
           'A' : IF (NOT LocalIOOnly) THEN
                   CheckForConnection := TRUE
                 ELSE

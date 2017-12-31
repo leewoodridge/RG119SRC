@@ -1,7 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$A+,B-,D-,E-,F+,I-,L-,N-,O+,R-,S+,V-}
 
 UNIT TimeFunc;
@@ -34,6 +30,7 @@ FUNCTION GetPackDateTime: LongInt;
 FUNCTION DoorToDate8(CONST SDate: Str10): Str8;
 FUNCTION PD2Time24(CONST PD: LongInt): Str5;
 FUNCTION ToDate8(CONST SDate: Str10): Str8;
+FUNCTION ToDate82(CONST SDate: Str10): String; {LeeW: Returns "Jan 01 2001" WORKING ON IT}
 FUNCTION PDToDateTime(VAR PDT: LongInt; CONST DOW: Byte): STRING;
 FUNCTION PD2Date(CONST PD: LongInt): STR10;
 FUNCTION Date2PD(CONST SDate: Str10): LongInt;
@@ -259,6 +256,15 @@ BEGIN
     ToDate8 := SDate
   ELSE
     ToDate8 := Copy(SDate,1,6)+Copy(SDate,9,2);
+END;
+
+FUNCTION ToDate82(CONST SDate: Str10): String; { LeeW: WORKING!!!! }
+BEGIN
+    ToDate82 := Copy(MonthString[StrToInt(Copy(SDate,1,2))],1,3)+' '+
+				Copy(SDate,4,2)+' '+
+				Copy(SDate,7,4);
+  (*ELSE
+  ToDate8 := Copy(SDate,1,6)+Copy(SDate,9,2);*)
 END;
 
 (* Done - Lee Palmer 11/23/07 *)

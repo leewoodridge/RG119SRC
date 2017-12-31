@@ -48,8 +48,8 @@ PROCEDURE NewUserTogglesConfiguration;
 				   '^0(^1S^0) Screen Pause     : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[18]),3));
 		  PrintACR('^0(^1F^0) Zip Code         : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[6]),3)+'   '+
 				   '^0(^1T^0) Hotkeys          : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[19]),3));
-		  PrintACR('^0(^1G^0) Phone Number     : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[7]),3)+'   '+
-				   '^0(^1U^0) QWK              : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[20]),3));
+		  PrintACR('^0(^1G^0) Phone Number     : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[7]),3)+'   '(*+
+				   '^0(^1U^0) UNUSED           : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[20]),3)*));
 		  PrintACR('^0(^1H^0) Birthdate        : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[8]),3)+'   '+
 				   '^0(^1V^0) Expert Mode      : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[21]),3));
 		  PrintACR('^0(^1I^0) Gender Identity  : ^1'+PadLeftStr(ShowYesNo(NewUserToggles[9]),3)+'   '+
@@ -83,11 +83,29 @@ PROCEDURE NewUserTogglesConfiguration;
 				  IF NewUserToggles[02] = False THEN
 					AllowAlias := True;
 				END;
-		  'C' : NewUserToggles[03] := NOT NewUserToggles[03];
-		  'D' : NewUserToggles[04] := NOT NewUserToggles[04];
+		  'C' : BEGIN
+				  NewUserToggles[03] := NOT NewUserToggles[03];
+				  IF NewUserToggles[03] = FALSE THEN
+					BEGIN
+					  { disable things that req country info }
+					  NewUserToggles[04] := FALSE;
+					  NewUserToggles[06] := FALSE;
+					  NewUserToggles[07] := FALSE;
+					END;
+				END;
+		  'D' : BEGIN
+				  NewUserToggles[04] := NOT NewUserToggles[04];
+				  IF NewUserToggles[04] = TRUE THEN 
+					NewUserToggles[03] := TRUE; { enable country }
+				END;
 		  'E' : NewUserToggles[05] := NOT NewUserToggles[05];
-		  'F' : NewUserToggles[06] := NOT NewUserToggles[06];
+		  'F' : BEGIN
+				  NewUserToggles[06] := NOT NewUserToggles[06];
+				  IF NewUserToggles[06] = TRUE THEN
+					NewUserToggles[03] := TRUE; { enable country }
+				END;
 		  'G' : BEGIN
+				  { standardize }
 				  IF (NewUserToggles[7]) THEN
 					BEGIN
 					  NewUserToggles[7] := False;
@@ -97,6 +115,9 @@ PROCEDURE NewUserTogglesConfiguration;
 					  General.PhonePW := False;
 					END
 				  ELSE NewUserToggles[7] := True;
+				  
+				  IF NewUserToggles[07] = TRUE THEN
+					NewUserToggles[03] := TRUE; { enable country }
 				END;
 		  'H' : NewUserToggles[08] := NOT NewUserToggles[08];
 		  'I' : NewUserToggles[09] := NOT NewUserToggles[09];
