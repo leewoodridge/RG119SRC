@@ -39,6 +39,23 @@ Updates
 - Added user 'Country' field
 - Country is selected from list of COUNTRY.TXT file
 - User editor redesign
+- Added Function: 'NewYN('Question String',TRUE OR FALSE FOR DEFAULT ANSWER);'. Prompt for yes/no questions, lightbar, arrowkey+y/n support and strings are in rglng
+- user editor : Added option to clear all fields (including country)
+- user editor : Added medium list mode
+- MCI: Added %CO for Country
+- Removed extra linefeed from top of generic menus
+- Most new user question strings are now in the lang file
+- QWK settings no longer part of new user questions
+- Fixed inconsistent pausing when changing user settings
+- New User App: Won't prompt on color scheme if theres only 1
+- New User App: color scheme prompt no longer adding extra linefeed
+- New User App: color scheme prompt skips if term emu doesn't support color
+- new user app: input validation for prompts
+- new user app: address input validation checks for 1 letter, 1 number, and 1 space
+- new user app: screen size and color scheme prompt to use default on invalid input
+- InputByte, InputInteger - if input is invalid, returns 1 less than minimum unless minimum is 0
+- new user app questions have 5-try limit now before disconnect
+- change password can now be aborted
 
 Renegade v1.19
 ==============
