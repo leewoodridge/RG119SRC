@@ -42,7 +42,7 @@ USES
   Dos,
   Crt,
   ArcView,
-  Common5,
+{  Common5,}
   File0,
   File1,
   File10,

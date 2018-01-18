@@ -22,8 +22,7 @@ PROCEDURE BatchDLULInfo;
 IMPLEMENTATION
 
 USES
-  Dos,
-  Common5,
+  DOS,
   ExecBat,
   File0,
   File1,

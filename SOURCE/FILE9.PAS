@@ -20,8 +20,7 @@ PROCEDURE SetFileAreaNewScanDate;
 IMPLEMENTATION
 
 USES
-  Dos,
-  Common5,
+  DOS,
   File0,
   File1,
   TimeFunc;

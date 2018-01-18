@@ -15,9 +15,8 @@ PROCEDURE MoveMsg(MsgNum: Word);
 IMPLEMENTATION
 
 USES
-  Dos,
+  DOS,
   Common,
-  Common5,
   Mail0,
   Mail1,
   Mail4,

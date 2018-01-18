@@ -16,12 +16,11 @@ PROCEDURE RGQuote(MenuOption: Str50);
 IMPLEMENTATION
 
 USES
-  Dos,
-  Common5,
+  CRT,
+  DOS,
   Mail1,
   ShortMsg,
-  TimeFunc,
-  CRT;
+  TimeFunc;
 
 TYPE
   LastCallerPtrType = ^LastCallerRec;

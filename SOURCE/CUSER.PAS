@@ -6,9 +6,11 @@ not all procs have input validation/error checking or output sysop log entry
 
 blank country = " ", this is set up to check for ""
 
-add try to all procs and disconn if too many, use same as max logon
-
 if no color, dont do color scheme?? -- depends if we plan to put more than colors in scheme data
+
+if no input is needed, move up one char and exit. ie: color scheme for non color emu
+
+
 *)
 UNIT CUser;
 
@@ -16,7 +18,7 @@ INTERFACE
 
 USES
   Common,
-  Common3;
+  CRT;
   
 PROCEDURE CStuff(Which,How: Byte; VAR User: UserRecordType);
 PROCEDURE UpString (VAR S : String); 
@@ -46,24 +48,29 @@ FUNCTION SearchFile (VAR Name, Find : String) : String; { LeeW: Search a text fi
 VAR
   FS : Text; 
   RD : String; { Matched string }
-  Line : LongInt; 
+  Line : LongInt;
+  X,
+  Y: Integer;
 BEGIN
   Line := 0; 
   SearchFile := ''; 
   UpString(Find); 
   Assign(FS,Name); 
   Reset(FS); 
+  X := WhereX;
+  Y := WhereY;
     REPEAT
       ReadLn(FS,RD); 
       Inc(Line);
       IF Pos(Find,AllCaps(RD))>0 THEN
 		BEGIN
+		  GoToXY(X,Y); { LeeW: XY positioning to stop from writing a million lines } {ANSIG?}
+		  {need to clear prev text (dobackspace?) }
 		  IF PYNQ('"'+RD+'" Is This Correct? ',0,FALSE) THEN
-		  { LeeW: ^ XY positioning to stop from writing a million lines? }
 		    BEGIN
 			  SearchFile := RD;
 			  Close(FS);
-			  Exit;
+			  EXIT;
 			END;
 		END;
     UNTIL EOF(FS) OR (HangUp);
@@ -74,7 +81,7 @@ END;
   
 PROCEDURE CStuff(Which,How: Byte; VAR User: UserRecordType);
 VAR
-  Try: Byte;
+  Tries: Byte;
   Done,
   Done1: Boolean;
   
@@ -268,59 +275,52 @@ VAR
 	TempPageLen: Byte;
 	DoneLine,
 	DonePage: Boolean;
+	Changed,
+	Invalid: Boolean;
   BEGIN
 	TempLineLen := User.LineLen;
 	TempPageLen := User.PageLen;
 	REPEAT
-	  BEGIN
+	  BEGIN { Screen Width }
+        (*Changed := FALSE;
+		Invalid := FALSE;*)
+		DoneLine := FALSE;
+	    NewInputByte(lRGLngStr(119,TRUE){ "How many characters wide is your screen?" },
+			TempLineLen,[NumbersOnly,InterActiveEdit],32,132,80,TRUE,Changed,Invalid);
+		(*
 		InputByteWOC(lRGLngStr(119,TRUE){ "How many characters wide is your screen?" },
 		TempLineLen,[NumbersOnly,InterActiveEdit],32,132);
-		IF (TempLineLen >= 32) AND (TempLineLen <= 132) THEN
+		*)
+		IF (TempLineLen >= 32) AND (TempLineLen <= 132) AND NOT (Invalid) THEN
 		  BEGIN
-			IF (How = 2) AND (TempLineLen <> User.LineLen) THEN
+			IF (How = 2) AND {(TempLineLen <> User.LineLen)} (Changed) THEN
 			  SysOpLog('Changed screen width from '+IntToStr(User.LineLen)+' to '+IntToStr(TempLineLen));
 			User.LineLen := TempLineLen;
 			DoneLine := TRUE;
-		  END
-		ELSE IF (TempLineLen = 31) THEN { If 1 less than minimum, input was invalid }
-		  BEGIN
-			IF PYNQ('^0Use the default of 80? ',0,TRUE) THEN
-			  BEGIN
-				User.LineLen := 80;
-				DoneLine := TRUE;
-			  END
-			ELSE
-			  BEGIN
-				TempLineLen := 80; { Reset to default }
-			  END;
-			NL;
 		  END;
+		NL;
 	  END;
 	UNTIL (DoneLine = TRUE) OR (How = 2) OR (How = 3);
 	REPEAT
-	  BEGIN
+	  BEGIN { Screen Length }
+        (*Changed := FALSE;
+		Invalid := FALSE;*)
+	    DonePage := FALSE;
+		NewInputByte(lRGLngStr(120,TRUE){ "How many characters tall is your screen?" },
+			TempPageLen,[NumbersOnly,InterActiveEdit],4,50,25,TRUE,Changed,Invalid);
+		(*
 		InputByteWOC(lRGLngStr(120,TRUE){ "How many characters tall is your screen?" },
 		TempPageLen,[NumbersOnly,InterActiveEdit],4,50);
-		IF (TempPageLen >= 4) AND (TempPageLen <= 50) THEN
+		*)
+		IF (TempPageLen >= 4) AND (TempPageLen <= 50) AND NOT (Invalid) THEN
 		  BEGIN
-			IF (How = 2) AND (TempPageLen <> User.PageLen) THEN
+			IF (How = 2) AND {(TempPageLen <> User.PageLen)} (Changed) THEN
 			  SysOpLog('Changed screen length from '+IntToStr(User.PageLen)+' to '+IntToStr(TempPageLen));
 			User.PageLen := TempPageLen;
 			DonePage := TRUE;
-		  END
-		ELSE IF (TempPageLen = 3) THEN { If 1 less than minimum, input was invalid }
-		  BEGIN
-			IF PYNQ('^0Use the default of 24? ',0,TRUE) THEN
-			  BEGIN
-				User.PageLen := 24;
-				DonePage := TRUE;
-			  END
-			ELSE
-			  BEGIN
-				TempPageLen := 24; { Reset to default }
-				NL;
-			  END;
 		  END;
+		IF (Invalid) THEN
+		  NL;
 	  END;
 	UNTIL (DonePage = TRUE) OR (How = 2) OR (How = 3);
 	IF (DoneLine = TRUE) AND (DonePage = TRUE) THEN
@@ -409,14 +409,9 @@ VAR
 	  BEGIN
 		NL;
 		lRGLngStr(106,FALSE); { "Invalid name" }
-		{Inc(Try);}
 		sl1('Unacceptable Name : '+s);
 	  END;
-	  {
-	IF (Try >= 3) AND (How = 1) THEN
-      HangUp := TRUE;
-	  }
-    IF ((Done) AND (How = 1) AND (NOT General.AllowAlias)) THEN {done is nothing!!!!!!!!!!!!!!!!!!!!!!!!!}
+    IF ((How = 1) AND (NOT General.AllowAlias)) THEN { This was checking for 'done', which was unused - LeeW }
       User.RealName := Caps(s);
     IF (Done1) THEN
 	  BEGIN
@@ -1251,13 +1246,13 @@ VAR
   { // }
   
 BEGIN
-  Try := 0;
-  Done1 := False;
+  Tries := 0;
+  Done1 := FALSE;
   CASE How OF
     1 : REPEAT { 1 = New User Application }
           WW(Which);
-		  Inc(Try);
-		  IF (Try >= 5) THEN { make this custo }
+		  Inc(Tries);
+		  IF (Tries >= 5) THEN { make this custo }
 		    BEGIN
 			  NL;
 			  Print('^8Exceeded maximum number of retries. Disconnecting.'); { this too }
@@ -1272,6 +1267,6 @@ BEGIN
 		  PauseScr(FALSE);
         END;
   END;
-  END;
+END;
 
 END.

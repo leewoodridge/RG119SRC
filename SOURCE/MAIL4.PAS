@@ -18,8 +18,7 @@ PROCEDURE ToggleMsgAreaScanFlags;
 IMPLEMENTATION
 
 USES
-  Crt,
-  Common5,
+  CRT,
   Mail0;
 
 PROCEDURE MessageAreaList(VAR MArea,NumMAreas: Integer; AdjPageLen: Byte; ShowScan: Boolean);

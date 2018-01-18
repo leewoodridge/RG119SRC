@@ -21,7 +21,8 @@ IMPLEMENTATION
 USES
   Dos,
   ArcView,
-  Common5,
+{Common3,
+Common5,}
   File0,
   File1,
   File2,

@@ -18,8 +18,7 @@ PROCEDURE Anonymous(Offline: Boolean; VAR MHeader: MHeaderRec);
 IMPLEMENTATION
 
 USES
-  Crt,
-  Common5,
+  CRT,
   File8,
   File0,
   Mail0,

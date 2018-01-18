@@ -1060,9 +1060,13 @@ BEGIN
                 END;
 		  '&' : BEGIN { LeeW: TESTING!!!!!!!!!!!!!!!!!!!!!!!! }
 				  cls;
-				  Print('starts out true');
+				  
+				  {IF TypeOf(var inbox) = typeof(var wantout) Then print('true');}
+				  
+				  
+				  {Print('starts out true');
 				  IF NewYN('Test Question?', TRUE) THEN print('It`s true!') else print('It`s NOT True!');
-				  PauseScr(FALSE);
+				  PauseScr(FALSE);}
 				END;
           'A' : IF (NOT LocalIOOnly) THEN
                   CheckForConnection := TRUE

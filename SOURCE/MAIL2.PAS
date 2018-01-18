@@ -20,8 +20,7 @@ FUNCTION FirstNew: Word;
 IMPLEMENTATION
 
 USES
-  Dos,
-  Common5,
+  DOS,
   Mail0,
   Mail1,
   EMail,

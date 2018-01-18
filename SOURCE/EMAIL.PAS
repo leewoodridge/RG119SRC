@@ -17,8 +17,7 @@ PROCEDURE ShowEmail;
 IMPLEMENTATION
 
 USES
-  Dos,
-  Common5,
+  DOS,
   File6,
   Mail0,
   Mail1,

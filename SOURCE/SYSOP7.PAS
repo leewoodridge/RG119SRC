@@ -24,7 +24,6 @@ PROCEDURE MenuEditor;
 IMPLEMENTATION
 
 USES
-  Common5,
   Menus2,
   SysOp7M;
 

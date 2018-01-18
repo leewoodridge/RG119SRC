@@ -106,10 +106,7 @@ BEGIN
   FillChar(IEMSIRec,SizeOf(IEMSIRec),0);
   IF (ComPortSpeed = 0) OR (NOT General.UseIEMSI) THEN
     Exit;
-  (* Should this be Prompt ???
-  Write('Attempting IEMSI negotiation ... ');
-  *)
-  Write(RGNoteStr(21,TRUE));
+  Write(RGNoteStr(21,TRUE)); {Attempting IEMSI negotiation ...} (* Should this be Prompt ???  *)
   FillChar(Buffer,SizeOf(Buffer),0);
   T1 := Timer;
   T2 := Timer;
@@ -213,18 +210,12 @@ BEGIN
   UNTIL (Done) OR (HangUp);
   IF (Success) THEN
   BEGIN
-    (* Should this be print ???
-    WriteLn('success.');
-    *)
-    Writeln(RGNOteStr(22,TRUE));
+    Writeln(RGNOteStr(22,TRUE)); {success} (* Should this be print ??? *)
     SL1('IEMSI negotiation Suceeded.');
   END
   ELSE
   BEGIN
-    (* Should this be print ???
-    WriteLn('failure.');
-    *)
-    WriteLn(RGNoteStr(23,TRUE));
+    WriteLn(RGNoteStr(23,TRUE)); {fail} (* Should this be print ???*)
     SL1('IEMSI negotiation failed.');
   END;
   NextItemPointer := 1;
@@ -263,7 +254,7 @@ VAR
     y := 0;
     WHILE (L > Timer) AND (C <> ^[) AND (NOT HangUp) DO
       IF (NOT Empty) THEN
-        C := Com_Recv;        { must be low level to avoid ansi-eater }
+        C := Com_Recv; { must be low level to avoid ansi-eater }
       IF (C = ^[) THEN
       BEGIN
         L := (Timer + 1);
@@ -800,20 +791,14 @@ BEGIN
     BEGIN
       IF (General.MinBaudOverride <> '') THEN
       BEGIN
-        (*
-        Prt('Baud rate override password: ');
-        *)
-        RGMainStr(0,FALSE);
+        RGMainStr(0,FALSE);(*Prt('Baud rate override password: ');*)
         GetPassword(OverridePW,20);
       END;
       IF (General.MinBaudOverride = '') OR (OverRidePW <> General.MinBaudOverride) THEN
       BEGIN
         PrintF('NOBAUD.ASC');
         IF (NoFile) THEN
-          RGNoteStr(3,FALSE);
-          (*
-          Print('You must be using at least '+IntToStr(General.MinimumBaud)+' baud to call this BBS.');
-          *)
+          RGNoteStr(3,FALSE); (*Print('You must be using at least X baud to call this BBS.');*)
         HangUp := TRUE;
         Exit;
       END;
@@ -822,21 +807,14 @@ BEGIN
     BEGIN
       IF (General.MinBaudOverride <> '') THEN
       BEGIN
-        (*
-        Prt('Baud rate override password: ');
-        *)
-        RGMainStr(0,FALSE);
+        RGMainStr(0,FALSE); (*Prt('Baud rate override password: ');*)
         GetPassword(OverridePW,20);
       END;
       IF (General.MinBaudOverride = '') OR (OverridePW <> General.MinBaudOverride) THEN
       BEGIN
         PrintF('NOBAUDH.ASC');
         IF (NoFile) THEN
-          (*
-          Print('Hours for those using less than '+IntToStr(General.MinimumBaud)+' baud are from '+
-               Ctim(General.MinBaudLowTime)+' to '+Ctim(General.MinBaudHiTime));
-          *)
-          RGNoteStr(4,FALSE);
+          RGNoteStr(4,FALSE); (*Hours for those using less than X baud are from X to X*)
         HangUp := TRUE;
         Exit;
       END;
@@ -848,12 +826,7 @@ BEGIN
         BEGIN
           PrintF('YESBAUDH.ASC');
           IF (NoFile) THEN
-            (*
-            Print('NOTE: Callers at less than '+IntToStr(General.MinimumBaud)+' baud are');
-            Print('restricted to the following hours ONLY:');
-            Print('  '+Ctim(General.MinBaudLowTime)+' to '+Ctim(General.MinBaudHiTime));
-            *)
-            RGNoteStr(5,FALSE);
+            RGNoteStr(5,FALSE); {low baud hours}
         END;
     END;
   END;
@@ -868,12 +841,12 @@ BEGIN
         EventNum := I;
       END;
 
-  Check_Ansi;
+  Check_ANSI;
   IEMSI;
   GotName := FALSE;
   IF ((General.ShuttleLog) AND (NOT FastLogon) AND (NOT HangUp)) THEN
     DoShuttle;
-  SetC(0);
+  {SetC(0);}
   ClrScr;
 (*
   PrintACR('^2GeneralCallerNum: '+IntToStr(General.CallerNum));
@@ -882,13 +855,12 @@ BEGIN
 *)
   Print(Centre(VerLine(1))); { Version & Copyright Information }
   Print(Centre(VerLine(2)));
-{ Print(Centre(VerLine(3))); }
   PrintF('PRELOGON');
   IF (ACSUser) THEN
   BEGIN
     PrintF('ACSEA'+IntToStr(EventNum));
     IF (NoFile) THEN
-      RGNoteStr(6,FALSE);(*Print('Restricted: Only certain users allowed online at this time.');*)
+      RGNoteStr(6,FALSE); { "Restricted: Only certain users allowed online at this time." }
   END;
   IF (NOT GotName) THEN
     TryIEMSILogon;
@@ -909,7 +881,7 @@ BEGIN
         IF (FString.Lprompt <> '') THEN
           Prompt(FString.Lprompt);
         *)
-        RGMainStr(1,FALSE);
+        RGMainStr(1,FALSE); { "Login Prompt" }
         FindUser(UserNum);
         Inc(TTimes);
         IF (ACSUser) AND (UserNum = -1) THEN
@@ -920,17 +892,14 @@ BEGIN
             Print('This time window allows certain other users to get online.');
             Print('Please call back later, after it has ended.');
             *)
-            RGNoteStr(7,FALSE);
+            RGNoteStr(7,FALSE); 
           HangUp := TRUE;
         END;
         IF (NOT HangUp) AND (UserNum = 0) THEN
         BEGIN
           PrintF('LOGERR');
           IF (NoFile) THEN
-            (*
-            Print('Name not found in user list.');
-            *)
-            RGNoteStr(8,FALSE);
+            RGNoteStr(8,FALSE); (*Print('Name not found in user list.');*)
           IF NOT (General.ShuttleLog) AND (NOT General.ClosedSystem) THEN
             IF PYNQ(RGMainStr(2,TRUE){FString.LogonAsNew},0,FALSE) THEN
               UserNum := -1;
@@ -1066,10 +1035,7 @@ BEGIN
     BEGIN
       PrintF('NOCREDTS');
       IF (NoFile) THEN
-        (*
-        Print('You have insufficient credits for online time.');
-        *)
-        RGNoteStr(14,FALSE);
+        RGNoteStr(14,FALSE); (*Print('You have insufficient credits for online time.');*)
       SysOpLog(ThisUser.Name+': insufficient credits for logon.');
       IF (General.CreditFreeTime < 1) THEN
         HangUp := TRUE
@@ -1084,10 +1050,7 @@ BEGIN
     BEGIN
       PrintF('2MANYCAL');
       IF (NoFile) THEN
-        (*
-        Print('You can only log on once per day.');
-        *)
-        RGNoteStr(15,FALSE);
+        RGNoteStr(15,FALSE); (*Print('You can only log on once per day.');*)
       TooMuch := TRUE;
     END
     ELSE IF ((ThisUser.OnToday >= General.CallAllow[ThisUser.SL])  AND
@@ -1095,10 +1058,7 @@ BEGIN
     BEGIN
       PrintF('2MANYCAL');
       IF (NoFile) THEN
-        (*
-        Print('You can only log on '+IntToStr(General.CallAllow[ThisUser.SL])+' times per day.');
-        *)
-        RGNoteStr(16,FALSE);
+        RGNoteStr(16,FALSE);(*Print('You can only log on '+IntToStr(General.CallAllow[ThisUser.SL])+' times per day.');*)
       TooMuch := TRUE;
     END
     ELSE IF (ThisUser.TLToday <= 0) AND NOT (General.PerCall) THEN
@@ -1137,10 +1097,7 @@ BEGIN
         IF (NSL >= 0) THEN
           TooMuch := FALSE
         ELSE
-          (*
-          Print('Hanging up.');
-          *)
-          RGNoteStr(20,FALSE);
+          RGNoteStr(20,FALSE); (*Print('Hanging up.');*)
       END;
     END;
     IF (TooMuch) THEN

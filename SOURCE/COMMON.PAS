@@ -5,8 +5,8 @@ UNIT Common;
 INTERFACE
 
 USES
-  Crt,
-  Dos,
+  CRT,
+  DOS,
   MyIO,
   TimeFunc;
 
@@ -22,13 +22,13 @@ TYPE
     LDesc: ARRAY[1..3] OF STRING[100];	{ Menu Description }
     ACS: ACString;						{ ACS Requirements }
     NodeActivityDesc: STRING[50];		{ Node Activity Description }
-    MenuFlags: MenuFlagSet;				{ menu status variables }
-    LongMenu: STRING[12];				{ displayed IN place OF long menu ?? }
-    MenuNum: Byte;						{ Menu Number }
-    MenuPrompt: STRING[120];			{ Menu Prompt }
+    MenuFlags: MenuFlagSet;				{ Flags }
+    LongMenu: STRING[12];				{ Extended Help File (File To Display For Long Menu) }
+    MenuNum: Byte;						{ Number }
+    MenuPrompt: STRING[120];			{ Prompt }
     Password: STRING[20];				{ Password Required }
     FallBack: Byte;						{ FallBack Menu }
-    Directive: STRING[12];				{ }
+    Directive: STRING[12];				{ Help File (File To Display For Short Menu) }
     ForceHelpLevel: Byte;				{ Forced Help Level }
     GenCols: Byte;						{ Generic Menu: Number Of Columns }
     GCol: ARRAY[1..3] OF Byte;			{ Generic Menu: Colors }
@@ -38,18 +38,18 @@ TYPE
     LDesc: STRING[100];					{ Long Command Description }
     ACS: ACString;						{ ACS Requirements }
     NodeActivityDesc: STRING[50];		{ Node Activity Description }
-    CmdFlags: CmdFlagSet;				{ command status variables }
+    CmdFlags: CmdFlagSet;				{ Flags }
     SDesc: STRING[35];					{ Short Command Description }
     CKeys: STRING[14];					{ Keys To Execute Command }
     CmdKeys: STRING[2];					{ Command }
     Options: STRING[50];				{ Command Options/Parameters }
   END;
 
-  LightBarRecordType = RECORD
-    XPos,
-    YPos: Byte;
-    CmdToExec: SmallInt;
-    CmdToShow: STRING[40];
+  LightBarRecordType = RECORD	{ LIGHTBAR RECORD }
+    XPos,						{ X Position }
+    YPos: Byte;					{ Y Position }
+    CmdToExec: SmallInt;		{  }
+    CmdToShow: STRING[40];		{  }
   END;
 
   States =
@@ -88,7 +88,7 @@ TYPE
 
   TransferFlagSet = SET OF TransferFlagType;
 
-  BatchDLRecordType = RECORD
+  BatchDLRecordType = RECORD	{}
     BDLFileName: Str52;
     BDLOwnerName: Str36;
     BDLStorage: StorageType;
@@ -101,7 +101,7 @@ TYPE
     BDLFlags: TransferFlagSet;
   END;
 
-  BatchULRecordType = RECORD
+  BatchULRecordType = RECORD	{}
     BULFileName: Str12;
     BULUserNum,
     BULSection: SmallInt;
@@ -206,8 +206,7 @@ CONST
   BadDLPath: Boolean = FALSE;		{ is the current DL path BAD? }
   BadUlPath: Boolean = FALSE;		{ is the current UL path BAD? }
   BeepEnd: Boolean = FALSE;			{ whether TO beep after caller logs off }
-  FileAreaNameDisplayed: 
-	Boolean = FALSE;				{ was FILE area name printed yet? }
+  FileAreaNameDisplayed: Boolean = FALSE;				{ was FILE area name printed yet? }
   CFO: Boolean = FALSE;				{ is chat FILE open? }
   InChat: Boolean = FALSE;			{ are we IN chat Mode? }
   ChatCall: Boolean = FALSE;		{ is the chat call "noise" on? }
@@ -257,16 +256,14 @@ CONST
   AnswerBaud: LongInt = 0;			{ baud rate TO answer the phone at }
   ExtEventTime: Word = 0;			{ # minutes before External event }
   IsInvisible: Boolean = FALSE;		{ Run IN invisible Mode? }
-  SaveNDescription: STRING[50] 		{ }
-	= 'Miscellaneous';
+  SaveNDescription: STRING[50] = 'Miscellaneous'; { }
   SaveNAvail: Boolean = FALSE;		{ }
   LastWFCX: Byte = 1;				{ }
   LastWFCY: Byte = 1;				{ }
   ANSIDetected: Boolean = FALSE;	{ }
 { Added June 21, 2013 //sk5 }
   PauseIsNull : Boolean = FALSE;	{ Added for null pause }
-  BuildDate   : ARRAY [1..5] OF
-	Word = ( 5, 27, 2013, 9, 19 );	{ Build date MM, DD, YYYY, HR, MIN }
+  BuildDate   : ARRAY [1..5] OF	Word = ( 5, 27, 2013, 9, 19 );	{ Build date MM, DD, YYYY, HR, MIN }
 
 VAR
   LightBarArray: ARRAY[1..50] OF LightBarRecordType;
@@ -312,9 +309,9 @@ VAR
 
   { Conference Variables }
   ConferenceFile: FILE OF ConferenceRecordType;	{ CONFRENC.DAT }
-  Conference: ConferenceRecordType;				{ Conferences }
-  ConfKeys: ConferenceKeyType;					{  }
-  NumConfKeys: Integer;							{  }
+  Conference: ConferenceRecordType;				{ }
+  ConfKeys: ConferenceKeyType;					{ }
+  NumConfKeys: Integer;							{ }
   CurrentConf: Char;							{ Current Conference Tag }
   ConfSystem: Boolean;							{ Is The Conference System Enabled? }
 
@@ -324,42 +321,42 @@ VAR
   NumValKeys: Byte;
   ValKeys: ValidationKeyType;
 
+  { Archivers }
   NumArcs: Byte;
 
   { Multi Node Variables }
-  NodeFile: FILE OF NodeRecordType;	{ multi node FILE }
+  NodeFile: FILE OF NodeRecordType;	{ .DAT }
   NodeR: NodeRecordType;			{  }
-  NodeChatLastRec: LongInt;			{ last record IN group chat FILE Read }
+  NodeChatLastRec: LongInt;			{ Last Record In Group Chat File Read }
 
   Liner: LineRec;
 
   SysOpLogFile,		{ SYSOP.LOG }
-  SysOpLogFile1,	{ SLOGXXXX.LOG }
+  SysOpLogFile1,	{ SLOG####.LOG }
   TrapFile,			{ TRAP#.MSG }
   ChatFile: Text;	{ CHAT#.MSG }
 
 
   { User Variables }
-  UserFile: FILE OF UserRecordType;					{ User.LST }
-  UserIDXFile: FILE OF UserIDXRec;					{ User.IDX }
-  ThisUser: UserRecordType;							{ User's account records }
+  UserFile: FILE OF UserRecordType;	{ User.LST }
+  UserIDXFile: FILE OF UserIDXRec;	{ User.IDX }
+  ThisUser: UserRecordType;			{ User's account records }
 
   { Color Scheme Variables }
-  SchemeFile: FILE OF SchemeRec;					{ SCHEME.DAT }
-  Scheme: SchemeRec;
-  NumSchemes: Integer;
+  SchemeFile: FILE OF SchemeRec;	{ SCHEME.DAT }
+  Scheme: SchemeRec;				{}
+  NumSchemes: Integer;				{}
 
   { Event Variables }
-  EventFile: FILE OF EventRecordType;				{ }
-  MemEventArray:									{ }
-	ARRAY [1..MaxEvents] OF ^EventRecordType;
-  Event: EventRecordType;							{ }
-  NumEvents: Integer;								{ # OF events    }
+  EventFile: FILE OF EventRecordType;						{ }
+  MemEventArray: ARRAY [1..MaxEvents] OF ^EventRecordType;	{ }
+  Event: EventRecordType;									{ }
+  NumEvents: Integer;										{ # OF events    }
 
   { Protocol Variables }
-  ProtocolFile: FILE OF ProtocolRecordType;			{ PROTOCOL.DAT }
-  Protocol: ProtocolRecordType;						{ protocol IN memory }
-  NumProtocols: Integer;							{  }
+  ProtocolFile: FILE OF ProtocolRecordType;	{ PROTOCOL.DAT }
+  Protocol: ProtocolRecordType;				{ Protocol In Memory }
+  NumProtocols: Integer;					{ Number Of Protocols }
 
   { File Variables }
   FileAreaFile: FILE OF FileAreaRecordType; { FBASES.DAT              }
@@ -373,9 +370,9 @@ VAR
   FileArea,                                 { File base User is in }
   NumFileAreas,                             { Max number OF FILE bases }
   ReadFileArea,                             { current uboard # IN memory }
-  LowFileArea,
-  HighFileArea: Integer;
-  NewScanFileArea: Boolean;                 { New scan this base? }
+  LowFileArea,								{ }
+  HighFileArea: Integer;					{ }
+  NewScanFileArea: Boolean;                 { New Scan This Area? }
 
   { Batch Download Variables }
   BatchDLFile: FILE OF BatchDLRecordType;	{ }
@@ -386,54 +383,54 @@ VAR
   BatchDLTime: LongInt;						{ }
 
   { Batch Upload Variables }
-  BatchULFile: FILE OF BatchULRecordType;
-  BatchULF: FILE;
-  BatchUL: BatchULRecordType;
-  NumBatchULFiles: Byte;							{ Number Of Files In Batch UL Queue }
+  BatchULFile: FILE OF BatchULRecordType;	{}
+  BatchULF: FILE;							{}
+  BatchUL: BatchULRecordType;				{}
+  NumBatchULFiles: Byte;					{ Number Of Files In Batch UL Queue }
 
   { Message Variables }
   EmailFile: FILE OF MessageAreaRecordType;		
-  MsgAreaFile: FILE OF MessageAreaRecordType;		{ MBASES.DAT }
-  MemMsgArea: MessageAreaRecordType;				{ MsgArea IN memory }
-  MsgHdrF: FILE OF MHeaderRec;						{ *.HDR }
-  MsgTxtF: FILE;									{ *.DAT }
-  LastReadRecord: ScanRec;
-  LastAuthor,										{ Author # OF the last message }
-  NumMsgAreas,										{ Max number OF msg bases }
-  MsgArea,
-  ReadMsgArea,
-  LowMsgArea,
-  HighMsgArea: Integer;
-  Msg_On: Word;										{ current message being Read }
+  MsgAreaFile: FILE OF MessageAreaRecordType;	{ MBASES.DAT }
+  MemMsgArea: MessageAreaRecordType;			{ MsgArea IN memory }
+  MsgHdrF: FILE OF MHeaderRec;					{ *.HDR }
+  MsgTxtF: FILE;								{ *.DAT }
+  LastReadRecord: ScanRec;						{ }
+  LastAuthor,									{ Author # OF the last message }
+  NumMsgAreas,									{ Max number OF msg bases }
+  MsgArea,										{ }
+  ReadMsgArea,									{ }
+  LowMsgArea,									{ }
+  HighMsgArea: Integer;							{ }
+  Msg_On: Word;									{ current message being Read }
 
   { Menu Variables }
-  MenuFile: FILE OF MenuRec;
-  MenuR: MenuRec;
+  MenuFile: FILE OF MenuRec;						{ }
+  MenuR: MenuRec;									{ }
   MemMenu: MemMenuRec;								{ menu information }
   MemCmd: MemCmdPointer;							{ Command information }
   MenuRecNumArray: ARRAY [1..MaxMenus] OF Integer;	{ }
-  CmdNumArray: ARRAY [1..MaxMenus] OF Byte;
+  CmdNumArray: ARRAY [1..MaxMenus] OF Byte;			{ }
   MenuStack: ARRAY [1..MaxMenus] OF Byte;			{ menu stack }
-  MenuKeys: AStr;									{ keys TO Abort menu display WITH }
+  MenuKeys: AStr;									{ Keys To Abort Menu Display }
   NumMenus,											{ }
-  NumCmds,
-  GlobalCmds,
-  MenuStackPtr,
-  FallBackMenu,
-  CurMenu,
-  CurHelpLevel: Byte;
+  NumCmds,											{ }
+  GlobalCmds,										{ }
+  MenuStackPtr,										{ }
+  FallBackMenu,										{ Fall Back Menu }
+  CurMenu,											{ Current Menu }
+  CurHelpLevel: Byte;								{ Current Help Level }
 
-  Buf: STRING[255];			{ macro buffer }
-  MLC: STRING[255];			{ multiline FOR chat }
+  Buf: STRING[255];			{ Macro Buffer }
+  MLC: STRING[255];			{ Multi Line For Chat }
 
-  ChatReason,				{ last chat reason           }
-  LastLineStr,				{ "last-line" STRING FOR Word-wrapping  }
-  StartDir: AStr;			{ Directory BBS was executed from    }
+  ChatReason,				{ last chat reason }
+  LastLineStr,				{ "last-line" STRING FOR Word-wrapping }
+  StartDir: AStr;			{ Directory BBS was executed from }
 
   TempDir,					{ Temporary Directory base name }
-  InResponseTo: STRING[40];	{ reason FOR reply           }
+  InResponseTo: STRING[40];	{ Reason For Reply }
 
-  LastDIRFileName: Str12;	{ last filename FOR recno/nrecno    }
+  LastDIRFileName: Str12;	{ last filename FOR recno/nrecno }
 
   CurrentColor,				{ current ANSI color          }
   ExitErrorLevel,			{ errorLEVEL TO Exit WITH        }
@@ -449,31 +446,31 @@ VAR
   ChatAttempts,				{ number chat attempts made by User   }
   LIL,						{ lines on screen since last PauseScr() }
 
-  PublicReadThisCall,		{ # public messages has Read this call }
+  PublicReadThisCall,		{ Number Of Public Messages Read This Call }
 
-  UserNum: Integer;			{ User's User number                    }
+  UserNum: Integer;			{ User's User Number }
 
-  Rate: Word;				{ cps FOR FILE transfers }
+  Rate: Word;				{ CPS For File Transfers }
 
-  NewFileDate,				{ NewScan Pointer date         }
+  NewFileDate,				{ NewScan Pointer Date }
 
-  DownloadsToday,			{ download sent TO User this call       }
-  UploadsToday,				{ uploads sent by User this call        }
-  DownloadKBytesToday,		{ download k by User this call          }
-  UploadKBytesToday,		{ upload k by User this call            }
+  DownloadsToday,			{ Downloads This Call }
+  UploadsToday,				{ Uploads This Call }
+  DownloadKBytesToday,		{ Downloaded K This Call }
+  UploadKBytesToday,		{ Uploaded K This Call }
 
-  CreditsLastUpdated,		{ Time Credits last updated }
-  TimeOn,					{ time User logged on          }
-  LastBeep,
-  LastKeyHit,
-  ChopTime,					{ time TO chop off FOR system events  }
-  ExtraTime,				{ extra time - given by F7/F8, etc   }
-  CreditTime,				{ credit time adjustment }
-  FreeTime: LongInt;		{ free time               }
+  CreditsLastUpdated,		{ Time Credits Last Updated }
+  TimeOn,					{ Time User Logged On }
+  LastBeep,					{ Last Beep }
+  LastKeyHit,				{ Last Key Pressed }
+  ChopTime,					{ Time To Chop Off For System Events }
+  ExtraTime,				{ Extra Time Given (F7/F8) }
+  CreditTime,				{ Credit Time Adjustment }
+  FreeTime: LongInt;		{ Free Time }
 
-  BlankMenuNow,				{ is the wfcmenu blanked out? }
-  Abort,
-  Next,						{ global Abort AND Next }
+  BlankMenuNow,				{ Is The WFC Menu Blanked Out? }
+  Abort,					{ Global Abort }
+  Next,						{ Global Next }
   RQArea,
   FQArea,
   MQArea,
@@ -560,7 +557,7 @@ FUNCTION SysOp: Boolean;
 FUNCTION Timer: LongInt;
 PROCEDURE TeleConfCheck;
 FUNCTION Substitute(Src: STRING; CONST old,New: STRING): STRING;
-PROCEDURE NewCompTables;
+{PROCEDURE NewCompTables;}
 FUNCTION OkANSI: Boolean;
 FUNCTION OkAvatar: Boolean;
 FUNCTION OkRIP: Boolean;
@@ -573,7 +570,7 @@ PROCEDURE Update_Screen;
 FUNCTION PageLength: Word;
 PROCEDURE lStatus_Screen(WhichScreen: Byte; Message: AStr; OneKey: Boolean; VAR Answer: AStr);
 FUNCTION CInKey: Char;
-FUNCTION CheckPW: Boolean;
+{FUNCTION CheckPW: Boolean;}
 FUNCTION StripColor(CONST InString: STRING): STRING;
 PROCEDURE sl1(s: AStr); { LeeW: Write to SysOp log }
 PROCEDURE SysOpLog(s: AStr); { LeeW: Write to SysOp log with 3 char indent }
@@ -581,8 +578,8 @@ FUNCTION StrToInt(S: Str11): LongInt;
 FUNCTION RealToStr(R: Real; W,D: Byte): STRING;
 FUNCTION ValueR(S: AStr): REAL;
 PROCEDURE ShellDos(MakeBatch: Boolean; CONST Command: AStr; VAR ResultCode: Integer);
-PROCEDURE SysOpShell;
-PROCEDURE RedrawForANSI;
+{PROCEDURE SysOpShell;}
+{PROCEDURE RedrawForANSI;}
 PROCEDURE Star(InString: AStr);
 FUNCTION GetKey: Word;
 PROCEDURE SetC(C: Byte);
@@ -611,7 +608,7 @@ FUNCTION MaxIDXRec: Integer;
 FUNCTION InKey: Word;
 PROCEDURE OutKey(c: Char);
 PROCEDURE CLS;
-PROCEDURE Wait(b: Boolean);
+{PROCEDURE Wait(b: Boolean);}
 FUNCTION DisplayARFlags(AR: ARFlagSet; C1,C2: Char): AStr;
 PROCEDURE ToggleARFlag(Flag: Char; VAR AR: ARFlagSet; VAR Changed: Boolean);
 FUNCTION DisplayACFlags(Flags: FlagSet; C1,C2: Char): AStr;
@@ -622,21 +619,21 @@ PROCEDURE ToggleStatusFlags(Flag: Char; VAR SUFlags: StatusFlagSet);
 FUNCTION TACCH(Flag: Char): FlagType;
 PROCEDURE LCmds(Len,c: Byte; c1,c2: AStr);
 PROCEDURE LCmds3(Len,c: Byte; c1,c2,c3: AStr);
-PROCEDURE InitTrapFile;
+{PROCEDURE InitTrapFile;}
 FUNCTION AOnOff(b: Boolean; CONST s1,s2: AStr): STRING;
 FUNCTION ShowOnOff(b: Boolean): STRING;
 FUNCTION ShowYesNo(b: Boolean): STRING;
 FUNCTION YN(Len: Byte; DYNY: Boolean): Boolean;
 FUNCTION PYNQ(CONST InString: AStr; MaxLen: Byte; DYNY: Boolean): Boolean;
-PROCEDURE InputLongIntWC(S: AStr; VAR L: LongInt; InputFlags: InputFlagSet; LowNum,HighNum: LongInt; VAR Changed: Boolean);
+(*PROCEDURE InputLongIntWC(S: AStr; VAR L: LongInt; InputFlags: InputFlagSet; LowNum,HighNum: LongInt; VAR Changed: Boolean);
 PROCEDURE InputLongIntWOC(S: AStr; VAR L: LongInt; InputFlags: InputFlagSet; LowNum,HighNum: LongInt);
 PROCEDURE InputWordWC(S: AStr; VAR W: SmallWord; InputFlags: InputFlagSet; LowNum,HighNum: Word; VAR Changed: Boolean);
 PROCEDURE InputWordWOC(S: AStr; VAR W: SmallWord; InputFlags: InputFlagSet; LowNum,HighNum: Word);
 PROCEDURE InputIntegerWC(S: AStr; VAR I: SmallInt; InputFlags: InputFlagSet; LowNum,HighNum: Integer; VAR Changed: Boolean);
 PROCEDURE InputIntegerWOC(S: AStr; VAR I: SmallInt; InputFlags: InputFlagSet; LowNum,HighNum: Integer);
 PROCEDURE InputByteWC(S: AStr; VAR B: Byte; InputFlags: InputFlagSet; LowNum,HighNum: Byte; VAR Changed: Boolean);
-PROCEDURE InputByteWOC(S: AStr; VAR B: Byte; InputFlags: InputFlagSet; LowNum,HighNum: Byte);
-PROCEDURE InputDefault(VAR S: STRING; v: STRING; MaxLen: Byte; InputFlags: InputFlagSet; LineFeed: Boolean);
+PROCEDURE InputByteWOC(S: AStr; VAR B: Byte; InputFlags: InputFlagSet; LowNum,HighNum: Byte);*)
+(*PROCEDURE InputDefault(VAR S: STRING; v: STRING; MaxLen: Byte; InputFlags: InputFlagSet; LineFeed: Boolean);
 PROCEDURE InputFormatted(DisplayStr: AStr; VAR InputStr: STRING; v: STRING; Abortable: Boolean);
 PROCEDURE InputWN1(DisplayStr: AStr; VAR InputStr: AStr; MaxLen: Byte; InputFlags: InputFlagSet; VAR Changed: Boolean);
 PROCEDURE InputWNWC(DisplayStr: AStr; VAR InputStr: AStr; MaxLen: Byte; VAR Changed: Boolean);
@@ -644,14 +641,14 @@ PROCEDURE InputMain(VAR s: STRING; MaxLen: Byte; InputFlags: InputFlagSet);
 PROCEDURE InputWC(VAR s: STRING; MaxLen: Byte);
 PROCEDURE Input(VAR s: STRING; MaxLen: Byte);
 PROCEDURE InputL(VAR s: STRING; MaxLen: Byte);
-PROCEDURE InputCaps(VAR s: STRING; MaxLen: Byte);
+PROCEDURE InputCaps(VAR s: STRING; MaxLen: Byte);*)
 PROCEDURE OneK(VAR C: Char; ValidKeys: AStr; DisplayKey,LineFeed: Boolean);
 PROCEDURE OneK1(VAR C: Char; ValidKeys: AStr; DisplayKey,LineFeed: Boolean);
 PROCEDURE LOneK(DisplayStr: AStr; VAR C: Char; ValidKeys: AStr; DisplayKey,LineFeed: Boolean);
-PROCEDURE Local_Input1(VAR S: STRING; MaxLen: Byte; LowerCase: Boolean);
-PROCEDURE Local_Input(VAR S: STRING; MaxLen: Byte);
+{PROCEDURE Local_Input1(VAR S: STRING; MaxLen: Byte; LowerCase: Boolean);}
+{PROCEDURE Local_Input(VAR S: STRING; MaxLen: Byte);
 PROCEDURE Local_InputL(VAR S: STRING; MaxLen: Byte);
-PROCEDURE Local_OneK(VAR C: Char; S: STRING);
+PROCEDURE Local_OneK(VAR C: Char; S: STRING);}
 FUNCTION Centre(InString: AStr): STRING;
 PROCEDURE WKey;
 PROCEDURE PrintMain(CONST ss: STRING);
@@ -670,12 +667,49 @@ FUNCTION AACS(s: ACString): Boolean;
 FUNCTION DiskKBFree(DrivePath: AStr): LongInt;
 FUNCTION IntToStr(L: LongInt): STRING;
 
+PROCEDURE NewInputByte (S: AStr; VAR B: Byte; InputFlags: InputFlagSet; LowNum, HighNum, DefNum: Byte; AskDef: Boolean;
+	VAR Changed, Invalid: Boolean);
+(*
+	new input
+	'string','inputflags','low','high','default','abortable','changed','invalid'
+*)  
+PROCEDURE InputDefault(VAR S: STRING; v: STRING; MaxLen: Byte; InputFlags: InputFlagSet; LineFeed: Boolean);
+PROCEDURE InputFormatted(DisplayStr: AStr; VAR InputStr: STRING; Format: STRING; Abortable: Boolean);
+PROCEDURE InputLongIntWC(S: AStr; VAR L: LongInt; InputFlags: InputFlagSet; LowNum,HighNum: LongInt; VAR Changed: Boolean);
+PROCEDURE InputLongIntWOC(S: AStr; VAR L: LongInt; InputFlags: InputFlagSet; LowNum,HighNum: LongInt);
+PROCEDURE InputWordWC(S: AStr; VAR W: SmallWord; InputFlags: InputFlagSet; LowNum,HighNum: Word; VAR Changed: Boolean);
+PROCEDURE InputWordWOC(S: AStr; VAR W: SmallWord; InputFlags: InputFlagSet; LowNum,HighNum: Word);
+PROCEDURE InputIntegerWC(S: AStr; VAR I: SmallInt; InputFlags: InputFlagSet; LowNum,HighNum: Integer; VAR Changed: Boolean);
+PROCEDURE InputIntegerWOC(S: AStr; VAR I: SmallInt; InputFlags: InputFlagSet; LowNum,HighNum: Integer);
+PROCEDURE InputByteWC(S: AStr; VAR B: Byte; InputFlags: InputFlagSet; LowNum,HighNum: Byte; VAR Changed: Boolean);
+PROCEDURE InputByteWOC(S: AStr; VAR B: Byte; InputFlags: InputFlagSet; LowNum,HighNum: Byte);
+PROCEDURE InputWN1(DisplayStr: AStr; VAR InputStr: AStr; MaxLen: Byte; InputFlags: InputFlagSet; VAR Changed: Boolean);
+PROCEDURE InputWNWC(DisplayStr: AStr; VAR InputStr: AStr; MaxLen: Byte; VAR Changed: Boolean);
+PROCEDURE InputMain(VAR S: STRING; MaxLen: Byte; InputFlags: InputFlagSet);
+PROCEDURE InputWC(VAR S: STRING; MaxLen: Byte);
+PROCEDURE Input(VAR S: STRING; MaxLen: Byte);
+PROCEDURE InputL(VAR S: STRING; MaxLen: Byte);
+PROCEDURE InputCaps(VAR S: STRING; MaxLen: Byte);
+
+PROCEDURE FileAreaScanInput(DisplayStr: AStr; MaxLen: Byte; VAR S: AStr; CONST Allowed: AStr; MinNum,MaxNum: Integer);
+PROCEDURE MsgAreaScanInput(DisplayStr: AStr; MaxLen: Byte; VAR S: AStr; CONST Allowed: AStr; MinNum,MaxNum: Integer);
+
+FUNCTION CheckPW: Boolean;
+PROCEDURE NewCompTables;
+PROCEDURE Wait(b: Boolean);
+PROCEDURE InitTrapFile;
+PROCEDURE Local_Input1(VAR S: STRING; MaxLen: Byte; LowerCase: Boolean);
+PROCEDURE Local_Input(VAR S: STRING; MaxLen: Byte);
+PROCEDURE Local_InputL(VAR S: STRING; MaxLen: Byte);
+PROCEDURE Local_OneK(VAR C: Char; S: STRING);
+PROCEDURE SysOpShell;
+PROCEDURE ReDrawForANSI;
+
 IMPLEMENTATION
 
 USES
-  Common1,
+{Common1,}
   Common2,
-  Common3,
   Common4,
   Events,
   File0,
@@ -779,7 +813,7 @@ BEGIN
   UpdateCRC32 := CRC;
 END;
 {$ENDIF}
-
+(*
 FUNCTION CheckPW: Boolean;
 BEGIN
   CheckPW := Common1.CheckPW;
@@ -829,7 +863,7 @@ PROCEDURE RedrawForANSI;
 BEGIN
   Common1.RedrawForANSI;
 END;
-
+*)
 PROCEDURE SKey1(VAR C: Char);
 BEGIN
   Common2.SKey1(C);
@@ -854,7 +888,7 @@ PROCEDURE TLeft;
 BEGIN
   Common2.TLeft;
 END;
-
+(*
 PROCEDURE InputLongIntWC(S: AStr; VAR L: LongInt; InputFlags: InputFlagSet; LowNum,HighNum: LongInt; VAR Changed: Boolean);
 BEGIN
   Common3.InputLongIntWC(S,L,InputFlags,LowNum,HighNum,Changed);
@@ -939,7 +973,7 @@ PROCEDURE InputCaps(VAR s: STRING; MaxLen: Byte);
 BEGIN
   Common3.InputCaps(s,MaxLen);
 END;
-
+*)
 PROCEDURE Com_Flush_Recv;
 BEGIN
   Common4.Com_Flush_Recv;
@@ -3140,73 +3174,89 @@ BEGIN
     ShowYesNo := 'No';
 END;
 
+PROCEDURE ANSIG(X,Y: Byte);
+BEGIN
+  IF (ComPortSpeed > 0) THEN
+    IF (OkAvatar) THEN
+      SerialOut(^V^H+Chr(Y)+Chr(X))
+    ELSE
+      SerialOut(#27+'['+IntToStr(Y)+';'+IntToStr(X)+'H');
+  IF (WantOut) THEN
+    GoToXY(X,Y);
+END;
+
 FUNCTION NewYN(CONST Q: AStr; YN: Boolean): Boolean; { LeeW: New Yes/No Question Prompt }
-(*
-	Add checking for ANSI, if not use regular PYNQ
-*)
 VAR
   W: Word; { Keyboard Input }
-  YesY, { X&Y Positions }
-  YesX,
-  NoY,
-  NoX: Integer;
+  YesX, { X&Y Positions }
+  YesY,
+  NoX,
+  NoY: Integer;
 BEGIN
-  Prt('^0'+Q+' ');
-  YesY := WhereY;
-  YesX := WhereX;
-  IF YN = TRUE THEN 
-	Prt(lRGLngStr(96,TRUE))
+  IF NOT (OkANSI) OR NOT ((General.UseLightBars) AND (UseLightBars IN ThisUser.Flags)) THEN
+	BEGIN { Basic prompt for no ANSI or lightbars disabled }
+	  NewYN := PYNQ(Q,0,YN);
+	  EXIT;
+	END
   ELSE
-	Prt(lRGLngStr(95,TRUE));
-  Prt(' ');
-  NoY := WhereY;
-  NoX := WhereX;
-  IF YN = FALSE THEN
-	Prt(lRGLngStr(98,TRUE))
-  ELSE
-	Prt(lRGLngStr(97,TRUE));
-  REPEAT
-	W := GetKey;
-	IF ((W = F_LEFT) AND (YN = FALSE)) OR ((W = F_RIGHT) AND (YN = TRUE)) THEN {LEFT/RIGHT ARROWS}
-	  BEGIN
-		GoToXY(YesX,YesY);
-		IF YN = TRUE THEN
-		  Prt(lRGLngStr(95,TRUE))
-		ELSE
-		  Prt(lRGLngStr(96,TRUE));
-		GoToXY(NoX,NoY);
-		IF YN = TRUE THEN
-		  Prt(lRGLngStr(98,TRUE))
-		ELSE
-		  Prt(lRGLngStr(97,TRUE));
-		YN := NOT YN;
-	  END;
-	IF (W = 89) OR (W = 121) THEN {89/121=Y}
-	  BEGIN
-	    IF YN = FALSE THEN 
+    BEGIN
+	  Prt('^0'+Q);
+	  YesX := WhereX;
+	  YesY := WhereY;
+	  IF YN = TRUE THEN 
+		Prt(lRGLngStr(96,TRUE))
+	  ELSE
+		Prt(lRGLngStr(95,TRUE));
+	  Prt(' ');
+	  NoX := WhereX;
+	  NoY := WhereY;
+	  IF YN = FALSE THEN
+		Prt(lRGLngStr(98,TRUE))
+	  ELSE
+		Prt(lRGLngStr(97,TRUE));
+	  REPEAT
+		W := GetKey;
+		IF ((W = F_LEFT) AND (YN = FALSE)) OR ((W = F_RIGHT) AND (YN = TRUE)) THEN {LEFT/RIGHT ARROWS}
 		  BEGIN
-			YN := TRUE;
-			GoToXY(YesX,YesY);
-			Prt(lRGLngStr(96,TRUE));
-			GoToXY(NoX,NoY);
-			Prt(lRGLngStr(97,TRUE));
+			ANSIG(YesX,YesY);
+			IF YN = TRUE THEN
+			  Prt(lRGLngStr(95,TRUE))
+			ELSE
+			  Prt(lRGLngStr(96,TRUE));
+			ANSIG(NoX,NoY);
+			IF YN = TRUE THEN
+			  Prt(lRGLngStr(98,TRUE))
+			ELSE
+			  Prt(lRGLngStr(97,TRUE));
+			YN := NOT YN;
 		  END;
-		Break;
-	  END;
-	IF (W = 78) OR (W = 110) THEN {78/110=N}
-	  BEGIN
-	    IF YN = TRUE THEN 
+		IF (W = 89) OR (W = 121) THEN {89/121=Y}
 		  BEGIN
-			YN := FALSE;
-			GoToXY(YesX,YesY);
-			Prt(lRGLngStr(95,TRUE));
-			GoToXY(NoX,NoY);
-			Prt(lRGLngStr(98,TRUE));
+			IF YN = FALSE THEN 
+			  BEGIN
+				YN := TRUE;
+				ANSIG(YesX,YesY);
+				Prt(lRGLngStr(96,TRUE));
+				ANSIG(NoX,NoY);
+				Prt(lRGLngStr(97,TRUE));
+			  END;
+			Break;
 		  END;
-		Break;
-	  END;
-  UNTIL (W = 13) OR (HangUp); {13=ENTER}
-  NewYN := YN;
+		IF (W = 78) OR (W = 110) THEN {78/110=N}
+		  BEGIN
+			IF YN = TRUE THEN 
+			  BEGIN
+				YN := FALSE;
+				ANSIG(YesX,YesY);
+				Prt(lRGLngStr(95,TRUE));
+				ANSIG(NoX,NoY);
+				Prt(lRGLngStr(98,TRUE));
+			  END;
+			Break;
+		  END;
+	  UNTIL (W = 13) OR (HangUp); {13=ENTER}
+	  NewYN := YN;
+	END;
 END;
 
 FUNCTION YN(Len: Byte; DYNY: Boolean): Boolean;
@@ -4285,7 +4335,7 @@ BEGIN
     IF (AllowExit) AND (TempDirPath = '') THEN
     BEGIN
       NL;
-      Print('Aborted!');
+      Print('^8Aborted!');
     END
     ELSE IF (TempDirPath = '') THEN
     BEGIN
@@ -5174,6 +5224,1467 @@ BEGIN
   CheckMS := (Ticks + WaitFor);
   REPEAT
   UNTIL (Ticks > CheckMS);
+END;
+
+PROCEDURE NewInputByte (S: AStr; VAR B: Byte; InputFlags: InputFlagSet; LowNum, HighNum, DefNum: Byte; AskDef: Boolean;
+	VAR Changed, Invalid: Boolean);
+	
+  (*
++---------+-----------+---------------------------------------------+
+| Param   | Name	  |	Description									|
++---------+-----------+---------------------------------------------+
+| 1			S			Prompt string								|
+| 2			B			Input value									|
+| 3			InputFlags	Input flags									|
+| 4			LowNum		Lowest valid value							|
+| 5			HighNum		Highest valid value							|
+| 6			DefNum		Default value								|
+| 7			AskDef		Ask to use default value on invalid input?	|
+| 8			Changed		Was value changed?							|
+| 9			Invalid		Was value invalid?							|
++-------------------------------------------------------------------+
+  *)
+	
+VAR
+  TempStr: Str3; 	{ Input }
+  SaveB: Byte;		{ Original value }
+  TempB: Integer;	{ Input converted to byte }
+BEGIN
+  Changed := FALSE; { Reset }
+  Invalid := FALSE; { Reset }
+  SaveB := B;
+  IF (NOT (DisplayValue IN InputFlags)) THEN
+    Prt(S+' ^0[^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0]: ')
+  ELSE
+    Prt(S+' ^0[^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0] [^1'+IntToStr(B)+'^0]: ');
+  MPL(Length(IntToStr(HighNum)));
+  TempStr := IntToStr(B);
+  InputMain(TempStr,Length(IntToStr(HighNum)),InputFlags);
+  
+  { // }
+  
+  IF (TempStr <> '') THEN
+	BEGIN
+      TempB := StrToInt(TempStr);
+	  IF ((TempB >= LowNum) AND (TempB <= HighNum)) THEN
+		B := TempB;
+	END;
+  IF (TempStr = '') OR NOT ((TempB >= LowNum) AND (TempB <= HighNum)) THEN
+	BEGIN
+	  Invalid := TRUE;
+	  NL;
+	  Print('^8ERROR: Valid range is between '+IntToStr(LowNum)+' and '+IntToStr(HighNum)+'!^0');
+	  NL;
+	END;
+  
+  { // }	
+  
+  IF (Invalid) AND (AskDef) THEN
+	IF PYNQ('^0Use the default of '+IntToStr(DefNum)+'? ',0,TRUE) THEN
+	  BEGIN
+		B := DefNum;
+		Invalid := FALSE;
+	  END;
+  IF (SaveB <> B) THEN
+    Changed := TRUE;
+END;
+  
+PROCEDURE InputDefault(VAR S: STRING; v: STRING; MaxLen: Byte; InputFlags: InputFlagSet; LineFeed: Boolean);
+VAR
+  C: Char;
+  Counter: Byte;
+BEGIN
+  MPL(MaxLen);
+  MCIAllowed := FALSE;
+  ColorAllowed := FALSE;
+  Prompt(v);
+  ColorAllowed := TRUE;
+  MCIAllowed := TRUE;
+  C := Char(GetKey);
+  IF (C <> #13) THEN
+  BEGIN
+    FOR Counter := 1 TO Length(v) DO
+      BackSpace;
+    Buf := C + Buf;
+    InputMain(S,MaxLen,InputFlags);
+    IF (S = '') THEN
+    BEGIN
+      S := v;
+      MPL(MaxLen);
+      Prompt(S);
+    END
+    ELSE IF (S = ' ') THEN
+      S := '';
+  END
+  ELSE
+  BEGIN
+    S := v;
+    IF NOT (NolineFeed IN InputFlags) THEN
+      NL;
+  END;
+  UserColor(1);
+  IF (LineFeed) THEN
+    NL;
+END;
+
+
+PROCEDURE InputFormatted(DisplayStr: AStr; VAR InputStr: STRING; Format: STRING; Abortable: Boolean);
+VAR
+  c: Char;
+  i,
+  FarBack: Byte;
+
+  PROCEDURE UpdateString;
+  BEGIN
+    WHILE (NOT (Format[i] IN ['#','@']) AND (i <= Length(Format))) DO
+    BEGIN
+      OutKey(Format[i]);
+      InputStr := InputStr + Format[i];
+      Inc(i);
+    END;
+  END;
+
+BEGIN
+  InputStr := '';
+  Prt(DisplayStr);
+  MPL(Length(Format));
+  i := 1;
+  UpdateString;
+  FarBack := i;
+  REPEAT
+    c := Char(GetKey);
+    IF (i <= Length(Format)) THEN
+      IF ((Format[i] = '@') AND (c IN ['a'..'z','A'..'Z'])) OR ((Format[i] = '#') AND (c IN ['0'..'9'])) THEN
+      BEGIN
+        c := UpCase(c);
+        OutKey(c);
+        InputStr := InputStr + c;
+        Inc(i);
+        UpdateString;
+      END;
+    IF (c = ^H) THEN
+    BEGIN
+      WHILE ((i > FarBack) AND NOT (Format[i - 1] IN ['#','@'])) DO
+      BEGIN
+        BackSpace;
+        Dec(InputStr[0]);
+        Dec(i);
+      END;
+      IF (i > FarBack) THEN
+      BEGIN
+        BackSpace;
+        Dec(InputStr[0]);
+        Dec(i);
+      END;
+    END;
+  UNTIL (HangUp) OR ((i > Length(Format)) OR (Abortable)) AND (c = #13);
+  UserColor(1);
+  NL;
+END;
+
+PROCEDURE InputLongIntWC(S: AStr; VAR L: LongInt; InputFlags: InputFlagSet; LowNum,HighNum: LongInt; VAR Changed: Boolean);
+VAR
+  TempStr: Str10;
+  SaveL: LongInt;
+  TempL: Real;
+BEGIN
+  SaveL := L;
+  IF (NOT (DisplayValue IN InputFlags)) THEN
+    Prt(S+'^0 [^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0]: ')
+  ELSE
+    Prt(S+'^0 [^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0] [^1'+IntToStr(L)+'^0]: ');
+  MPL(Length(IntToStr(HighNum)));
+  TempStr := IntToStr(L);
+  InputMain(TempStr,Length(IntToStr(HighNum)),InputFlags);
+  IF (TempStr <> '') THEN
+  BEGIN
+    TempL := ValueR(TempStr);
+    IF ((Trunc(TempL) >= LowNum) AND (Trunc(TempL) <= HighNum)) THEN
+      L := Trunc(TempL)
+    ELSE
+    BEGIN
+      NL;
+      Print('^7The range must be from '+IntToStr(LowNum)+' to '+IntToStr(HighNum)+'!^1');
+      PauseScr(FALSE);
+    END;
+  END;
+  IF (SaveL <> L) THEN
+    Changed := TRUE;
+END;
+
+PROCEDURE InputLongIntWOC(S: AStr; VAR L: LongInt; InputFlags: InputFlagSet; LowNum,HighNum: LongInt);
+VAR
+  Changed: Boolean;
+BEGIN
+  Changed := FALSE;
+  InputLongIntWC(S,L,InputFlags,LowNum,HighNum,Changed);
+END;
+
+PROCEDURE InputWordWC(S: AStr; VAR W: SmallWord; InputFlags: InputFlagSet; LowNum,HighNum: Word; VAR Changed: Boolean);
+VAR
+  TempStr: Str5;
+  SaveW: Word;
+  TempW: Longint;
+BEGIN
+  SaveW := W;
+  IF (NOT (DisplayValue IN InputFlags)) THEN
+    Prt(S+' (^5'+IntToStr(LowNum)+'^4-^5'+IntToStr(HighNum)+'^4): ')
+  ELSE
+    Prt(S+' (^5'+IntToStr(LowNum)+'^4-^5'+IntToStr(HighNum)+'^4) [^5'+IntToStr(W)+'^4]: ');
+  MPL(Length(IntToStr(HighNum)));
+  TempStr := IntToStr(W);
+  InputMain(TempStr,Length(IntToStr(HighNum)),InputFlags);
+  IF (TempStr <> '') THEN
+  BEGIN
+    TempW := StrToInt(TempStr);
+    IF ((TempW >= LowNum) AND (TempW <= HighNum)) THEN
+      W := TempW
+    ELSE
+    BEGIN
+      NL;
+      Print('^7The range must be from '+IntToStr(LowNum)+' to '+IntToStr(HighNum)+'!^1');
+      PauseScr(FALSE);
+    END;
+  END;
+  IF (SaveW <> W) THEN
+    Changed := TRUE;
+END;
+
+PROCEDURE InputWordWOC(S: AStr; VAR W: SmallWord; InputFlags: InputFlagSet; LowNum,HighNum: Word);
+VAR
+  Changed: Boolean;
+BEGIN
+  Changed := FALSE;
+  InputWordWC(S,W,InputFlags,LowNum,HighNum,Changed);
+END;
+
+PROCEDURE InputIntegerWC(S: AStr; VAR I: SmallInt; InputFlags: InputFlagSet; LowNum,HighNum: Integer; VAR Changed: Boolean);
+VAR
+  TempStr: Str5;
+  SaveI: Integer;
+  TempI: Longint;
+BEGIN
+  SaveI := I;
+  IF (NOT (DisplayValue IN InputFlags)) THEN
+    Prt(S+' ^0[^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0]: ')
+  ELSE
+    Prt(S+' ^0[^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0] [^1'+IntToStr(I)+'^0]: ');
+  MPL(Length(IntToStr(HighNum)));
+  TempStr := IntToStr(I);
+  InputMain(TempStr,Length(IntToStr(HighNum)),InputFlags);
+  IF (TempStr <> '') THEN
+  BEGIN
+    TempI := StrToInt(TempStr);
+    IF ((TempI >= LowNum) AND (TempI <= HighNum)) THEN
+      I := TempI
+    ELSE
+    BEGIN
+      NL;
+      Print('^8ERROR: Valid range is between '+IntToStr(LowNum)+' and '+IntToStr(HighNum)+'!^1'); { LeeW: Word this better }
+	  IF (LowNum >= 1) THEN
+		I := (LowNum - 1); { set b to 1 less than min so we can detect if input failed }
+    END;
+  END;
+  IF (SaveI <> I) THEN
+    Changed := TRUE;
+END;
+
+PROCEDURE InputIntegerWOC(S: AStr; VAR I: SmallInt; InputFlags: InputFlagSet; LowNum,HighNum: Integer);
+VAR
+  Changed: Boolean;
+BEGIN
+  Changed := FALSE;
+  InputIntegerWC(S,I,InputFlags,LowNum,HighNum,Changed);
+END;
+
+PROCEDURE InputByteWC(S: AStr; VAR B: Byte; InputFlags: InputFlagSet; LowNum,HighNum: Byte; VAR Changed: Boolean);
+VAR
+  TempStr: Str3;
+  SaveB: Byte;
+  TempB: Integer;
+BEGIN
+  SaveB := B;
+  IF (NOT (DisplayValue IN InputFlags)) THEN
+    Prt(S+' ^0[^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0]: ')
+  ELSE
+    Prt(S+' ^0[^1'+IntToStr(LowNum)+'^0-^1'+IntToStr(HighNum)+'^0] [^1'+IntToStr(B)+'^0]: ');
+  MPL(Length(IntToStr(HighNum)));
+  TempStr := IntToStr(B);
+  InputMain(TempStr,Length(IntToStr(HighNum)),InputFlags);
+  IF (TempStr <> '') THEN
+  BEGIN
+    TempB := StrToInt(TempStr);
+    IF ((TempB >= LowNum) AND (TempB <= HighNum)) THEN
+      B := TempB
+    ELSE
+    BEGIN
+      NL;
+      Print('^8ERROR: Valid range is between '+IntToStr(LowNum)+' and '+IntToStr(HighNum)+'!^0');
+	  NL;
+	  IF (LowNum >= 1) THEN
+		B := (LowNum - 1); { set b to 1 less than min so we can detect if input failed }
+    END;
+  END;
+  IF (SaveB <> B) THEN
+    Changed := TRUE;
+END;
+
+PROCEDURE InputByteWOC(S: AStr; VAR B: Byte; InputFlags: InputFlagSet; LowNum,HighNum: Byte);
+VAR
+  Changed: Boolean;
+BEGIN
+  Changed := FALSE;
+  InputByteWC(S,B,InputFlags,LowNum,HighNum,Changed);
+END;
+
+PROCEDURE InputWN1(DisplayStr: AStr; VAR InputStr: AStr; MaxLen: Byte; InputFlags: InputFlagSet; VAR Changed: Boolean);
+VAR
+  SaveInputStr: AStr;
+BEGIN
+  Prt(DisplayStr);
+  IF (NOT (ColorsAllowed IN InputFlags)) THEN
+    MPL(MaxLen);
+  SaveInputStr := InputStr;
+  InputMain(SaveInputStr,MaxLen,InputFlags);
+  IF (SaveInputStr = '') THEN
+    SaveInputStr := InputStr;
+  IF (SaveInputStr = ' ') THEN
+    IF PYNQ('Blank String? ',0,FALSE) THEN
+      SaveInputStr := ''
+    ELSE
+      SaveInputStr := InputStr;
+  IF (SaveInputStr <> InputStr) THEN
+    Changed := TRUE;
+  InputStr := SaveInputStr;
+END;
+
+PROCEDURE InputWNWC(DisplayStr: AStr; VAR InputStr: AStr; MaxLen: Byte; VAR Changed: Boolean);
+BEGIN
+  InputWN1(DisplayStr,InputStr,MaxLen,[ColorsAllowed,InterActiveEdit],Changed);
+END;
+
+PROCEDURE InputMain(VAR S: STRING; MaxLen: Byte; InputFlags: InputFlagSet);
+VAR
+  SaveS: STRING;
+  Is: STRING[2];
+  Cp,
+  Cl,
+  Counter: Byte;
+  c,
+  C1: Word;
+  InsertMode,
+  FirstKey: Boolean;
+
+  PROCEDURE MPrompt(S: STRING);
+  BEGIN
+    SerialOut(S);
+    IF (WantOut) THEN
+      Write(S);
+  END;
+
+  PROCEDURE Cursor_Left;
+  BEGIN
+    IF (NOT OkAvatar) THEN
+      SerialOut(#27'[D')
+    ELSE
+      SerialOut(^V^E);
+    IF (WantOut) THEN
+      GotoXY((WhereX - 1),WhereY);
+  END;
+
+  PROCEDURE Cursor_Right;
+  BEGIN
+    OutKey(S[Cp]);
+    Inc(Cp);
+  END;
+
+{$IFDEF MSDOS}
+  PROCEDURE SetCursor(InsertMode: Boolean); ASSEMBLER;
+  ASM
+    cmp InsertMode,0
+    je @turnon
+    mov ch,0
+    mov Cl,7
+    jmp @goforit
+    @turnon:
+    mov ch,6
+    mov Cl,7
+    @goforit:
+    mov ah,1
+    int 10h
+  END;
+{$ENDIF}
+{$IFDEF WIN32}
+  PROCEDURE SetCursor(InsertMode: Boolean);
+  BEGIN
+    if (InsertMode) then
+    begin
+      RPInsertCursor;
+    end else
+    begin
+      RPBlockCursor;
+    end;
+  END;
+{$ENDIF}
+
+BEGIN
+  FirstKey := FALSE;
+
+  IF (NOT (InterActiveEdit IN InputFlags)) OR NOT (Okansi OR OkAvatar) THEN
+  BEGIN
+    S := '';
+    Cp := 1;
+    Cl := 0;
+  END
+  ELSE
+  BEGIN
+    Cp := Length(S);
+    Cl := Length(S);
+    IF (Cp = 0) THEN
+      Cp := 1;
+    MPrompt(S);
+    IF (Length(S) > 0) THEN
+    BEGIN
+      Cursor_Left;
+      IF (Cp <= MaxLen) THEN  (* Was Cp < MaxLen *)
+        Cursor_Right;
+    END;
+    FirstKey := TRUE;
+  END;
+
+  SaveS := S;
+  InsertMode := FALSE;
+
+  REPEAT
+    MLC := S;
+    SetCursor(InsertMode);
+    c := GetKey;
+
+    IF (FirstKey) AND (C = 32) THEN
+      C := 24;
+
+    FirstKey := FALSE;
+
+    CASE c OF
+      8 : IF (Cp > 1) THEN
+          BEGIN
+            Dec(Cl);
+            Dec(Cp);
+            Delete(S,Cp,1);
+            BackSpace;
+            IF (Cp < Cl) THEN
+            BEGIN
+              MPrompt(Copy(S,Cp,255)+' ');
+              FOR Counter := Cp TO (Cl + 1) DO
+                Cursor_Left;
+            END;
+          END;
+     24 : BEGIN
+            FOR Counter := Cp TO Cl DO
+              OutKey(' ');
+            FOR Counter := 1 TO Cl DO
+              BackSpace;
+            Cl := 0;
+            Cp := 1;
+          END;
+     32..255:
+          BEGIN
+            IF (NOT (NumbersOnly IN InputFlags)) THEN
+            BEGIN
+              IF (UpperOnly IN InputFlags) THEN
+                c := Ord(UpCase(Char(c)));
+              IF (CapWords IN InputFlags) THEN
+                IF (Cp > 1) THEN
+                BEGIN
+                  IF (S[Cp - 1] IN [#32..#64]) THEN
+                    c := Ord(UpCase(Char(c)))
+                  ELSE IF (c IN [Ord('A')..Ord('Z')]) THEN
+                    Inc(c,32);
+                END
+                ELSE
+                  c := Ord(UpCase(Char(c)));
+            END;
+            IF (NOT (NumbersOnly IN InputFlags)) OR (c IN [45,48..57]) THEN
+            BEGIN
+              IF ((InsertMode) AND (Cl < MaxLen)) OR ((NOT InsertMode) AND (Cp <= MaxLen)) THEN
+              BEGIN
+                OutKey(Char(c));
+                IF (InsertMode) THEN
+                BEGIN
+                  Is := Char(c);
+                  MPrompt(Copy(S,Cp,255));
+                  Insert(Is,S,Cp);
+                  FOR Counter := Cp TO Cl DO
+                    Cursor_Left;
+                END
+                ELSE
+                  S[Cp]:= Char(c);
+                IF (InsertMode) OR ((Cp - 1) = Cl) THEN
+                  Inc(Cl);
+                Inc(Cp);
+                IF (Trapping) THEN
+                  Write(TrapFile,Char(c));
+              END;
+            END;
+          END;
+      F_END :
+          WHILE (Cp < (Cl + 1)) AND (Cp <= MaxLen) DO
+            Cursor_Right;
+     F_HOME :
+          WHILE (Cp > 1) DO
+          BEGIN
+            Cursor_Left;
+            Dec(Cp);
+          END;
+     F_LEFT :
+          IF (Cp > 1) THEN
+          BEGIN
+            Cursor_Left;
+            Dec(Cp);
+          END;
+    F_RIGHT :
+          IF (Cp <= Cl) THEN
+            Cursor_Right;
+      F_INS :
+          BEGIN
+            InsertMode := (NOT InsertMode);
+            SetCursor(InsertMode);
+          END;
+      F_DEL :
+          IF (Cp > 0) AND (Cp <= Cl) THEN
+          BEGIN
+            Dec(Cl);
+            Delete(S,Cp,1);
+            MPrompt(Copy(S,Cp,255)+' ');
+            FOR Counter := Cp TO (Cl + 1) DO
+              Cursor_Left;
+          END;
+    END;
+    S[0] := Chr(Cl);
+  UNTIL (c = 13) OR (HangUp);
+  IF ((Redisplay IN InputFlags) AND (S = '')) THEN
+  BEGIN
+    S := SaveS;
+    MPrompt(S);
+  END;
+
+  UserColor(1);
+
+  IF (NOT (NoLineFeed IN InputFlags)) THEN
+    NL;
+  MLC := '';
+  SetCursor(FALSE);
+END;
+
+PROCEDURE InputWC(VAR S: STRING; MaxLen: Byte);
+BEGIN
+  InputMain(S,MaxLen,[ColorsAllowed]);
+END;
+
+PROCEDURE Input(VAR S: STRING; MaxLen: Byte);
+BEGIN
+  InputMain(S,MaxLen,[UpperOnly]);
+END;
+
+PROCEDURE InputL(VAR S: STRING; MaxLen: Byte);
+BEGIN
+  InputMain(S,MaxLen,[]);
+END;
+
+PROCEDURE InputCaps(VAR S: STRING; MaxLen: Byte);
+BEGIN
+  InputMain(S,MaxLen,[CapWords]);
+END;
+(*
+PROCEDURE ANSIG(X,Y: Byte);
+BEGIN
+  IF (ComPortSpeed > 0) THEN
+    IF (OkAvatar) THEN
+      SerialOut(^V^H+Chr(Y)+Chr(X))
+    ELSE
+      SerialOut(#27+'['+IntToStr(Y)+';'+IntToStr(X)+'H');
+  IF (WantOut) THEN
+    GoToXY(X,Y);
+END;
+*)
+FUNCTION CmdExists(Num: Integer): Boolean;
+VAR
+  Counter: Byte;
+  Found: Boolean;
+BEGIN
+  Found := FALSE;
+  FOR Counter := 1 TO LightBarCounter DO
+    IF (LightBarArray[Counter].CmdToExec = Num) THEN
+    BEGIN
+      Found := TRUE;
+      Break;
+    END;
+  CmdExists := Found;
+END;
+
+PROCEDURE FileAreaScanInput(DisplayStr: AStr; MaxLen: Byte; VAR S: AStr; CONST Allowed: AStr; MinNum,MaxNum: Integer);
+VAR
+  SaveS: AStr;
+  C: Char;
+  Counter,
+  SaveX,
+  SaveY: Byte;
+  W: Word;
+  GotCmd: Boolean;
+BEGIN
+  Prt(DisplayStr);
+  MPL(MaxLen);
+
+  IF (LightBarFirstCmd) THEN
+    LightBarCmd := 1
+  ELSE
+    LightBarCmd := LightBarCounter;
+
+  IF (General.UseLightBars) AND (UseLightBars IN ThisUser.Flags) THEN
+  BEGIN
+    SaveX := WhereX;
+    SaveY := WhereY;
+    ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+    SetC(114);
+    Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+    ANSIG(SaveX,SaveY);
+    SetC(31);
+  END;
+
+  GotCmd := FALSE;
+
+  s := '';
+
+  REPEAT
+
+    W := GetKey;
+
+    IF (General.UseLightBars) AND (UseLightBars IN ThisUser.Flags) THEN
+    BEGIN
+      IF (W = 13) AND (S = '') THEN
+      BEGIN
+        S := IntToStr(LightBarArray[LightBarCmd].CmdToExec);
+        GotCmd := TRUE;
+      END
+      ELSE IF (W = 91) THEN
+      BEGIN
+        IF (CmdExists(MinNum)) THEN
+          W := 0
+        ELSE
+        BEGIN
+          S := '[';
+          LightBarFirstCmd := FALSE;
+          GotCmd := TRUE
+        END;
+      END
+      ELSE IF (W = 93) THEN
+      BEGIN
+        IF (CmdExists(MaxNum)) THEN
+          W := 0
+        ELSE
+        BEGIN
+          S := ']';
+          LightBarFirstCmd := TRUE;
+          GotCmd := TRUE
+        END
+      END
+      ELSE IF (W = F_Home) AND (LightBarCmd <> 1) THEN
+      BEGIN
+        SaveX := WhereX;
+        SaveY := WhereY;
+        ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+        SetC(10);
+        Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+        LightBarCmd := 1;
+        ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+        SetC(114);
+        Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+        ANSIG(SaveX,SaveY);
+        SetC(31);
+      END
+      ELSE IF (W = F_End) AND (LightBarCmd <> LightBarCounter) THEN
+      BEGIN
+        SaveX := WhereX;
+        SaveY := WhereY;
+        ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+        SetC(10);
+        Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+        LightBarCmd := LightBarCounter;
+        ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+        SetC(114);
+        Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+        ANSIG(SaveX,SaveY);
+        SetC(31);
+      END
+      ELSE IF (W = F_Left) THEN
+      BEGIN
+        IF (LightBarCmd = 1) AND (LightBarArray[LightBarCmd].CmdToExec <> MinNum) THEN
+        BEGIN
+          S := '[';
+          LightBarFirstCmd := FALSE;
+          GotCmd := TRUE
+        END
+        ELSE IF (LightBarCmd > 1) THEN
+        BEGIN
+          SaveX := WhereX;
+          SaveY := WhereY;
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(10);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          Dec(LightBarCmd);
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(114);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          ANSIG(SaveX,SaveY);
+          SetC(31);
+        END;
+      END
+      ELSE IF (W = F_Right) THEN
+      BEGIN
+        IF (LightBarCmd = LightBarCounter) AND (LightBarArray[LightBarCmd].CmdToExec <> MaxNum) THEN
+        BEGIN
+          S := ']';
+          LightBarFirstCmd := TRUE;
+          GotCmd := TRUE
+        END
+        ELSE IF (LightBarCmd < LightBarCounter) THEN
+        BEGIN
+          SaveX := WhereX;
+          SaveY := WhereY;
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(10);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          Inc(LightBarCmd);
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(114);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          ANSIG(SaveX,SaveY);
+          SetC(31);
+        END;
+      END
+      ELSE IF (W = F_Up) THEN
+      BEGIN
+        IF (LightBarCmd = 1) AND (LightBarArray[LightBarCmd].CmdToExec <> MinNum) THEN
+        BEGIN
+          S := '[';
+          LightBarFirstCmd := FALSE;
+          GotCmd := TRUE
+        END
+        ELSE IF ((LightBarCmd - 2) >= 1) THEN
+        BEGIN
+          SaveX := WhereX;
+          SaveY := WhereY;
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(10);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          Dec(LightBarCmd,2);
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(114);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          ANSIG(SaveX,SaveY);
+          SetC(31);
+        END
+      END
+      ELSE IF (W = F_Down) THEN
+      BEGIN
+        IF (LightBarCmd = LightBarCounter) AND (LightBarArray[LightBarCmd].CmdToExec <> MaxNum) THEN
+        BEGIN
+          S := ']';
+          LightBarFirstCmd := TRUE;
+          GotCmd := TRUE
+        END
+        ELSE IF ((LightBarCmd + 2) <= LightBarCounter) THEN
+        BEGIN
+          SaveX := WhereX;
+          SaveY := WhereY;
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(10);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          Inc(LightBarCmd,2);
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(114);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          ANSIG(SaveX,SaveY);
+          SetC(31);
+        END;
+      END;
+    END;
+
+    C := UpCase(Char(W));
+
+    SaveS := s;
+
+    IF ((Pos(c,Allowed) <> 0) AND (s = '')) THEN
+    BEGIN
+      GotCmd := TRUE;
+      s := c;
+    END
+    ELSE IF (Pos(c,'0123456789') > 0) OR (c = '-') THEN
+    BEGIN
+      IF ((Length(s) < 6) OR ((Pos('-',s) > 0) AND (Length(s) < 11))) THEN
+        s := s + c;
+    END
+    ELSE IF ((s <> '') AND (c = ^H)) THEN
+      Dec(s[0])
+    ELSE IF (c = ^X) THEN
+    BEGIN
+      FOR Counter := 1 TO Length(s) DO
+        BackSpace;
+      s := '';
+      SaveS := '';
+    END
+    ELSE IF (c = #13) AND (S <> '') THEN
+    BEGIN
+      IF (S = '-') THEN
+      BEGIN
+        BackSpace;
+        S := '';
+        SaveS := '';
+      END
+      ELSE
+        GotCmd := TRUE;
+    END;
+    IF (Length(s) < Length(SaveS)) THEN
+      BackSpace;
+    IF (Length(s) > Length(SaveS)) THEN
+      Prompt(s[Length(s)]);
+  UNTIL (GotCmd) OR (HangUp);
+
+  IF (General.UseLightBars) AND (UseLightBars IN ThisUser.Flags) THEN
+  BEGIN
+    SaveX := WhereX;
+    SaveY := WhereY;
+    ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+    SetC(10);
+    Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+    ANSIG(SaveX,SaveY);
+  END;
+
+  UserColor(1);
+  NL;
+END;
+
+PROCEDURE MsgAreaScanInput(DisplayStr: AStr; MaxLen: Byte; VAR S: AStr; CONST Allowed: AStr; MinNum,MaxNum: Integer);
+VAR
+  SaveS: AStr;
+  C: Char;
+  Counter,
+  SaveX,
+  SaveY: Byte;
+  W: Word;
+  GotCmd: Boolean;
+BEGIN
+  Prt(DisplayStr);
+  MPL(MaxLen);
+
+  IF (LightBarFirstCmd) THEN
+    LightBarCmd := 1
+  ELSE
+    LightBarCmd := LightBarCounter;
+
+  IF (General.UseLightBars) AND (UseLightBars IN ThisUser.Flags) THEN
+  BEGIN
+    SaveX := WhereX;
+    SaveY := WhereY;
+    ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+    SetC(114);
+    Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+    ANSIG(SaveX,SaveY);
+    SetC(31);
+  END;
+
+  GotCmd := FALSE;
+
+  s := '';
+
+  REPEAT
+
+    W := GetKey;
+
+    IF (General.UseLightBars) AND (UseLightBars IN ThisUser.Flags) THEN
+    BEGIN
+      IF (W = 13) AND (S = '') THEN
+      BEGIN
+        S := IntToStr(LightBarArray[LightBarCmd].CmdToExec);
+        GotCmd := TRUE;
+      END
+      ELSE IF (W = 91) THEN
+      BEGIN
+        IF (CmdExists(MinNum)) THEN
+          W := 0
+        ELSE
+        BEGIN
+          S := '[';
+          LightBarFirstCmd := FALSE;
+          GotCmd := TRUE
+        END;
+      END
+      ELSE IF (W = 93) THEN
+      BEGIN
+        IF (CmdExists(MaxNum)) THEN
+          W := 0
+        ELSE
+        BEGIN
+          S := ']';
+          LightBarFirstCmd := TRUE;
+          GotCmd := TRUE
+        END
+      END
+      ELSE IF (W = F_Home) AND (LightBarCmd <> 1) THEN
+      BEGIN
+        SaveX := WhereX;
+        SaveY := WhereY;
+        ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+        SetC(10);
+        Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+        LightBarCmd := 1;
+        ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+        SetC(114);
+        Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+        ANSIG(SaveX,SaveY);
+        SetC(31);
+      END
+      ELSE IF (W = F_End) AND (LightBarCmd <> LightBarCounter) THEN
+      BEGIN
+        SaveX := WhereX;
+        SaveY := WhereY;
+        ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+        SetC(10);
+        Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+        LightBarCmd := LightBarCounter;
+        ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+        SetC(114);
+        Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+        ANSIG(SaveX,SaveY);
+        SetC(31);
+      END
+      ELSE IF (W = F_Left) THEN
+      BEGIN
+        IF (LightBarCmd = 1) AND (LightBarArray[LightBarCmd].CmdToExec <> MinNum) THEN
+        BEGIN
+          S := '[';
+          LightBarFirstCmd := FALSE;
+          GotCmd := TRUE
+        END
+        ELSE IF (LightBarCmd > 1) THEN
+        BEGIN
+          SaveX := WhereX;
+          SaveY := WhereY;
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(10);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          Dec(LightBarCmd);
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(114);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          ANSIG(SaveX,SaveY);
+          SetC(31);
+        END;
+      END
+      ELSE IF (W = F_Right) THEN
+      BEGIN
+        IF (LightBarCmd = LightBarCounter) AND (LightBarArray[LightBarCmd].CmdToExec <> MaxNum) THEN
+        BEGIN
+          S := ']';
+          LightBarFirstCmd := TRUE;
+          GotCmd := TRUE
+        END
+        ELSE IF (LightBarCmd < LightBarCounter) THEN
+        BEGIN
+          SaveX := WhereX;
+          SaveY := WhereY;
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(10);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          Inc(LightBarCmd);
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(114);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          ANSIG(SaveX,SaveY);
+          SetC(31);
+        END;
+      END
+      ELSE IF (W = F_Up) THEN
+      BEGIN
+        IF (LightBarCmd = 1) AND (LightBarArray[LightBarCmd].CmdToExec <> MinNum) THEN
+        BEGIN
+          S := '[';
+          LightBarFirstCmd := FALSE;
+          GotCmd := TRUE
+        END
+        ELSE IF ((LightBarCmd - 2) >= 1) THEN
+        BEGIN
+          SaveX := WhereX;
+          SaveY := WhereY;
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(10);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          Dec(LightBarCmd,2);
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(114);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          ANSIG(SaveX,SaveY);
+          SetC(31);
+         END
+      END
+      ELSE IF (W = F_Down) THEN
+      BEGIN
+        IF (LightBarCmd = LightBarCounter) AND (LightBarArray[LightBarCmd].CmdToExec <> MaxNum) THEN
+        BEGIN
+          S := ']';
+          LightBarFirstCmd := TRUE;
+          GotCmd := TRUE
+        END
+        ELSE IF ((LightBarCmd + 2) <= LightBarCounter) THEN
+        BEGIN
+          SaveX := WhereX;
+          SaveY := WhereY;
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(10);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          Inc(LightBarCmd,2);
+          ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+          SetC(114);
+          Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+          ANSIG(SaveX,SaveY);
+          SetC(31);
+        END;
+      END;
+    END;
+
+    C := UpCase(Char(W));
+
+    SaveS := s;
+
+    IF ((Pos(c,Allowed) <> 0) AND (s = '')) THEN
+    BEGIN
+      GotCmd := TRUE;
+      s := c;
+    END
+    ELSE IF (Pos(c,'0123456789') > 0) OR (c = '-') THEN
+    BEGIN
+      IF ((Length(s) < 6) OR ((Pos('-',s) > 0) AND (Length(s) < 11))) THEN
+        s := s + c;
+    END
+    ELSE IF ((s <> '') AND (c = ^H)) THEN
+      Dec(s[0])
+    ELSE IF (c = ^X) THEN
+    BEGIN
+      FOR Counter := 1 TO Length(s) DO
+        BackSpace;
+      s := '';
+      SaveS := '';
+    END
+    ELSE IF (c = #13) AND (S <> '') THEN
+    BEGIN
+      IF (S = '-') THEN
+      BEGIN
+        BackSpace;
+        S := '';
+        SaveS := '';
+      END
+      ELSE
+        GotCmd := TRUE;
+    END;
+    IF (Length(s) < Length(SaveS)) THEN
+      BackSpace;
+    IF (Length(s) > Length(SaveS)) THEN
+      Prompt(s[Length(s)]);
+  UNTIL (GotCmd) OR (HangUp);
+
+  IF (General.UseLightBars) AND (UseLightBars IN ThisUser.Flags) THEN
+  BEGIN
+    SaveX := WhereX;
+    SaveY := WhereY;
+    ANSIG(LightBarArray[LightBarCmd].XPos,LightBarArray[LightBarCmd].YPos);
+    SetC(10);
+    Prompt(PadLeftStr(LightBarArray[LightBarCmd].CmdToShow,32));
+    ANSIG(SaveX,SaveY);
+  END;
+
+  UserColor(1);
+  NL;
+END;
+
+FUNCTION CheckPW: Boolean;
+VAR
+  Password: STR20;
+BEGIN
+  IF (NOT General.SysOpPWord) OR (InWFCMenu) THEN
+  BEGIN
+    CheckPW := TRUE;
+    Exit;
+  END;
+  CheckPW := FALSE;
+  { Prompt(FString.SysOpPrompt); }
+  lRGLngStr(33,FALSE);
+  GetPassword(Password,20);
+  IF (Password = General.SysOpPW) THEN
+    CheckPW := TRUE
+  ELSE IF (InCom) AND (Password <> '') THEN
+    SysOpLog('--> SysOp Password Failure = '+Password+' ***');
+END;
+
+PROCEDURE NewCompTables;
+VAR
+  FileCompArrayFile: FILE OF CompArrayType;
+  MsgCompArrayFile: FILE OF CompArrayType;
+  CompFileArray: CompArrayType;
+  CompMsgArray: CompArrayType;
+  Counter,
+  Counter1,
+  Counter2,
+  SaveReadMsgArea,
+  SaveReadFileArea: Integer;
+BEGIN
+  SaveReadMsgArea := ReadMsgArea;
+  SaveReadFileArea := ReadFileArea;
+  Reset(FileAreaFile);
+  IF (IOResult <> 0) THEN
+  BEGIN
+    SysOpLog('Error opening FBASES.DAT (Procedure: NewCompTables)');
+    Exit;
+  END;
+  NumFileAreas := FileSize(FileAreaFile);
+  Assign(FileCompArrayFile,TempDir+'FACT'+IntToStr(ThisNode)+'.DAT');
+  ReWrite(FileCompArrayFile);
+  CompFileArray[0] := 0;
+  CompFileArray[1] := 0;
+  FOR Counter := 1 TO FileSize(FileAreaFile) DO
+    Write(FileCompArrayFile,CompFileArray);
+  Reset(FileCompArrayFile);
+  IF (NOT General.CompressBases) THEN
+  BEGIN
+    FOR Counter := 1 TO FileSize(FileAreaFile) DO
+    BEGIN
+      Seek(FileAreaFile,(Counter - 1));
+      Read(FileAreaFile,MemFileArea);
+      IF (NOT AACS(MemFileArea.ACS)) THEN
+      BEGIN
+        CompFileArray[0] := 0;
+        CompFileArray[1] := 0;
+      END
+      ELSE
+      BEGIN
+        CompFileArray[0] := Counter;
+        CompFileArray[1] := Counter;
+      END;
+      Seek(FileCompArrayFile,(Counter - 1));
+      Write(FileCompArrayFile,CompFileArray);
+    END;
+  END
+  ELSE
+  BEGIN
+    Counter2 := 0;
+    Counter1 := 0;
+    FOR Counter := 1 TO FileSize(FileAreaFile) DO
+    BEGIN
+      Seek(FileAreaFile,(Counter - 1));
+      Read(FileAreaFile,MemFileArea);
+      Inc(Counter1);
+      IF (NOT AACS(MemFileArea.ACS)) THEN
+      BEGIN
+        Dec(Counter1);
+        CompFileArray[0] := 0;
+      END
+      ELSE
+      BEGIN
+        CompFileArray[0] := Counter1;
+        Seek(FileCompArrayFile,(Counter - 1));
+        Write(FileCompArrayFile,CompFileArray);
+        Inc(Counter2);
+        Seek(FileCompArrayFile,(Counter2 - 1));
+        Read(FileCompArrayFile,CompFileArray);
+        CompFileArray[1] := Counter;
+        Seek(FileCompArrayFile,(Counter2 - 1));
+        Write(FileCompArrayFile,CompFileArray);
+      END;
+    END;
+  END;
+  Close(FileAreaFile);
+  LastError := IOResult;
+  LowFileArea := 0;
+  Counter1 := 0;
+  Counter := 1;
+  WHILE (Counter <= FileSize(FileCompArrayFile)) AND (Counter1 = 0) DO
+  BEGIN
+    Seek(FileCompArrayFile,(Counter - 1));
+    Read(FileCompArrayFile,CompFileArray);
+    IF (CompFileArray[0] <> 0) THEN
+      Counter1 := CompFileArray[0];
+    Inc(Counter);
+  END;
+  LowFileArea := Counter1;
+  HighFileArea := 0;
+  Counter1 := 0;
+  Counter := 1;
+  WHILE (Counter <= FileSize(FileCompArrayFile)) DO
+  BEGIN
+    Seek(FileCompArrayFile,(Counter - 1));
+    Read(FileCompArrayFile,CompFileArray);
+    IF (CompFileArray[0] <> 0) THEN
+      Counter1 := CompFileArray[0];
+    Inc(Counter);
+  END;
+  HighFileArea := Counter1;
+  Close(FileCompArrayFile);
+  LastError := IOResult;
+  Reset(MsgAreaFile);
+  IF (IOResult <> 0) THEN
+  BEGIN
+    SysOpLog('Error opening MBASES.DAT (Procedure: NewCompTables)');
+    Exit;
+  END;
+  NumMsgAreas := FileSize(MsgAreaFile);
+  Assign(MsgCompArrayFile,TempDir+'MACT'+IntToStr(ThisNode)+'.DAT');
+  ReWrite(MsgCompArrayFile);
+  CompMsgArray[0] := 0;
+  CompMsgArray[1] := 0;
+  FOR Counter := 1 TO FileSize(MsgAreaFile) DO
+    Write(MsgCompArrayFile,CompMsgArray);
+  Reset(MsgCompArrayFile);
+  IF (NOT General.CompressBases) THEN
+  BEGIN
+    FOR Counter := 1 TO FileSize(MsgAreaFile) DO
+    BEGIN
+      Seek(MsgAreaFile,(Counter - 1));
+      Read(MsgAreaFile,MemMsgArea);
+      IF (NOT AACS(MemMsgArea.ACS)) THEN
+      BEGIN
+        CompMsgArray[0] := 0;
+        CompMsgArray[1] := 0;
+      END
+      ELSE
+      BEGIN
+        CompMsgArray[0] := Counter;
+        CompMsgArray[1] := Counter;
+      END;
+      Seek(MsgCompArrayFile,(Counter - 1));
+      Write(MsgCompArrayFile,CompMsgArray);
+    END;
+  END
+  ELSE
+  BEGIN
+    Counter2 := 0;
+    Counter1 := 0;
+    FOR Counter := 1 TO FileSize(MsgAreaFile) DO
+    BEGIN
+      Seek(MsgAreaFile,(Counter - 1));
+      Read(MsgAreaFile,MemMsgArea);
+      Inc(Counter1);
+      IF (NOT AACS(MemMsgArea.ACS)) THEN
+      BEGIN
+        Dec(Counter1);
+        CompMsgArray[0] := 0;
+      END
+      ELSE
+      BEGIN
+        CompMsgArray[0] := Counter1;
+        Seek(MsgCompArrayFile,(Counter - 1));
+        Write(MsgCompArrayFile,CompMsgArray);
+        Inc(Counter2);
+        Seek(MsgCompArrayFile,(Counter2 - 1));
+        Read(MsgCompArrayFile,CompMsgArray);
+        CompMsgArray[1] := Counter;
+        Seek(MsgCompArrayFile,(Counter2 - 1));
+        Write(MsgCompArrayFile,CompMsgArray);
+      END;
+    END;
+  END;
+  Close(MsgAreaFile);
+  LastError := IOResult;
+  LowMsgArea := 0;
+  Counter1 := 0;
+  Counter := 1;
+  WHILE (Counter <= FileSize(MsgCompArrayFile)) AND (Counter1 = 0) DO
+  BEGIN
+    Seek(MsgCompArrayFile,(Counter - 1));
+    Read(MsgCompArrayFile,CompMsgArray);
+    IF (CompMsgArray[0] <> 0) THEN
+      Counter1 := CompMsgArray[0];
+    Inc(Counter);
+  END;
+  LowMsgArea := Counter1;
+  HighMsgArea := 0;
+  Counter1 := 0;
+  Counter := 1;
+  WHILE (Counter <= FileSize(MsgCompArrayFile)) DO
+  BEGIN
+    Seek(MsgCompArrayFile,(Counter - 1));
+    Read(MsgCompArrayFile,CompMsgArray);
+    IF (CompMsgArray[0] <> 0) THEN
+      Counter1 := CompMsgArray[0];
+    Inc(Counter);
+  END;
+  HighMsgArea := Counter1;
+  Close(MsgCompArrayFile);
+  LastError := IOResult;
+  ReadMsgArea := -1;
+  ReadFileArea := -1;
+  IF (NOT FileAreaAC(FileArea)) THEN
+    ChangeFileArea(CompFileArea(1,1));
+  IF (NOT MsgAreaAC(MsgArea)) THEN
+    ChangeMsgArea(CompMsgArea(1,1));
+  LoadMsgArea(SaveReadMsgArea);
+  LoadFileArea(SaveReadFileArea);
+END;
+
+PROCEDURE Wait(b: Boolean);
+CONST
+  SaveCurrentColor: Byte = 0;
+BEGIN
+  IF (B) THEN
+  BEGIN
+    SaveCurrentColor := CurrentColor;
+    { Prompt(FString.lWait); }
+    lRGLngStr(4,FALSE);
+  END
+  ELSE
+  BEGIN
+    BackErase(LennMCI(lRGLngStr(4,TRUE){FString.lWait}));
+    SetC(SaveCurrentColor);
+  END;
+END;
+
+PROCEDURE InitTrapFile;
+BEGIN
+  Trapping := FALSE;
+  IF (General.GlobalTrap) OR (TrapActivity IN ThisUser.SFlags) THEN
+    Trapping := TRUE;
+  IF (Trapping) THEN
+  BEGIN
+    IF (TrapSeparate IN ThisUser.SFlags) THEN
+      Assign(TrapFile,General.LogsPath+'TRAP'+IntToStr(UserNum)+'.LOG')
+    ELSE
+      Assign(TrapFile,General.LogsPath+'TRAP.LOG');
+    Append(TrapFile);
+    IF (IOResult = 2) THEN
+    BEGIN
+      ReWrite(TrapFile);
+      WriteLn(TrapFile);
+    END;
+    WriteLn(TrapFile,'***** Renegade User Audit - '+Caps(ThisUser.Name)+' on at '+DateStr+' '+TimeStr+' *****');
+  END;
+END;
+
+PROCEDURE Local_Input1(VAR S: STRING; MaxLen: Byte; LowerCase: Boolean);
+VAR
+  C: Char;
+  B: Byte;
+BEGIN
+  B := 1;
+  REPEAT
+    C := ReadKey;
+    IF (NOT LowerCase) THEN
+      C := UpCase(C);
+    IF (C IN [#32..#255]) THEN
+      IF (B <= MaxLen) THEN
+      BEGIN
+        S[B] := C;
+        Inc(B);
+        Write(C);
+      END
+      ELSE
+    ELSE
+      CASE C of
+        ^H : IF (B > 1) THEN
+             BEGIN
+               Write(^H' '^H);
+               C := ^H;
+               Dec(B);
+             END;
+     ^U,^X : WHILE (B <> 1) DO
+             BEGIN
+               Write(^H' '^H);
+               Dec(B);
+             END;
+      END;
+  UNTIL (C IN [^M,^N]);
+  S[0] := Chr(B - 1);
+  IF (WhereY <= Hi(WindMax) - Hi(WindMin)) THEN
+    WriteLn;
+END;
+
+PROCEDURE Local_Input(VAR S: STRING; MaxLen: Byte);
+BEGIN
+  Local_Input1(S,MaxLen,FALSE);
+END;
+
+PROCEDURE Local_InputL(VAR S: STRING; MaxLen: Byte);
+BEGIN
+  Local_Input1(S,MaxLen,TRUE);
+END;
+
+PROCEDURE Local_OneK(VAR C: Char; S: STRING);
+BEGIN
+  REPEAT
+    C := UpCase(ReadKey)
+  UNTIL (Pos(C,S) > 0);
+  WriteLn(C);
+END;
+
+PROCEDURE SysOpShell;
+VAR
+  SavePath: STRING;
+  SaveWhereX,
+  SaveWhereY,
+  SaveCurCo: Byte;
+  ReturnCode: Integer;
+  SaveTimer: LongInt;
+BEGIN
+  SaveCurCo := CurrentColor;
+  GetDir(0,SavePath);
+  SaveTimer := Timer;
+  IF (UserOn) THEN
+  BEGIN
+    lRGLngStr(12,FALSE); { "SysOp has shelled to DOS" }
+    Com_Flush_Send;
+    Delay(100); { why the delay? }
+  END;
+  SaveWhereX := WhereX;
+  SaveWhereY := WhereY;
+  Window(1,1,80,25);
+  TextBackGround(Black);
+  TextColor(LightGray);
+  ClrScr;
+  TextColor(LightCyan);
+  WriteLn('Type "EXIT" to return to Renegade.');
+  WriteLn;
+  TimeLock := TRUE;
+  ShellDOS(FALSE,'',ReturnCode);
+  TimeLock := FALSE;
+  IF (UserOn) THEN
+    Com_Flush_Recv;
+  ChDir(SavePath);
+  TextBackGround(Black);
+  TextColor(LightGray);
+  ClrScr;
+  TextAttr := SaveCurCo;
+  GoToXY(SaveWhereX,SaveWhereY);
+  IF (UserOn) THEN
+  BEGIN
+    IF (NOT InChat) THEN
+      FreeTime := ((FreeTime + Timer) - SaveTimer);
+    Update_Screen;
+    FOR SaveCurCo := 1 TO LennMCI(lRGLngStr(12,TRUE){FString.ShellDOS1}) DO
+      BackSpace;
+  END;
+END;
+
+PROCEDURE ReDrawForANSI;
+BEGIN
+  IF (DOSANSIOn) THEN
+  BEGIN
+    DOSANSIOn := FALSE;
+    Update_Screen;
+  END;
+  TextAttr := 7;
+  CurrentColor := 7;
+  IF (OutCom) THEN
+    IF (OKAvatar) THEN
+      SerialOut(^V^A^G)
+    ELSE IF (OkANSI) THEN
+      SerialOut(#27+'[0m');
 END;
 
 END.

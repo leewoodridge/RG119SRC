@@ -268,17 +268,15 @@ BEGIN
       Append(SysOpLogFile1);
       TempStr := '';
       TempStr1 := '';
-      FOR Counter := 1 TO (26 + Length(ThisUser.Name)) DO
+      FOR Counter := 1 TO (25 + Length(ThisUser.Name)) DO
       BEGIN
-        TempStr := TempStr + '_';
+        TempStr := TempStr + '-';
         TempStr1 := TempStr1 + ' ';
       END;
       WriteLn(SysOpLogFile1,'');
-      WriteLn(SysOpLogFile1,'  '+TempStr);
-      WriteLn(SysOpLogFile1,'>>'+TempStr1+'<<');
-      WriteLn(SysOpLogFile1,'>> Renegade SysOp Log for '+Caps(ThisUser.Name)+': <<');
-      WriteLn(SysOpLogFile1,'>>'+TempStr+'<<');
-      WriteLn(SysOpLogFile1,'');
+      WriteLn(SysOpLogFile1,'+'+TempStr+'+');
+      WriteLn(SysOpLogFile1,'| Renegade SysOp Log for '+Caps(ThisUser.Name)+' |');
+      WriteLn(SysOpLogFile1,'+'+TempStr+'+');
     END;
     WriteLn(SysOpLogFile1);
 
@@ -453,7 +451,7 @@ BEGIN
         Prompt('^0You have not voted on ^1'+IntToStr(Counter)+'^0 voting '+Plural('question',Counter)+'...');
 		NL;
 		NL;
-		IF PYNQ('^0Would you like to vote now? ',0,FALSE) THEN { LeeW: Added }
+		IF NewYN('^0Would you like to vote now? ',FALSE) THEN { LeeW: Added }
 		  BEGIN
 		    VoteAll;
 		  END;

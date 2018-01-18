@@ -30,7 +30,7 @@ USES
   Dos,
   Boot,
   Common,
-  Common1,
+{Common1,}
   Events,
   File0,
   File7,
@@ -47,11 +47,31 @@ USES
   TimeFunc,
   WfCMenu;
 
-{$O MsgPack   } {$O Common1   } {$O Common2   } {$O Common3   } {$O Boot      }
-{$O WfcMenu   } {$O Timefunc  } {$O Sysop1    } {$O Sysop2    } {$O Offline   }
-{$O Sysop2j   } {$O Sysop2a   } {$O Sysop2b   } {$O Sysop2c   } {$O Sysop2d   }
-(*{$O Sysop2e   }*) {$O Sysop2f   } {$O Sysop2l   } {$O Sysop2g   } {$O Sysop2i   }
-{$O Sysop2h   } {$O File4     } {$O Sysop2k   } {$O Sysop3    } {$O Sysop4    }
+{$O MsgPack   }
+(*{$O Common1   }*)
+{$O Common2   }
+{$O Common4   }
+{$O Boot      }
+{$O WFCMenu   } 
+{$O Timefunc  } 
+{$O Sysop1    } 
+{$O Sysop2    } 
+{$O Offline   }
+{$O Sysop2j   } 
+{$O Sysop2a   } 
+{$O Sysop2b   } 
+{$O Sysop2c   } 
+{$O Sysop2d   }
+(*{$O Sysop2e   }*) 
+{$O Sysop2f   } 
+{$O Sysop2l   } 
+{$O Sysop2g   } 
+{$O Sysop2i   }
+{$O Sysop2h   } 
+{$O Sysop2o   } 
+{$O Sysop5    }  
+{$O SysOp12   }
+{$O File4     } {$O Sysop2k   } {$O Sysop3    } {$O Sysop4    }
 {$O Sysop6    } {$O Sysop7    } {$O Sysop7m   } {$O Sysop8    } {$O Sysop2m   }
 {$O Sysop9    } {$O Sysop10   } {$O Sysop11   } {$O Mail0     } {$O Mail1     }
 {$O Email     } {$O Mail2     } {$O Mail3     } {$O Vote      } {$O Nodelist  }
@@ -62,8 +82,8 @@ USES
 {$O Maint     } {$O NewUsers  } {$O TimeBank  } {$O Bulletin  } {$O MiscUser  }
 {$O ShortMsg  } {$O CUser     } {$O Doors     } {$O ExecBat   } {$O Automsg   }
 {$O MyIO      } {$O Menus2    } {$O Menus3    } {$O LineChat  } {$O Stats      }
-{$O Events    } {$O BBSList   } {$O Common4   } {$O File7     } {$O SplitCha  }
-{$O Sysop2o   } {$O Sysop5   }  {$O SysOp12   } {$O OneLiner  }
+{$O Events    } {$O BBSList   } {$O File7     } {$O SplitCha  }
+{$O OneLiner  }
 
 CONST
   NeedToHangUp: Boolean = FALSE;
@@ -186,7 +206,6 @@ BEGIN
 				WriteLn('/EE###   : Critical Error Aborts To DOS With Errorlevel ###');
 				WriteLn('/EN###   : With /Q, Exits With Errorlevel 2 If New EchoMail, Or 0 If None ');
 				WriteLn('/I###    : Passes Caller ID Information');
-				WriteLn('/K##     : 25/43/50 Line Display Mode');
 				WriteLn('/L       : Local Mode');
 				WriteLn('/M#      : Create QWK Packet For User #, Then Return To DOS');
 				WriteLn('/N#      : Specifies Which Node To Load');
@@ -195,6 +214,13 @@ BEGIN
 				WriteLn('/Q       : Renegade Exits To DOS When User Logs Off');
 				WriteLn('/U#      : Upload REP Packet For User #, Then Return To DOS');
 				WriteLn('/X####   : Logs User Off In #### Minutes For External Event');
+				WriteLn('/T       : Telnet (Net2BBS)');
+				WriteLn('/TC      : Telnet (NetSerial or Com/IP)');
+				WriteLn('/5       : Fifty-Line Display Mode');
+				WriteLn('/C       : Reliable');
+				WriteLn('/D       : Don`t Load Overlay file to ems');
+				WriteLn('/H       : Sock Handle');
+				WriteLn('/F       : Files.BBS');
 				Halt;
 			  END;
         '5' : TextMode(259);

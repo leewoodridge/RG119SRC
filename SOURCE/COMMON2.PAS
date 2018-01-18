@@ -209,7 +209,7 @@ BEGIN
       TextAttr := c1
     ELSE
       TextAttr := c2;
-    Write(Copy('1234',(Ord(Flag) - 19),1));
+    Write(Copy('1234',(Ord(Flag) - 9),1)); {fixt}
   END;
 END;
 

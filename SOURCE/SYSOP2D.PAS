@@ -317,7 +317,7 @@ PROCEDURE SystemGeneralVariables;
                 END;
                 Cmd := #0;
               END;
-        'A'..'F','m','h'{},'g','k','u','v','w'{},'N'..'P' :
+        'A'..'F','H','G','K','M','U','V','W','N'..'P' :
               BEGIN
                 CASE Cmd OF
                   'B' : BEGIN
@@ -370,11 +370,11 @@ PROCEDURE SystemGeneralVariables;
                           MaxInt := 32767;
                           TempI := PasswordChange;
                         END;
-
+{
                   'V' : BEGIN
                           PauseScr(FALSE);
 						END;
-
+}
                  {'O' : BEGIN
                           MinInt := 1;
                           MaxInt := 32767;
