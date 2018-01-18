@@ -56,6 +56,8 @@ Updates
 - InputByte, InputInteger - if input is invalid, returns 1 less than minimum unless minimum is 0
 - new user app questions have 5-try limit now before disconnect
 - change password can now be aborted
+- newyn function now has fallback for basic input if no ansi emu or lightbars disabled
+- combined common#.pas to common.pas
 
 Renegade v1.19
 ==============
