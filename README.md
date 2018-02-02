@@ -58,6 +58,18 @@ Updates
 - change password can now be aborted
 - newyn function now has fallback for basic input if no ansi emu or lightbars disabled
 - combined common#.pas to common.pas
+- fixed miscolored pause prompt issue
+- removed alt+e alt+w user editor, will redo
+- added more common messages to Common.Messages()
+- SysOp7/7M (Menu&Command Editor) now uses Common.Messages() for insert,position,delete messages
+- oneliners now use Common.Messages()
+- rework oneliners, esp error handling and combined procedures
+- DisplayBuffer PROC now a FUNC to store output
+- MCI: %1R for random oneliner
+- splitscreen chat: now restores screen on exit (local disp) and crtl+z opens and closes help
+- added menu record to rgupdate
+- can now choose default chat type: line or split-screen
+- splitcha and linechat combined into chat.pas
 
 Renegade v1.19
 ==============
