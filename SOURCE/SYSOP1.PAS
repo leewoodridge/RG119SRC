@@ -1,4 +1,3 @@
-{$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
 
 {  ___   ____  _      ____  __     __    ___   ____      ___   ___   __  
   | |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`
@@ -7,7 +6,6 @@
   PROTOCOL EDITOR
   
 }
-
 
 UNIT SysOp1;
 
@@ -81,7 +79,7 @@ VAR
     END;
   END;
 
-  PROCEDURE DeleteProtocol(TempProtocol1: ProtocolRecordType; RecNumToDelete: SmallInt);
+  PROCEDURE DeleteProtocol(TempProtocol1: ProtocolRecordType; RecNumToDelete: Integer);
   VAR
     RecNum: Integer;
   BEGIN
@@ -248,7 +246,7 @@ VAR
   END;
 
   PROCEDURE EditProtocol(TempProtocol1: ProtocolRecordType; VAR Protocol: ProtocolRecordType; VAR Cmd1: Char;
-                         VAR RecNumToEdit: SmallInt; VAR Changed: Boolean; Editing: Boolean);
+                         VAR RecNumToEdit: Integer; VAR Changed: Boolean; Editing: Boolean);
   VAR
     TempStr,
     CmdStr: AStr;
@@ -265,75 +263,80 @@ VAR
           Next := FALSE;
           CLS;
           IF (Editing) THEN
-            PrintACR('^5Editing protocol #'+IntToStr(RecNumToEdit)+' of '+IntToStr(NumProtocols))
+		    ConfigHeader('Editing Protocol #'+IntToStr(RecNumToEdit)+' Of '+IntToStr(NumProtocols))
           ELSE
-            PrintACR('^5Inserting protocol #'+IntToStr(RecNumToEdit)+' of '+IntToStr(NumProtocols + 1));
-          NL;
-          PrintACR('^1!. Type/protocl: ^5'+
-                   AOnOff(ProtActive IN PRFlags,'Active','INACTIVE')+' - '+
+		    ConfigHeader('Inserting Protocol #'+IntToStr(RecNumToEdit)+' Of '+IntToStr(NumProtocols + 1));
+          PrintACR('^0(^1!^0) Type         : ^1'+
+                   AOnOff(ProtActive IN PRFlags,'Active','Inactive')+'^0 - ^1'+
                    AOnOff(ProtIsBatch IN PRFlags,'Batch','Single')+
-                   AOnOff(ProtIsResume IN PRFlags,' - Resume','')+
-                   AOnOff(ProtBiDirectional IN PRFlags,' - Bidirectional','')+
-                   AOnOff(ProtReliable IN PRFlags,' - Reliable only',''));
-          PrintACR('^11. Keys/descrip: ^5'+CKeys+'^1 / ^5'+AOnOff(Description = '','*None*',Description)+'^1');
-          PrintACR('^12. ACS required: ^5'+AOnOff(ACS = '','*None*',ACS)+'^1');
+                   AOnOff(ProtIsResume IN PRFlags,' ^0- ^1Resume','')+
+                   AOnOff(ProtBiDirectional IN PRFlags,' ^0- ^1Bi-Directional','')+
+                   AOnOff(ProtReliable IN PRFlags,'^0 - ^1Reliable Only',''));
+          PrintACR('^0(^11^0) Keys/Desc    : ^1'+CKeys+'^1 ^0/ ^1'+AOnOff(Description = '','*None*',Description)+'^1');
+          PrintACR('^0(^12^0) ACS Required : ^1'+AOnOff(ACS = '','*None*',ACS)+'^1');
           IF (CmdOk(Protocol)) AND (ProtIsBatch IN PRFLags) THEN
           BEGIN
-            PrintACR('^13. Temp. log   : ^5'+AOnOff(TempLog = '','*None*',TempLog));
+            PrintACR('^0(^13^0) Temp Log     : ^1'+AOnOff(TempLog = '','*None*',TempLog));
             IF (Protocol.TempLog <> '') THEN
-              PrintACR('^1               : File name position: ^5'+IntToStr(TempLogPF)+
-                       ' ^1/ Status position: ^5'+IntToStr(TempLogPS));
+			begin
+              PrintACR('^0                  File Name Position: ^1'+IntToStr(TempLogPF)+' / '+'Status Position: ^1'
+			  +IntToStr(TempLogPS));
+			end;
           END;
           IF (CmdOk(Protocol)) AND (ProtIsBatch IN PRFLags) THEN
           BEGIN
-            PrintACR('^14. <U>L log    : ^5'+AOnOff(ULoadLog = '','*None*',ULoadLog));
-            PrintACR('^1   <D>L log    : ^5'+AOnOff(DLoadLog = '','*None*',DLoadLog));
+            PrintACR('^0(^14^0) UL Log       : ^1'+AOnOff(ULoadLog = '','*None*',ULoadLog));
+            PrintACR('^0    DL Log       : ^1'+AOnOff(DLoadLog = '','*None*',DLoadLog));
           END;
-          PrintACR('^15. <U>L command: ^5'+AOnOff(ULCmd = '','*None*',ULCmd));
-          PrintACR('^1   <D>L command: ^5'+AOnOff(DLCmd = '','*None*',DLCmd));
+          PrintACR('^0(^15^0) UL Command   : ^1'+AOnOff(ULCmd = '','*None*',ULCmd));
+          PrintACR('^0    DL Command   : ^1'+AOnOff(DLCmd = '','*None*',DLCmd));
           IF (ProtIsBatch IN PRFLags) AND (CMDOk(Protocol)) AND (Protocol.DLCmd <> '') THEN
-            PrintACR('^1               : DL File List: ^5'+AOnOff(DLFList = '','*None*',DLFList)+
-                     ' ^1/ Max DOS chars: ^5'+IntToStr(MaxChrs));
+            PrintACR('^0    DL File List : ^1'+AOnOff(DLFList = '','*None*',DLFList)+
+                     '^0 / Max DOS Chars  : ^1'+IntToStr(MaxChrs));
           IF (CmdOk(Protocol)) THEN
-            PrintACR('^16. Codes mean  : ^5'+AOnOff(ProtXferOkCode IN PRFlags,'Transfer Successful','Transfer Failed'));
+            PrintACR('^0(^16^0) Codes Mean   : ^1'+AOnOff(ProtXferOkCode IN PRFlags,'Transfer Successful','Transfer Failed'));
           IF (CmdOk(Protocol)) THEN
           BEGIN
-            TempStr := '^17. <U>L codes  :';
+            TempStr := '^0(^17^0) UL Codes     :';
             FOR Counter := 1 TO 3 DO
-              TempStr := TempStr + PadLeftStr('^1 ('+IntToStr(Counter)+') "^5'+ULCode[Counter]+'^1" ',13);
+              TempStr := TempStr + PadLeftStr('^0 (^1'+IntToStr(Counter)+'^0) "^1'+ULCode[Counter]+'^1" ',13);
             PrintACR(TempStr);
-            TempStr := '^1               :';
+            TempStr := '^1                 :';
             FOR Counter := 4 TO 6 DO
-              TempStr := TempStr + PadLeftStr('^1 ('+IntToStr(Counter)+') "^5'+ULCode[Counter]+'^1" ',13);
+              TempStr := TempStr + PadLeftStr('^0 (^1'+IntToStr(Counter)+'^0) "^1'+ULCode[Counter]+'^1" ',13);
             PrintACR(TempStr);
-            TempStr := '^1   <D>L codes  :';
+            TempStr := '^0    DL Codes     :';
             FOR Counter := 1 TO 3 DO
-              TempStr := TempStr + PadLeftStr('^1 ('+IntToStr(Counter)+') "^5'+DLCode[Counter]+'^1" ',13);
+              TempStr := TempStr + PadLeftStr('^0 (^1'+IntToStr(Counter)+'^0) "^1'+DLCode[Counter]+'^1" ',13);
             PrintACR(TempStr);
-            TempStr := '^1               :';
+            TempStr := '^1                 :';
             FOR Counter := 4 TO 6 DO
-              TempStr := TempStr + PadLeftStr('^1 ('+IntToStr(Counter)+') "^5'+DLCode[Counter]+'^1" ',13);
+              TempStr := TempStr + PadLeftStr('^0 (^1'+IntToStr(Counter)+'^0) "^1'+DLCode[Counter]+'^1" ',13);
             PrintACR(TempStr);
           END;
           IF (CmdOk(Protocol)) THEN
-            PrintACR('^18. Environ. cmd: ^5'+AOnOff(EnvCmd = '','*None*',EnvCmd));
+            PrintACR('^0(^18^0) Enviro Cmd   : ^1'+AOnOff(EnvCmd = '','*None*',EnvCmd));
           MCIAllowed := TRUE;
         END;
         IF (NOT Editing) THEN
           CmdStr := '!12345678'
         ELSE
-          CmdStr := '!12345678[]FJL';
-        LOneK('%LFModify menu [^5?^4=^5Help^4]: ',Cmd1,'Q?'+CmdStr+^M,TRUE,TRUE);
+          CmdStr := '!12345678[]<>/';
+		NL;
+        LOneK('^0Protocol Editor: ',Cmd1,'Q?'+CmdStr+^M,TRUE,TRUE);
         CASE Cmd1 OF
           '!' : BEGIN
                   REPEAT
-                    Print('%LF^5Protocol types:^1');
-                    Print('%LF^11. Protocol active   : ^5'+ShowYesNo(ProtActive IN PRFlags));
-                    Print('^12. Is batch protocol : ^5'+ShowYesNo(ProtIsBatch IN PRFlags));
-                    Print('^13. Is resume protocol: ^5'+ShowYesNo(ProtIsResume IN PRFlags));
-                    Print('^14. Is bidirectional  : ^5'+ShowYesNo(ProtBiDirectional IN PRFlags));
-                    Print('^15. For reliable only : ^5'+ShowYesNo(ProtReliable IN PRFlags));
-                    LOneK('%LFNew protocol type? [^51^4-^55^4,^5<CR>^4=^5Quit^4]: ',Cmd1,^M'12345',TRUE,TRUE);
+				    NL;
+                    Print('^0Protocol Types:');
+					NL;
+                    Print('^0(^11^0) Active         : ^1'+ShowYesNo(ProtActive IN PRFlags));
+                    Print('^0(^12^0) Batch          : ^1'+ShowYesNo(ProtIsBatch IN PRFlags));
+                    Print('^0(^13^0) Resume         : ^1'+ShowYesNo(ProtIsResume IN PRFlags));
+                    Print('^0(^14^0) Bi-Directional : ^1'+ShowYesNo(ProtBiDirectional IN PRFlags));
+                    Print('^0(^15^0) Reliable Only  : ^1'+ShowYesNo(ProtReliable IN PRFlags));
+					NL;
+                    LOneK('Enter Protocol Type: ',Cmd1,^M'12345',TRUE,TRUE);
                     IF (Cmd1 IN ['1'..'5']) THEN
                       ToggleXBFlags(Cmd1,PRFlags,Changed);
                   UNTIL (Cmd1 = ^M) OR (HangUp);
@@ -472,13 +475,14 @@ VAR
                                     END;
                             END;
                       'I' : BEGIN
-                              Print('%LF^5Internal protocol types:^1');
+							  NL;
+                              Print('^0Internal Protocol Types:');
                               NL;
-                              LCmds(40,3,'ASCII','');
-                              LCmds(40,3,'BATCH','');
-                              LCmds(40,3,'EDIT','');
-                              LCmds(40,3,'NEXT','');
-                              LCmds(40,3,'QUIT','');
+                              LCmds(10,1,'ASCII','');
+                              LCmds(10,1,'BATCH','');
+                              LCmds(10,1,'EDIT','');
+                              LCmds(10,1,'NEXT','');
+                              LCmds(10,1,'QUIT','');
                               LOneK('%LFNew internal protocol? [^5A^4,^5B^4,^5E^4,^5N^4,^5Q^4,^5<CR>^4=^5Quit^4]: ',
                                     Cmd2,^M'ABENQ',TRUE,TRUE);
                               IF (Cmd2 <> ^M) THEN
@@ -570,20 +574,26 @@ VAR
                   Messages(3,0,'');
                   Cmd1 := #0;
                 END;
-          'F' : IF (RecNumToEdit <> 1) THEN
-                  RecNumToEdit := 1
+          '<' : IF (RecNumToEdit <> 1) THEN
+		  begin
+                  RecNumToEdit := 1;
+				  {Cmd1 := #0;}
+		  end
                 ELSE
                 BEGIN
                   Messages(2,0,'');
                   Cmd1 := #0;
                 END;
-          'J' : BEGIN
+          '/' : BEGIN
                   InputIntegerWOC('^0%LFJump To Which Entry?',RecNumToEdit,[NumbersOnly],1,NumProtocols);
-                  IF (RecNumToEdit < 1) OR (RecNumToEdit > NumProtocols) THEN
-                    Cmd1 := #0;
+                  IF (RecNumToEdit > 1) OR (RecNumToEdit < NumProtocols) THEN
+                    {Cmd1 := #0;}
                 END;
-          'L' : IF (RecNumToEdit <> NumProtocols) THEN
-                  RecNumToEdit := NumProtocols
+          '>' : IF (RecNumToEdit <> NumProtocols) THEN
+		  begin
+                  RecNumToEdit := NumProtocols;
+				  {Cmd1 := #0;}
+		  end
                 ELSE
                 BEGIN
                   Messages(3,0,'');
@@ -596,20 +606,21 @@ VAR
                     LCmds(20,3,'Q Quit','')
                   ELSE
                   BEGIN
+				    NL;
                     LCmds(20,3,'[ Previous Entry','] Next Entry');
-                    LCmds(20,3,'F First Entry','J Jump To Entry');
-                    LCmds(20,3,'L Last Entry','Q Quit');
+                    LCmds(20,3,'< First Entry','> Last Entry');
+                    LCmds(20,3,'/ Jump To Entry','Q Quit');
                   END;
                 END;
         END;
-      UNTIL (Pos(Cmd1,'Q[]FJL') <> 0) OR (HangUp);
+      UNTIL (Pos(Cmd1,'Q[]<>/') <> 0) OR (HangUp);
   END;
 
-  PROCEDURE InsertProtocol(TempProtocol1: ProtocolRecordType; RecNumToInsertBefore: SmallInt);
+  PROCEDURE InsertProtocol(TempProtocol1: ProtocolRecordType; RecNumToInsertBefore: Integer);
   VAR
     Cmd1: Char;
     RecNum,
-    RecNumToEdit: SmallInt;
+    RecNumToEdit: Integer;
     Ok,
     Changed: Boolean;
   BEGIN
@@ -664,7 +675,7 @@ VAR
     END;
   END;
 
-  PROCEDURE ModifyProtocol(TempProtocol1: ProtocolRecordType; Cmd1: Char; RecNumToEdit: SmallInt);
+  PROCEDURE ModifyProtocol(TempProtocol1: ProtocolRecordType; Cmd1: Char; RecNumToEdit: Integer);
   VAR
     SaveRecNumToEdit: Integer;
     Ok,
@@ -715,11 +726,11 @@ VAR
     END;
   END;
 
-  PROCEDURE PositionProtocol(TempProtocol1: ProtocolRecordType; RecNumToPosition: SmallInt);
+  PROCEDURE PositionProtocol(TempProtocol1: ProtocolRecordType; RecNumToPosition: Integer);
   VAR
     RecNumToPositionBefore,
     RecNum1,
-    RecNum2: SmallInt;
+    RecNum2: Integer;
   BEGIN
     IF (NumProtocols = 0) THEN
       Messages(4,0,'protocols')
@@ -778,7 +789,8 @@ VAR
     Abort := FALSE;
     Next := FALSE;
     CLS;
-
+	
+	ConfigHeader('Protocol Editor');
 	PrintACR('^4+---+----+------------+-------------------------------------------------------+');
 	PrintACR('^4| ^3A ^4| ^3## ^4| ^3ACS        ^4| ^3Description                                           ^4|');
 	PrintACR('^4+---+----+------------+-------------------------------------------------------+');

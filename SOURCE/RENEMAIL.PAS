@@ -1,20 +1,18 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
 {$IFDEF MSDOS}
 {$M 49152,0,65536}
 {$ENDIF}
+
 {$A+,I-,E-,F+}
 
 PROGRAM ReneMail;
 
 USES
   Crt,
+  Common,
   Dos,
   TimeFunc;
 
-{$I RECORDS.PAS}
+(*{$I RECORDS.PAS}*)
 
 CONST
   Activity_Log: Boolean = FALSE;
@@ -40,16 +38,16 @@ TYPE
     ToUserName: STRING[35];
     Subject: STRING[71];
     DateTime: STRING[19];
-    TimesRead: SmallWord;
-    DestNode: SmallWord;
-    OrigNode: SmallWord;
-    Cost: SmallWord;
-    OrigNet: SmallWord;
-    DestNet: SmallWord;
+    TimesRead: Word;
+    DestNode: Word;
+    OrigNode: Word;
+    Cost: Word;
+    OrigNet: Word;
+    DestNet: Word;
     Filler: ARRAY[1..8] OF Char;
-    ReplyTo: SmallWord;
-    Attribute: SmallWord;
-    NextReply: SmallWord;
+    ReplyTo: Word;
+    Attribute: Word;
+    NextReply: Word;
   END;
 
   BufferArrayType = ARRAY[1..32767] OF Char;
@@ -73,7 +71,7 @@ VAR
 
   FidoFile: FILE;
 
-  HiWaterF: FILE OF SmallWord;
+  HiWaterF: FILE OF Word;
 
   General: GeneralRecordType;
 
@@ -772,7 +770,7 @@ END;
 PROCEDURE GetMsgLst(MemMsgPath: STRING; VAR LowMsg,HighMsg: Word);
 VAR
   FidoMsgNum,
-  HiWater: SmallWord;
+  HiWater: Word;
 BEGIN
   HiWater := 1;
   IF (NOT IsNetMail) THEN
@@ -850,7 +848,7 @@ BEGIN
       LowMsg := 2;
 END;
 
-PROCEDURE UpdateHiWater(MemMsgPath: STRING; HighWater: SmallWord);
+PROCEDURE UpdateHiWater(MemMsgPath: STRING; HighWater: Word);
 BEGIN
   Assign(HiWaterF,MemMsgPath+'HI_WATER.MRK');
   {$I-} ReWrite(HiWaterF); {$I+}

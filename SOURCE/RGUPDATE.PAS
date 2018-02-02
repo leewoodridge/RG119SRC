@@ -1,22 +1,54 @@
 (*{$M 49152,0,65536}*)
+
 PROGRAM RGUPDATE;
 
-USES
-  Crt,
-  Dos,
-  TimeFunc;
+(*
+	Update RENEGADE.DAT USERS.DAT
+*)
 
-{$I RECORDS.PAS}
+USES
+  CRT,
+  Common,
+  DOS,
+  TimeFunc;
 
 CONST
   DYNY: BOOLEAN = FALSE;
-
-(* +---------------------------------------------------+ 
-   |             START OF OLD RENEGADE.DAT             |
-   +---------------------------------------------------+ *)
   
 TYPE
 
+(* +------------------------+ 
+   | START OF OLD MENUS.DAT |
+   +------------------------+ *)
+
+  OldMenuRec = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
+    LDesc: ARRAY [1..3] OF STRING[100];  { Menu Or Command Long Description Array }
+    ACS: ACString;                       { Access Requirements }
+    NodeActivityDesc: STRING[50];
+    CASE Menu: Boolean OF                { Menu Or Command - Variant Section }
+      TRUE:
+        (MenuFlags: MenuFlagSet;         { Menu Flag Set }
+         LongMenu: STRING[12];           { Displayed In Place OF Long Description }
+         MenuNum: Byte;                  { Menu Number }
+         MenuPrompt: STRING[120];        { Menu Prompt }
+         Password: STRING[20];           { Menu Password }
+         FallBack: Byte;                 { Menu Fallback Number }
+         Directive: STRING[12];
+         ForceHelpLevel: Byte;           { Menu Forced Help Level }
+         GenCols: Byte;                  { Generic Menus: # Of Columns }
+         GCol: ARRAY [1..3] OF Byte);    { Generic Menus: Colors }
+      FALSE:
+        (CmdFlags: CmdFlagSet;           { Command Flag Set }
+         SDesc: STRING[35];              { Command Short Description }
+         CKeys: STRING[14];              { Command Execution Keys }
+         CmdKeys: STRING[2];             { Command Keys: Type Of Command }
+         Options: STRING[50]);           { MString: Command Data }
+    END;
+{ END OF OLD MENUS.DAT }
+	
+(* +---------------------------------------------------+ 
+   |             START OF OLD RENEGADE.DAT             |
+   +---------------------------------------------------+ *)
 OldGeneralRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
     ForgotPWQuestion: STRING[70];      { Forgot Password Question }
     QWKWelcome,                        { QWK Welcome Filename }
@@ -82,11 +114,11 @@ OldGeneralRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
     MaxChat,                           { Max SysOp Pages Per Call }
     MaxWaiting,                        { Max Mail Waiting }
     CSMaxWaiting,                      { Max Mail Waiting For Co-SysOp + }
-    MaxMassMailList,				   {}
+    MaxMassMailList,				   {  }
     MaxLogonTries,                     { Max Tries Allowed For PW's At Logon }
     SysOpColor,                        { SysOp Color In Chat Mode }
     UserColor,                         { User Color In Chat Mode }
-    SliceTimer, 					   {}
+    SliceTimer, 					   {  }
     MaxBatchDLFiles,				   { Max Files In Batch DL Queue }
     MaxBatchULFiles,				   { Max Files In Batch UL Queue }
 	Text_Color,                        { Color Of Standard Text }
@@ -132,12 +164,12 @@ OldGeneralRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
     CreditInternetMail,                { Credits Per Internet E-Mail }
     BirthDateCheck,                    { Verify Users Birthdate Every # Logons }
     UnUsedInteger1,                    { UNUSED }
-    UnUsedInteger2: SmallInt;          { UNUSED }
+    UnUsedInteger2: Integer;		   { UNUSED }
     MaxQWKTotal,                       { Max Msgs In A Packet, Period! }
     MaxQWKBase,                        { Max Msgs In A Area }
-    DaysOnline: SmallWord;             { Days Online }
+    DaysOnline: Word;         		   { Days Online }
     UnUsedWord1,					   { UNUSED }
-    UnUsedWord2: SmallWord;            { UNUSED }
+    UnUsedWord2: Word;            	   { UNUSED }
     MinimumBaud,                       { Minimum Baud Rate To Logon }
     MinimumDLBaud,                     { Minimum Baud Rate To Download }
     MaxDepositEver,					   { Maximum Amount Of Time Allowed In TimeBank }
@@ -214,10 +246,10 @@ OldGeneralRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
       Zone,                           
       Net,
       Node,
-      Point: SmallWord;
+      Point: Word;
     END;
 
-    NewUserToggles: ARRAY [1..27] OF Boolean; { LeeW: New User Application Toggles }
+    NewUserToggles: ARRAY [1..30] OF Boolean; { LeeW: New User Application Toggles }
 	
     Macro: ARRAY [0..9] OF STRING[100]; { SysOp Macros }
 
@@ -288,12 +320,12 @@ OldUserRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
     TLToday,                                { # Min Left Today }
     ForUsr,                                 { Forward Mail To }
     LastMsgArea,                            { # Last Msg Area }
-    LastFileArea: SmallInt;                 { # Last File Area }
+    LastFileArea: Integer;                 { # Last File Area }
     UnUsedInteger1,
-    UnUsedInteger2: SmallInt; 
-    PasswordChanged: SmallWord;             { Numeric Date PW Changed (Was UnixTime) }
+    UnUsedInteger2: Integer; 
+    PasswordChanged: Word;             { Numeric Date PW Changed (Was UnixTime) }
     UnUsedWord1,
-    UnUsedWord2: SmallWord; 
+    UnUsedWord2: Word; 
     lCredit,                                { Amount Of Credit }
     Debit,                                  { Amount Of Debit }
     PW,                                     { Password }
@@ -323,7 +355,7 @@ OldUserRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
     AR: ARFlagSet;                          { AR Flags }
     Flags: FlagSet;                         { Flags }
     SFlags: StatusFlagSet;                  { Status Flags }
-	Country: STRING[40];
+	Country: STRING[40];					{ Country }
   END;
 
 (* +---------------------------------------------------+ 
@@ -426,6 +458,7 @@ VAR
   OldGeneral: OldGeneralRecordType;
   General: GeneralRecordType;
   Counter: Integer;
+  DefChatType: Byte; {*}
 BEGIN
   Write('Converting "RENEGADE.DAT" file ... ');
   Assign(OldGeneralFile,'RENEGADE.DAT');
@@ -662,6 +695,13 @@ BEGIN
 	
 	FOR Counter := 1 TO 2 DO
 	  ConnectionType[Counter] := OldGeneral.ConnectionType[Counter];
+	  
+	LastCallersInLogon := OldGeneral.LastCallersInLogon;
+	OneLinersInLogon := OldGeneral.OneLinersInLogon;
+	VoteInLogon := OldGeneral.VoteInLogon;
+	
+	DefChatType := 1;
+
   END;
   
 (* +---------------------------------------------------+ 
@@ -679,6 +719,75 @@ BEGIN
   WriteLn('Done');
 END;
 
+PROCEDURE ConvertMenuRec(OldGeneral: OldGeneralRecordType); { LeeW: Added }
+VAR
+  OldMenuFile: FILE OF OldMenuRec{ordType};
+  MenuFile: FILE OF MenuRec{ordType};
+  OldMenu: OldMenuRec{ordType};
+  Menu: MenuRec{ordType};
+  Counter,
+  Counter1: Integer;
+BEGIN
+  Write('Converting "MENUS.DAT" file ... ');
+  Assign(OldMenuFile,OldGeneral.DataPath+'MENUS.DAT');
+  Reset(OldMenuFile);
+  Assign(MenuFile,OldGeneral.DataPath+'MENUS.NEW');
+  ReWrite(MenuFile);
+  Counter := 0;
+  WHILE (Counter <= (FileSize(OldMenuFile) - 1)) DO
+  BEGIN
+    Seek(OldMenuFile,Counter);
+    Read(OldMenuFile,OldMenu);
+    WITH Menu DO
+    BEGIN
+	  { ------------- }
+	  { NEW MENU FILE }
+	  { ------------- }
+	  FOR Counter1 := 1 TO 3 DO
+	    LDesc[Counter1] := OldMenu.LDesc[Counter1];
+	  ACS := OldMenu.ACS;
+	  NodeActivityDesc := OldMenu.NodeActivityDesc;
+	  Menu := OldMenu.Menu;
+	  IF MENU THEN
+		BEGIN
+		  MenuFlags := OldMenu.MenuFlags;
+		  LongMenu := OldMenu.LongMenu; {longmenufile}
+		  MenuNum := OldMenu.MenuNum;
+		  MenuPrompt := OldMenu.MenuPrompt;
+		  Password := OldMenu.Password;
+		  Fallback := OldMenu.Fallback;
+		  Directive := OldMenu.Directive; {shortmenufile}
+		  ForceHelpLevel := OldMenu.ForceHelpLevel;
+		  GenCols := OldMenu.GenCols;
+		  FOR Counter1 := 1 TO 3 DO
+			GCol[Counter1] := OldMenu.GCol[Counter1];
+		END
+	  ELSE
+		BEGIN
+		  CmdFlags := OldMenu.CmdFlags;
+		  SDesc := OldMenu.SDesc;
+		  CKeys := OldMenu.CKeys;
+		  CmdKeys := OldMenu.CmdKeys;
+		  Options := OldMenu.Options;
+		END;
+	  { ------------ }
+	  { END NEW MENU }
+	  { ------------ }
+    END;
+    Write(MenuFile,Menu);
+    Inc(Counter);
+  END;
+  
+  Close(OldMenuFile);
+  Close(MenuFile);
+  Assign(OldMenuFile,OldGeneral.DataPath+'MENUS.DAT');
+  Erase(OldMenuFile);
+  Assign(MenuFile,OldGeneral.DataPath+'MENUS.NEW');
+  ReName(MenuFile,OldGeneral.DataPath+'MENUS.DAT');
+  Write('Done!');
+  WriteLn (' ('+IntToStr(Counter)+' Records)');
+END;
+
 PROCEDURE ConvertUserRec(OldGeneral: OldGeneralRecordType);
 VAR
   OldUserFile: FILE OF OldUserRecordType;
@@ -690,7 +799,6 @@ VAR
   PH: STRING[13];
 BEGIN
   Write('Converting "USERS.DAT" file ... ');
-  Write('[');
   Assign(OldUserFile,OldGeneral.DataPath+'USERS.DAT');
   Reset(OldUserFile);
   Assign(UserFile,OldGeneral.DataPath+'USERS.NEW');
@@ -877,24 +985,21 @@ BEGIN
 
     END;
     Write(UserFile,User);
-	Write(Counter);
-	Write(',');
     Inc(Counter);
   END;
-  Write(']');
   Close(OldUserFile);
   Close(UserFile);
   Assign(OldUserFile,OldGeneral.DataPath+'USERS.DAT');
   Erase(OldUserFile);
   Assign(UserFile,OldGeneral.DataPath+'USERS.NEW');
   ReName(UserFile,OldGeneral.DataPath+'USERS.DAT');
-  WriteLn('Done');
+  Write('Done!');
+  WriteLn (' ('+IntToStr(Counter)+' Records)');
 END;
 
 VAR
   OldGeneralFile: FILE OF OldGeneralRecordType;
   OldGeneral: OldGeneralRecordType;
-
 BEGIN
   ClrScr;
   WriteLn('Renegade Upgrade Utility (v1.XX to v1.XX)');  (* <-- Update this with version *)
@@ -919,7 +1024,9 @@ BEGIN
       Kill(OldGeneral.DataPath+'BATCHDL.DAT');
       WriteLn('Done');
     END; 
+	ConvertMenuRec(OldGeneral);
     ConvertUserRec(OldGeneral);
     ConvertGeneralRec;
   END;
+  
 END.

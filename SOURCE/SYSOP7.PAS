@@ -240,7 +240,7 @@ VAR
   PROCEDURE DeleteMenu;
   VAR
     RecNumToDelete,
-    RecNum: SmallInt;
+    RecNum: Integer;
     DeleteOk: Boolean;
   BEGIN
     IF (NumMenus = 0) THEN
@@ -289,8 +289,8 @@ VAR
           Print('%LFMenu: ^5'+MenuR.LDesc[1]);
           IF PYNQ('%LFAre you sure you want to delete it? ',0,FALSE) THEN
           BEGIN
-            Print('%LF[> Deleting menu record ...');
-            SysOpLog('* Deleted menu: ^5'+MenuR.LDesc[1]);
+			Messages(16,0,'menu'); { "[> Deleting menu ..." }
+            SysOpLog('* Deleted menu "'+MenuR.LDesc[1]+'" (#'+IntToStr(RecNumToDelete)+')');
             RecNumToDelete := MenuRecNumArray[RecNumToDelete];  { Convert To Real Record Number }
             Reset(MenuFile);
             IF (RecNumToDelete >= 0) AND (RecNumToDelete <= (FileSize(MenuFile) - 2)) THEN
@@ -316,7 +316,7 @@ VAR
   VAR
     RecNumToInsertBefore,
     NewMenuNum,
-    RecNum: SmallInt;
+    RecNum: Integer;
   BEGIN
     IF (NumMenus = MaxMenus) THEN
       Messages(5,MaxMenus,'menus')
@@ -326,8 +326,8 @@ VAR
       InputIntegerWOC('%LFMenu number to insert before?',RecNumToInsertBefore,[NumbersOnly],1,(NumMenus + 1));
       IF (RecNumToInsertBefore >= 1) AND (RecNumToInsertBefore <= (NumMenus + 1)) THEN
       BEGIN
-        Print('%LF[> Inserting menu record ...');
-        SysOpLog('* Inserted 1 menu.');
+		Messages(17,0,'menu'); { "[> Inserting menu ..." }
+        SysOpLog('* Inserted menu #'+IntToStr(RecNumToInsertBefore));
         IF (RecNumToInsertBefore = (NumMenus + 1)) THEN
           MenuRecNumArray[RecNumToInsertBefore] := (MenuRecNumArray[NumMenus] + CmdNumArray[NumMenus] + 1);
         RecNumToInsertBefore := MenuRecNumArray[RecNumToInsertBefore];  {Convert To Real Record Number }
@@ -376,7 +376,7 @@ VAR
     RecNum,
     RecNum1,
     RecNumToModify,
-    SaveRecNumToModify: SmallInt;
+    SaveRecNumToModify: Integer;
     Changed: Boolean;
 	FallBackMenuName: STRING[100];
   BEGIN

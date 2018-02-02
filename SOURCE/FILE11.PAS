@@ -14,7 +14,7 @@ USES
 TYPE
   FileRecType = RECORD
     FArrayFileArea,
-    FArrayDirFileRecNum: SmallInt;
+    FArrayDirFileRecNum: Integer;
   END;
 
   FileArrayType = ARRAY [0..99] OF FileRecType;
@@ -50,7 +50,7 @@ USES
   TimeFunc;
 
 TYPE
-  DownLoadArrayType = ARRAY [0..99] OF SmallInt;
+  DownLoadArrayType = ARRAY [0..99] OF Integer;
 
 VAR
   DLArray: DownloadArrayType;

@@ -19,6 +19,7 @@ USES
   Automsg,
   Bulletin,
   Common,
+  Common0, {NewYN}
   CUser,
   Email,
   Events,
@@ -320,7 +321,7 @@ BEGIN
   LastError := IOResult;
   IF ((CoSysOp) AND (NOT FastLogon) AND (ComPortSpeed > 0)) THEN
   BEGIN
-    IF PYNQ(lRGLngStr(57,TRUE){FString.QuickLogon},0,FALSE) THEN
+    IF NewYN(lRGLngStr(57,TRUE),FALSE) THEN { "Quick Logon?" }
       FastLogon := TRUE;
     NL;
   END;
@@ -438,7 +439,7 @@ BEGIN
 
 	IF (General.OneLinersInLogon) THEN { LeeW: Added }
 	  BEGIN
-		DoOneLiners;
+		DoOneLiners('Default'); {LeeW: fix this param}
 		CLS;
 	  END;
 	
@@ -554,7 +555,7 @@ PauseScr(FALSE); *) { LeeW: testing... }
       ReadMail
     ELSE
     BEGIN
-      IF PYNQ('^0Read Your Private Messages? ',0,TRUE) THEN
+      IF NewYN('^0Read Your Private Messages? ',TRUE) THEN
         ReadMail;
     END;
 
@@ -647,7 +648,11 @@ BEGIN
     IF (HungUp) THEN
       SL1('^0 Hung Up ');
 
-    SL1('^0Read: ^1'+IntToStr(PublicReadThisCall)+'^0 / Time on: ^1'+IntToStr(TotTimeOn)); { call stats }
+	  (* stats after logoff *)
+	SL1('Downloads: '+IntToStr(DownloadsToday)+' ('+IntToStr(DownloadKBytesToday)+' KB)');
+	SL1('Uploads: '+IntToStr(UploadsToday)+' ('+IntToStr(UploadKBytesToday)+' KB)');
+	SL1('Pub Posts:'+IntToStr(PublicPostsToday)+' / Read: '+IntToStr(PublicReadThisCall));
+	SL1('Time On: '+IntToStr(TotTimeOn));	
 
   END;
   LastError := IOResult;

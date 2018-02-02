@@ -735,7 +735,7 @@ BEGIN
   END;
   IF (Answer = '') THEN
     Exit;
-  Shel('Running "'+Answer+'"');
+  {Shel('Running "'+Answer+'"');}
   SysOpLog('Opened door '+Answer+' on '+DateStr+' at '+TimeStr);
 
   IF (General.MultiNode) THEN
@@ -749,7 +749,7 @@ BEGIN
   DoorTime := GetPackDateTime;
   ShellDos(FALSE,Answer,ReturnCode);
   DoorTime := (GetPackDateTime - DoorTime);
-  Shel2(FALSE);
+  {Shel2(FALSE);}
 
   IF (General.MultiNode) THEN
   BEGIN

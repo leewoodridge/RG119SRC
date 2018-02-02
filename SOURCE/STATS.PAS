@@ -21,13 +21,13 @@ USES
 
 TYPE
   Top10UserRecordArray = RECORD
-    UNum: SmallInt;
+    UNum: Integer;
     Info: Real;
   END;
 
   Top20FileRecordArray = RECORD
     DirNum,
-    DirRecNum: SmallInt;
+    DirRecNum: Integer;
     Downloaded: LongInt;
   END;
 

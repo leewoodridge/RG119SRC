@@ -1,12 +1,9 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
 
 PROGRAM RGLNG;
 
 USES
-  Crt,
-  Dos;
+  CRT,
+  DOS;
 
 TYPE
   StrPointerRec = RECORD
@@ -377,7 +374,23 @@ BEGIN
 	  ELSE IF (S = 'PROVINCE') THEN
 	    RGStrNum := 153
 	  ELSE IF (S = 'COUNTRY_INVALID') THEN
-	    RGStrNum := 154;
+	    RGStrNum := 154
+	  ELSE IF (S = '1L_TITLE') THEN
+	    RGStrNum := 155
+	  ELSE IF (S = '1L_HEADER') THEN
+	    RGStrNum := 156
+	  ELSE IF (S = '1L_FOOTER') THEN
+	    RGStrNum := 157
+	  ELSE IF (S = '1L_NONE') THEN
+	    RGStrNum := 158
+	  ELSE IF (S = '1L_ENTER') THEN
+	    RGStrNum := 159
+	  ELSE IF (S = '1L_ADD') THEN
+	    RGStrNum := 160
+	  ELSE IF (S = '1L_ADD_CONFIRM') THEN
+	    RGStrNum := 161
+	  ELSE IF (S = '1L_POST_ANONYMOUS') THEN
+	    RGStrNum := 162;
 
 (*
 	  ELSE IF (S = '') THEN

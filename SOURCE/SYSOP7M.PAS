@@ -125,7 +125,7 @@ VAR
   PROCEDURE DeleteCommand;
   VAR
     RecNumToDelete,
-    RecNum: SmallInt;
+    RecNum: Integer;
   BEGIN
     IF (CmdNumArray[MenuToModify] = 0) THEN
       Messages(4,0,'commands')
@@ -140,8 +140,8 @@ VAR
         Print('^0%LFCommand: ^1'+MenuR.LDesc[1]);
         IF PYNQ('^0%LFAre you sure you want to delete it? ',0,FALSE) THEN
         BEGIN
-          Print('%LF[> Deleting command record ...');
-          SysOpLog('* Deleted command: '+MenuR.LDesc[1]);
+		  Messages(16,0,'command'); { "[> Deleting command ..." }
+          SysOpLog('* Deleted command "'+MenuR.LDesc[1]+'"');
           RecNumToDelete := (MenuRecNumArray[MenuToModify] + RecNumToDelete); { Convert To Real Record Number }
           IF (RecNumToDelete <= (FileSize(MenuFile) - 2)) THEN
             FOR RecNum := RecNumToDelete TO (FileSize(MenuFile) - 2) DO
@@ -164,7 +164,7 @@ VAR
   VAR
     RecNumToInsertBefore,
     InsertNum,
-    RecNum: SmallInt;
+    RecNum: Integer;
   BEGIN
     IF (CmdNumArray[MenuToModify] = MaxCmds) THEN
       Messages(5,MaxCmds,'commands')
@@ -179,8 +179,8 @@ VAR
                         [DisplayValue,NumbersOnly],1,(MaxCmds - CmdNumArray[MenuToModify]));
         IF (InsertNum < 1) OR (InsertNum > (MaxCmds - CmdNumArray[MenuToModify])) THEN
           InsertNum := 1;
-        Print('%LF[> Inserting '+IntToStr(InsertNum)+' commands.');
-        SysOpLog('* Inserted '+IntToStr(InsertNum)+' commands.');
+		Messages(17,0,+IntToStr(InsertNum)+' '+Plural('command',InsertNum)); { "[> Inserting # command(s) ..." }
+        SysOpLog('* Inserted '+IntToStr(InsertNum)+' '+Plural('command',InsertNum));
         RecNumToInsertBefore := (MenuRecNumArray[MenuToModify] + RecNumToInsertBefore);  { Convert To Real Record Number }
         FOR RecNum := 1 TO InsertNum DO
         BEGIN
@@ -212,7 +212,7 @@ VAR
     Cmd1: Char;
     TempB: Byte;
     RecNumToModify,
-    SaveRecNumToModify: SmallInt;
+    SaveRecNumToModify: Integer;
     Changed: Boolean;
   BEGIN
     IF (CmdNumArray[MenuToModify] = 0) THEN
@@ -365,7 +365,7 @@ VAR
     RecNumToPosition,
     RecNumToPositionBefore,
     RecNum1,
-    RecNum2: SmallInt;
+    RecNum2: Integer;
   BEGIN
     IF (CmdNumArray[MenuToModify] = 0) THEN
       Messages(4,0,'commands')
@@ -385,7 +385,7 @@ VAR
         BEGIN
           RecNumToPosition := (MenuRecNumArray[MenuToModify] + RecNumToPosition);  { Convert To Real Record Number }
           RecNumToPositionBefore := (MenuRecNumArray[MenuToModify] + RecNumToPositionBefore);
-          Print('%LF[> Positioning command.');
+		  Messages(18,0,'command'); { "[> Positioning command ..." }
           IF (RecNumToPositionBefore > RecNumToPosition) THEN
             Dec(RecNumToPositionBefore);
           Seek(MenuFile,RecNumToPosition);

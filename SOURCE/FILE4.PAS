@@ -76,7 +76,8 @@ BEGIN
   BEGIN
     SaveSwapShell := General.SwapShell;
     General.SwapShell := FALSE;
-    ExecWindow(ResultOK,Dir,BatLine,OKLevel,ReturnCode);
+	ExecBatch(ResultOK,Dir,BatLine,OKLevel,ReturnCode,FALSE); {LeeW: Changed from execwin to execbat}
+    {ExecWindow(ResultOK,Dir,BatLine,OKLevel,ReturnCode);}
     General.SwapShell := SaveSwapShell;
   END;
 

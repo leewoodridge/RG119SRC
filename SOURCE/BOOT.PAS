@@ -1,24 +1,22 @@
-{starting over}
-{$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
 
 UNIT Boot;
 
 INTERFACE
 
-PROCEDURE initp1;
-PROCEDURE init;
+PROCEDURE InitP1;
+PROCEDURE Init;
 
 IMPLEMENTATION
 
 USES
-  Crt,
-  Dos,
+  CRT,
   Common,
-  MyIo,
+  DOS,
+  MyIO,
   MiscUser,
   TimeFunc;
 
-PROCEDURE initp1;
+PROCEDURE InitP1;
 VAR
   LineFile: FILE OF LineRec;
   F: FILE OF Byte;
@@ -37,10 +35,10 @@ VAR
     Counter: Byte;
 	Changed: Boolean;
   BEGIN
-    InField_Out_FGrd := 7;
+    {InField_Out_FGrd := 7;
     Infield_Out_BkGd := 0;
     Infield_Inp_FGrd := 7;
-    Infield_Inp_BkGd := 0;
+    Infield_Inp_BkGd := 0;}
     IF Exist('1STBOOT') THEN
     BEGIN
       General.DataPath := StartDir+'\DATA\';

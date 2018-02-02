@@ -26,7 +26,7 @@ VAR
   Counter: Byte;
   DisplayValue,
   FromValue,
-  ToValue: SmallInt;
+  ToValue: Integer;
   NewValue: LongInt;
 
   PROCEDURE ShowSecRange(Start: Byte);

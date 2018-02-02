@@ -1305,7 +1305,7 @@ VAR
     HelpCounter: Byte;
     Counter,
     LineNum1,
-    LineNum2: SmallInt;
+    LineNum2: Integer;
     ShowCont,
     ExitMsg,
     SaveLine,

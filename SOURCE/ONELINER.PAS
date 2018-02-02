@@ -1,48 +1,48 @@
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
-Unit OneLiner;
+
+(*
+	Strings are in rglng now
+	uses common.message for error now
+	random is done except it displays the oneliner not sets itself as
+	can now specify through menu command param how many oneliners to show
+	oneliner length should be calcd by length of name and other info shown	
+*)
+
+UNIT OneLiner;
 
 INTERFACE
 
-Uses
-    Common,
-    TimeFunc,
-    Mail1,
-	CRT;
+USES
+  Common,
+  Common0, { NewYN, ToLower }
+  CRT,
+  Mail1,
+  TimeFunc;
+  
+CONST
+  DefOneLinersToList: Integer = 10;
+  
+TYPE
+  OneLinerRecordType = {$IFDEF WIN32} PACKED {$ENDIF} RECORD
+	RecordNum  : LongInt;
+	OneLiner   : STRING[55];
+	UserID     : LongInt;
+	UserName   : STRING[36];
+	DateAdded,
+	DateEdited : UnixTime;
+	Anonymous  : Boolean;
+  END;
 
-Type
-    OneLinerRecordType = {$IFDEF WIN32} Packed {$ENDIF} Record
-       RecordNum  : LongInt;
-       OneLiner   : String[55];
-       UserID     : LongInt;
-       UserName   : String[36];
-       DateAdded,
-       DateEdited : UnixTime;
-       Anonymous  : Boolean;
-    End;
-
-PROCEDURE DoOneLiners;
+PROCEDURE DoOneLiners(S: STRING);
 PROCEDURE OneLiner_Add;
-PROCEDURE OneLiner_View;
-FUNCTION OneLiner_Random : STRING;
-FUNCTION ToLower( S : STRING ) : STRING;
+PROCEDURE OneLiner_View(OneLinersToList: Integer);
+FUNCTION OneLiner_Random: STRING;
 
 IMPLEMENTATION
 
 VAR
-            OneLinerListFile : FILE OF OneLinerRecordType;
-            OneLineRec  : OneLinerRecordType;
-
-FUNCTION ToLower( S : STRING ) : STRING;
-VAR
-  i : BYTE;
-BEGIN
- FOR i := 1 TO Length(S) DO
-  BEGIN
-   IF S[i] IN ['A'..'Z'] THEN
-   S[i] := Chr(Ord(S[i]) + 32);
-  END;
-  ToLower := S;
-END;
+  OneLinerListFile : FILE OF OneLinerRecordType;
+  OneLineRec  : OneLinerRecordType;
 
 FUNCTION OneLinerListMCI(CONST S: ASTR; Data1,Data2: Pointer): STRING;
 VAR
@@ -87,18 +87,18 @@ BEGIN
             'N' : BEGIN { User Name }
                     LoadURec(User,OneLinerListPtr^.UserID);
                     IF (OneLinerListPtr^.Anonymous) THEN
-                     OneLinerListMCI := 'Anon';
+                     OneLinerListMCI := 'Anonymous';
                     IF (OneLinerListPtr^.Anonymous) AND (SysOp) THEN
-                     OneLinerListMCI := Caps(User.Name) + ' ^1(^3A^1)';
+                     OneLinerListMCI := Caps(User.Name) + ' ^0(^1A^0)';
                     IF (NOT OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := Caps(User.Name);
                   END;
             'L' : BEGIN { User Name Lower }
                     LoadURec(User,OneLinerListPtr^.UserID);
                     IF (OneLinerListPtr^.Anonymous) THEN
-                     OneLinerListMCI := 'anon';
+                     OneLinerListMCI := 'anonymous';
                     IF (OneLinerListPtr^.Anonymous) AND (SysOp) THEN
-                     OneLinerListMCI := ToLower(User.Name) + ' ^1(^3a^1)';
+                     OneLinerListMCI := ToLower(User.Name) + ' ^0(^1a^0)';
                     IF (NOT OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := ToLower(User.Name);
                   END;
@@ -107,7 +107,7 @@ BEGIN
                     IF (OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := 'Anon';
                     IF (OneLinerListPtr^.Anonymous) AND (SysOp) THEN
-                     OneLinerListMCI := Copy(User.Name,1,2) + ' ^1(^3A^1)';
+                     OneLinerListMCI := Copy(User.Name,1,2) + ' ^0(^1A^0)';
                     IF (NOT OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := Copy(User.Name,1,2);
                   END;
@@ -116,7 +116,7 @@ BEGIN
                     IF (OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := 'anon';
                     IF (OneLinerListPtr^.Anonymous) AND (SysOp) THEN
-                     OneLinerListMCI := ToLower(Copy(User.Name,1,2)) + ' ^1(^3a^1)';
+                     OneLinerListMCI := ToLower(Copy(User.Name,1,2)) + ' ^0(^1a^0)';
                     IF (NOT OneLinerListPtr^.Anonymous) THEN
                      OneLinerListMCI := ToLower(Copy(User.Name,1,2));
                   END;
@@ -124,10 +124,10 @@ BEGIN
     END;
 END;
 
-FUNCTION OneLinerList_Exists: Boolean;
+FUNCTION ONELDAT_Exists: Boolean;
 VAR
   OneLinerListFile: FILE OF OneLinerRecordType;
-  FSize: Longint;
+  FSize: LongInt;
   FExist: Boolean;
 BEGIN
   FSize := 0;
@@ -140,184 +140,167 @@ BEGIN
     Close(OneLinerListFile);
   END;
   IF (NOT FExist) OR (FSize = 0) THEN
-  BEGIN
-    NL;
-    PrintF('ONELH');
-    IF (NoFile) THEN
-      BEGIN
-        ClrScr; NL;
-        Print(Centre('^4' + General.BBSName + ' One Liners'));
-        Print(Centre('^5컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴'));
-      END;
-    Print(' ^4There are currently no One Liners.');
-    NL;
-    PrintF('ONELE');
-    IF (NoFile) THEN
-       Print(Centre('^5컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴'));
-
-    SysOpLog('^5* The ONELINER.DAT file is missing.');
-  END;
-  OneLinerList_Exists := (FExist) AND (FSize <> 0);
+	lRGLngStr(158,FALSE); { "There are currently no one-liners" }
+  ONELDAT_Exists := (FExist) AND (FSize > 0);
 END;
 
-PROCEDURE DisplayError(FName: ASTR; VAR FExists: Boolean);
+FUNCTION ONELM_Exists: Boolean;
 BEGIN
-  NL;
-  PrintACR('|12?|09The '+FName+'.*  File is missing.');
-  PrintACR('|12?|09Please, inform the Sysop!');
-  SysOpLog('The '+FName+'.* file is missing.');
-  FExists := FALSE;
-END;
-
-FUNCTION OneLinerAddScreens_Exists: Boolean;
-VAR
-  FExistsH,
-  FExistsM,
-  FExistsE: Boolean;
-BEGIN
-  FExistsH := TRUE;
-  FExistsM := TRUE;
-  FExistsE := TRUE;
-  (*IF (NOT ReadBuffer('ONELH')) THEN
-    DisplayError('ONELH',FExistsH); *)
   IF (NOT ReadBuffer('ONELM')) THEN
-    DisplayError('ONELM',FExistsM);
-  (*IF (NOT ReadBuffer('ONELE')) THEN
-    DisplayError('ONELE',FExistsE); *)
-    OneLinerAddScreens_Exists := (*(FExistsH) AND *)(FExistsM) (*AND (FExistsE)*);
+	BEGIN
+	  ONELM_Exists := FALSE;
+	  Messages(15,0,'ONELM');
+	END
+  ELSE
+    ONELM_Exists := TRUE;
 END;
 
-Procedure AskOneLinerQuestions(VAR OneLinerList: OneLinerRecordType);
-{Var MHeader : MHeaderRec; }
-Begin
-
- WHILE (NOT Abort) AND (NOT Hangup) DO
-  Begin
-   NL;
-   Print('^0 Enter Your One-Liner ...');
-   Prt(' ');
-   MPL(55);
-   InputMain(OneLinerList.OneLiner,(SizeOf(OneLinerList.OneLiner) - 1),[InterActiveEdit,ColorsAllowed]);
-   NL;
-   Abort := (OneLinerList.OneLiner = '');
-   IF (Abort) THEN
-   Exit
-   ELSE
-     OneLinerList.Anonymous := PYNQ('^0 Post Anonymously? ',0,FALSE);
-     Exit;
-  End;
-End;
+FUNCTION ONELR_Exists: Boolean;
+BEGIN
+  IF (NOT ReadBuffer('ONELR')) THEN
+	BEGIN
+	  ONELR_Exists := FALSE;
+	  Messages(15,0,'ONELR');
+	END
+  ELSE
+    ONELR_Exists := TRUE;
+END;
 
 PROCEDURE OneLiner_Add;
 VAR
   Data2: Pointer;
   OneLinerList: OneLinerRecordType;
 BEGIN
-  IF (OneLinerAddScreens_Exists) THEN
-  BEGIN
-    NL;
-    OneLiner_View;
-	NL; { LeeW }
-    IF PYNQ('^0 Add A One-Liner? ',0, FALSE) THEN
-    BEGIN
-      FillChar(OneLinerList,SizeOf(OneLinerList),0);
-      AskOneLinerQuestions(OneLinerList);
-      IF (NOT Abort) THEN
-      BEGIN
-        PrintF('ONELH');
-		IF (NoFile) THEN
-		  BEGIN
-			ClrScr;
-			NL;
-			Print(Centre('^0' + General.BBSName + ' One-Liners'));
-			Print(Centre('^4컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴'));
-		  END;
-        Print(' ^1'+OneLinerList.OneLiner); { LeeW: Add name tag }
-        PrintF('ONELE');
-        IF (NoFile) THEN
-			Print(Centre('^4컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴'));
-        NL;
-        IF (PYNQ('^0 Add This One-Liner? ^5',0,TRUE)) THEN
-        BEGIN
-          Assign(OneLinerListFile,General.DataPath+'ONELINER.DAT');
-          IF (Exist(General.DataPath+'ONELINER.DAT')) THEN
-            Reset(OneLinerListFile)
-          ELSE
-          Rewrite(OneLinerListFile);
-          Seek(OneLinerListFile,FileSize(OneLinerListFile));
-          OneLinerList.UserID := UserNum;
-          OneLinerList.DateAdded := GetPackDateTime;
-          OneLinerList.DateEdited := OneLinerList.DateAdded;
-          OneLinerList.RecordNum := (FileSize(OneLinerListFile) + 1);
-          Write(OneLinerListFile,OneLinerList);
-          Close(OneLinerListFile);
-          LastError := IOResult;
-
-          SysOpLog('Added One-Liner : '+OneLinerList.OneLiner{+'.'});
-        END;
-      END;
+  IF NewYN(lRGLngStr(160,TRUE){ "Add A One-Liner?" },FALSE) THEN
+	BEGIN
+	  FillChar(OneLinerList,SizeOf(OneLinerList),0);
+	  
+	  WHILE (NOT Abort) AND (NOT Hangup) DO
+		BEGIN
+		  NL;
+		  lRGLngStr(159,FALSE); { "Enter your one-liner ..." }
+		  MPL(55);
+		  InputMain(OneLinerList.OneLiner,(SizeOf(OneLinerList.OneLiner) - 1),[InterActiveEdit,ColorsAllowed]);
+		  NL;
+		  Abort := (OneLinerList.OneLiner = '');
+		  IF (Abort) THEN
+			BREAK
+		  ELSE
+			OneLinerList.Anonymous := NewYN(lRGLngStr(162,TRUE){ "Post Anonymously?" },FALSE);
+		  BREAK;
+		END;
+	  
+	  IF (NOT Abort) THEN
+		BEGIN
+		  PrintF('ONELH');
+		  IF (NoFile) THEN
+			BEGIN
+			  CLS;
+			  NL;
+			  lRGLngStr(155,FALSE); { "%BN One-Liners" }
+			  lRGLngStr(156,FALSE); { "--------------" }
+			END;
+		  Print('^1'+OneLinerList.OneLiner); { LeeW: show using onelm.* style }
+		  PrintF('ONELE');
+		  IF (NoFile) THEN
+			lRGLngStr(157,FALSE); { "--------------" }
+		  IF (NewYN(lRGLngStr(161,TRUE){ "Add This One-Liner?" },TRUE)) THEN
+			BEGIN
+			  Assign(OneLinerListFile,General.DataPath+'ONELINER.DAT');
+			  IF (Exist(General.DataPath+'ONELINER.DAT')) THEN
+				Reset(OneLinerListFile)
+			  ELSE
+				Rewrite(OneLinerListFile);
+				Seek(OneLinerListFile,FileSize(OneLinerListFile));
+				OneLinerList.UserID := UserNum;
+				OneLinerList.DateAdded := GetPackDateTime;
+				OneLinerList.DateEdited := OneLinerList.DateAdded;
+				OneLinerList.RecordNum := (FileSize(OneLinerListFile) + 1);
+				Write(OneLinerListFile,OneLinerList);
+				Close(OneLinerListFile);
+				LastError := IOResult;
+				SysOpLog('Added One-Liner "'+OneLinerList.OneLiner+'"');
+			END;
+		END;
     END;
-  END;
 END;
 
-PROCEDURE OneLiner_View;
+PROCEDURE OneLiner_View(OneLinersToList: Integer);
 VAR
   Data2: Pointer;
   OneLinerList: OneLinerRecordType;
-  OnRec: Longint;
-  Cnt : Byte;
-BEGIN
-
-  IF (OneLinerList_Exists) AND (OneLinerAddScreens_Exists) THEN
-  BEGIN
-    Assign(OneLinerListFile,General.DataPath+'ONELINER.DAT');
-    Reset(OneLinerListFile);
-    ReadBuffer('ONELM');
-    AllowContinue := TRUE;
-    Abort := FALSE;
-    PrintF('ONELH');
-    IF (NoFile) THEN
-      BEGIN
-        ClrScr; NL;
-        Print(Centre('^0' + General.BBSName + ' One-Liners'));
-        Print(Centre('^4컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴'));
-        NL;
-      END;
-    OnRec := 1;
-    Cnt := (FileSize(OneLinerListFile));
-    {WHILE (OnRec <= FileSize(OneLinerListFile)) AND (NOT Abort) AND (NOT HangUp) DO}
-
-   FOR Cnt := (FileSize(OneLinerListFile)) DOWNTO 1 DO
-    BEGIN
-      Seek(OneLinerListFile,(Cnt-1));
-      Read(OneLinerListFile,OneLinerList);
-      DisplayBuffer(OneLinerListMCI,@OneLinerList,Data2);
-      Inc(OnRec);
-      IF ((OnRec-1) = 10) THEN
-       Break
-      ELSE
-       OnRec := OnRec;
-    END;
-    Close(OneLinerListFile);
-    LastError := IOResult;
-    IF (NOT Abort) THEN
-      PrintF('ONELE');
-      IF (NoFile) THEN
-        Print(Centre('^4컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴'));
-
-    AllowContinue := FALSE;
-    SysOpLog(ThisUser.Name+' Viewed The One-Liners.');
-  END;
+  Count : Byte;
+BEGIN 
+  AllowContinue := TRUE;
+  Abort := FALSE;
+  PrintF('ONELH');
+  IF (NoFile) THEN
+	BEGIN
+	  CLS;
+	  NL;
+	  lRGLngStr(155,FALSE); { "%BN One-Liners" }
+	  lRGLngStr(156,FALSE); { "--------------" }
+	END;
+  
+  IF (ONELDAT_Exists) AND (ONELM_Exists) THEN
+	BEGIN
+	  Assign(OneLinerListFile,General.DataPath+'ONELINER.DAT');
+	  Reset(OneLinerListFile);
+	  ReadBuffer('ONELM');
+	  
+	  IF OneLinersToList > FileSize(OneLinerListFile) THEN
+		OneLinersToList := FileSize(OneLinerListFile); {ugh}
+		
+	  FOR Count := FileSize(OneLinerListFile) DOWNTO (FileSize(OneLinerListFile))-(OneLinersToList)+1 DO {ugh}
+		BEGIN
+		  Seek(OneLinerListFile,((Count)-1));
+		  Read(OneLinerListFile,OneLinerList);
+		  DisplayBuffer(OneLinerListMCI,@OneLinerList,Data2);
+		END;
+	  Close(OneLinerListFile);
+	END;
+  LastError := IOResult;
+  IF (NOT Abort) THEN
+	PrintF('ONELE');
+  IF (NoFile) THEN
+	lRGLngStr(157,FALSE); { "--------------" }
+  AllowContinue := FALSE;
+  SysOpLog(ThisUser.Name+' Viewed The One-Liners.');
+  OneLiner_Add;
 END;
 
-Function OneLiner_Random : String;
-Begin
+FUNCTION OneLiner_Random : STRING;
+VAR
+  RandNmbr: Integer;
+  Data2: Pointer;
+  OneLinerList: OneLinerRecordType;
+BEGIN
+  IF (ONELDAT_Exists) AND (ONELR_Exists) THEN
+	BEGIN
+	  Assign(OneLinerListFile,General.DataPath+'ONELINER.DAT');
+      Reset(OneLinerListFile);
+      ReadBuffer('ONELR');
+	  REPEAT
+		RandNmbr := Random(FileSize(OneLinerListFile)+1);
+	  UNTIL RandNmbr > 0; { Minimum of 1 }
+	  Seek(OneLinerListFile,(RandNmbr-1));
+	  Read(OneLinerListFile,OneLinerList);
+	  OneLiner_Random := DisplayBuffer(OneLinerListMCI,@OneLinerList,Data2);	  
+	  Close(OneLinerListFile);
+    END;
+  (*PauseScr(FALSE); {just for testing}*)
+END;
 
-End;
+PROCEDURE DoOneLiners(S: STRING); { To-Do : Variable Number of One Liners To Display }
+VAR
+  I: Integer; { Number of one-liners to list }
+BEGIN
+  I := StrToInt(S); { Use the passed param }
+  
+  IF I = 0 THEN { Was not a number }
+	I := DefOneLinersToList; { Use the default }	
+	
+  OneLiner_View(I);
+END;
 
-Procedure DoOneLiners; { To-Do : Variable Number of One Liners To Display }
-Begin
-OneLiner_Add;
-End;
-
-End.
+END.

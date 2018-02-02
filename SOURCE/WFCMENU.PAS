@@ -10,30 +10,30 @@ PROCEDURE WFCMenus;
 IMPLEMENTATION
 
 USES
-  Crt,
-  Dos,
-  Boot,
+  CRT,
+  DOS,
+{Boot,}
   Bulletin,
   Common,
-  CUser,
-  Doors,
+  {CUser,
+  Doors,}
   EMail,
   Events,
   File7,
   File10,
   File13,
-  Mail1,
+{Mail1,}
   Mail2,
-  Mail3,
+  {Mail3,}
   Maint,
-  Menus2,
+{Menus2,}
   MsgPack,
   MultNode,
   MyIO,
   SysOp1,
   SysOp2,
   SysOp3,
-  SysOp4,
+{SysOp4,}
   SysOp5,
   SysOp6,
   SysOp7,
@@ -51,7 +51,7 @@ USES
 
 VAR
   LastKeyPress: LongInt;
-
+  
 CONST
   ANSWER_LENGTH = 203;
   ANSWER: ARRAY [1..203] OF Char = (
@@ -765,7 +765,7 @@ VAR
   PROCEDURE ChkEvents;
   VAR
     EventNum: Byte;
-    RCode: Integer;
+    RCode: Integer;	
   BEGIN
     IF (CheckEvents(0) <> 0) THEN
       FOR EventNum := 1 TO NumEvents DO
@@ -1058,15 +1058,8 @@ BEGIN
                   Write('Talking To Modem ...');
                   RedrawWFC := FALSE;
                 END;
-		  '&' : BEGIN { LeeW: TESTING!!!!!!!!!!!!!!!!!!!!!!!! }
-				  cls;
-				  
-				  {IF TypeOf(var inbox) = typeof(var wantout) Then print('true');}
-				  
-				  
-				  {Print('starts out true');
-				  IF NewYN('Test Question?', TRUE) THEN print('It`s true!') else print('It`s NOT True!');
-				  PauseScr(FALSE);}
+		  '&' : BEGIN { *TESTING* }
+				  PauseScr(FALSE);
 				END;
           'A' : IF (NOT LocalIOOnly) THEN
                   CheckForConnection := TRUE
@@ -1091,8 +1084,6 @@ BEGIN
           'L' : BEGIN
                   ClrScr;
                   ShowLogs;
-                  {NL;
-                  PauseScr(FALSE);}
                 END;
           'M' : IF (CPW) THEN
                 BEGIN

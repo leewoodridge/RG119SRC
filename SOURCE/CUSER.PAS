@@ -200,7 +200,7 @@ VAR
     AScheme: SchemeRec;
 	TempScheme,
     Counter,
-    OnLine: SmallInt;
+    OnLine: Integer;
   BEGIN
 	Reset(SchemeFile);
 	IF NOT (Color In User.Flags) OR NOT ((ANSI IN User.Flags) XOR (VT100 IN User.Flags)) THEN
@@ -1257,7 +1257,7 @@ BEGIN
 			  NL;
 			  Print('^8Exceeded maximum number of retries. Disconnecting.'); { this too }
 			  HangUp := TRUE;
-			END;
+		  END;
         UNTIL (Done1) OR (HangUp);
     2,3 :
         BEGIN { 2 = Menu Command "OP", 3 = User Editor, Maint }

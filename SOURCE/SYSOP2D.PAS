@@ -16,7 +16,7 @@ IMPLEMENTATION
 USES
   Common;
 
-PROCEDURE GetTimeRange(CONST RGStrNum: LongInt; VAR LoTime,HiTime: SmallInt);
+PROCEDURE GetTimeRange(CONST RGStrNum: LongInt; VAR LoTime,HiTime: Integer);
   VAR
     TempStr: Str5;
     LowTime,
@@ -72,7 +72,7 @@ PROCEDURE SystemGeneralVariables;
 	HiNum,
 	TempInt,
 	MinInt,
-	MaxInt: SmallInt;
+	MaxInt: Integer;
 	TempL,
 	MinLongInt,
 	MaxLongInt: LongInt;
@@ -202,7 +202,7 @@ PROCEDURE SystemGeneralVariables;
 					 '^0(^1X^0) Min Free For Posts : ^1'+PadLeftStr(IntToStr(MinSpaceForPost)+'^0 KB',14));
 			PrintACR('^0(^1M^0) Pre-Event Warning  : ^1'+PadLeftStr(AOnOff((EventWarningTime = 0),'None',IntToStr(EventWarningTime)+
 														'^0 '+Plural('Second',EventWarningTime)),14)+
-					 '');
+					 '^0(^1Y^0) Default Chat Type  : ^1'+PadLeftStr(AOnOff((DefChatType = 1),'Line','Split-Screen'),14));
 	  NL;
       FOR TempB := 0 TO 9 DO
       BEGIN
@@ -217,6 +217,12 @@ PROCEDURE SystemGeneralVariables;
       Prt('^0Enter Selection or (^1Q^0) to Quit: ^1');
       OneK(Cmd,'QABCDEFGHIJKLMNOPRSTUVWXYZ1234567890',TRUE,TRUE);
       CASE Cmd OF
+	    'Y' : BEGIN
+				IF General.DefChatType = 1 THEN
+				  General.DefChatType := 2
+				else
+				  general.defchattype := 1;
+			  END;
 		'X' : BEGIN
 				MinInt := 1;
 				MaxInt := 32767;

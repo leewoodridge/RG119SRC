@@ -2,16 +2,18 @@
 {$M 35500,0,131072}
 {$ENDIF}
 
-{                             R E N E G A D E                                }
-{                             ===============                                }
+{	 ___   ____  _      ____  __     __    ___   ____      ___   ___   __	}
+{	| |_) | |_  | |\ | | |_  / /`_  / /\  | | \ | |_      | |_) | |_) ( (`	}
+{	|_| \ |_|__ |_| \| |_|__ \_\_/ /_/--\ |_|_/ |_|__     |_|_) |_|_) _)_)	}
+{																			}
 
-{$A+} { Align Data for faster execution }
+{$A+} { Align Data }
 {$B-} { Shortcut Boolean eval }
 {$D+} { No Debug Info }
 {$E-} { No Math-Co library }
 {$F+} { Force Far Calls }
 {$I-} { Disable I/O check }
-{$L+} { Local Symbols, Ignored IF D-, don't need cause of D- }
+{$L+} { Local Symbols }
 {$N-} { No Math-Co use }
 {$P+} { Allow OpenString }
 {$O+} { Use Overlays? }
@@ -24,13 +26,11 @@
 PROGRAM Renegade;
 
 USES
-  OverLay,
-{ OvrUMB,}
+  Overlay,
   Crt,
   Dos,
   Boot,
   Common,
-{Common1,}
   Events,
   File0,
   File7,
@@ -48,7 +48,6 @@ USES
   WfCMenu;
 
 {$O MsgPack   }
-(*{$O Common1   }*)
 {$O Common2   }
 {$O Common4   }
 {$O Boot      }
@@ -62,7 +61,6 @@ USES
 {$O Sysop2b   } 
 {$O Sysop2c   } 
 {$O Sysop2d   }
-(*{$O Sysop2e   }*) 
 {$O Sysop2f   } 
 {$O Sysop2l   } 
 {$O Sysop2g   } 
@@ -81,8 +79,8 @@ USES
 {$O File14    } {$O Archive1  } {$O Archive2  } {$O Archive3  } {$O Logon     }
 {$O Maint     } {$O NewUsers  } {$O TimeBank  } {$O Bulletin  } {$O MiscUser  }
 {$O ShortMsg  } {$O CUser     } {$O Doors     } {$O ExecBat   } {$O Automsg   }
-{$O MyIO      } {$O Menus2    } {$O Menus3    } {$O LineChat  } {$O Stats      }
-{$O Events    } {$O BBSList   } {$O File7     } {$O SplitCha  }
+{$O MyIO      } {$O Menus2    } {$O Menus3    } {$O Chat  } {$O Stats      }
+{$O Events    } {$O BBSList   } {$O File7     }
 {$O OneLiner  }
 
 CONST
@@ -192,38 +190,42 @@ BEGIN
     Inc(Counter);
     IF ((SC(ParamStr(Counter),1) = '-') OR (SC(ParamStr(Counter),1) = '/')) THEN
       CASE SC(ParamStr(Counter),2) OF
-	    '?' : BEGIN
-			    { Command Line Parameters Help }
+	    '?' : BEGIN { Command Line Parameters Help }
 				TextColor(White);
 				TextBackground(Blue);
-				WriteLn(PadLeftStr(' þ Renegade BBS Command-Line Parameters',80));	
+				WriteLn(PadLeftStr(' '+#240+' Renegade BBS Command-Line Parameters',80));	
 				TextColor(LightGray);
 				TextBackground(Black);
 				WriteLn('Renegade BBS supports the following command-line parameters, please see the ');
 				WriteLn('manual for more detailed information.');
 				WriteLn('');
+				WriteLn('/50      : Fifty-Line Display Mode');
 				WriteLn('/B###### : User Already Connected At ##### Baud');
+				WriteLn('/C       : Reliable');
+				WriteLn('/D       : Don`t Load Overlay file to EMS');
 				WriteLn('/EE###   : Critical Error Aborts To DOS With Errorlevel ###');
 				WriteLn('/EN###   : With /Q, Exits With Errorlevel 2 If New EchoMail, Or 0 If None ');
+				WriteLn('/F       : Files.BBS');
+				WriteLn('/H       : Sock Handle');
 				WriteLn('/I###    : Passes Caller ID Information');
 				WriteLn('/L       : Local Mode');
 				WriteLn('/M#      : Create QWK Packet For User #, Then Return To DOS');
 				WriteLn('/N#      : Specifies Which Node To Load');
 				WriteLn('/P       : Pack Message Bases, Then Return To DOS');
-				WriteLn('/S       : Sort File Areas, Then Return To DOS');
 				WriteLn('/Q       : Renegade Exits To DOS When User Logs Off');
-				WriteLn('/U#      : Upload REP Packet For User #, Then Return To DOS');
-				WriteLn('/X####   : Logs User Off In #### Minutes For External Event');
+				WriteLn('/S       : Sort File Areas, Then Return To DOS');
 				WriteLn('/T       : Telnet (Net2BBS)');
 				WriteLn('/TC      : Telnet (NetSerial or Com/IP)');
-				WriteLn('/5       : Fifty-Line Display Mode');
-				WriteLn('/C       : Reliable');
-				WriteLn('/D       : Don`t Load Overlay file to ems');
-				WriteLn('/H       : Sock Handle');
-				WriteLn('/F       : Files.BBS');
+				WriteLn('/U#      : Upload REP Packet For User #, Then Return To DOS');
+				WriteLn('/X####   : Logs User Off In #### Minutes For External Event');
+				        {---------------------------------------|----------------------------------------} {80 CHARS}
 				Halt;
 			  END;
-        '5' : TextMode(259);
+        '5' : BEGIN
+				CASE SC(ParamStr(Counter),3) OF
+				  '0' : TextMode(259);
+				END;
+			  END;
         'B' : AnswerBaud := StrToInt(Copy(ParamStr(Counter),3,255));
         'C' : Reliable := (Pos(AllCaps(Liner.Reliable),AllCaps(ParamStr(Counter))) > 0);
         'D' : OvrUseEms := FALSE;

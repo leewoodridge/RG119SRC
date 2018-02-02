@@ -1,9 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
-
-{$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
-
 UNIT Logon;
 
 INTERFACE
@@ -13,9 +7,9 @@ FUNCTION GetUser: Boolean;
 IMPLEMENTATION
 
 USES
-  Crt,
-  Common,
   Archive1,
+  CRT,
+  Common,
   CUser,
   Doors,
   Email,
@@ -48,7 +42,7 @@ BEGIN
   Two := (i AND $0000FF00) SHR 8;
   Three := (i AND $00FF0000) SHR 16;
   Four := (i AND $FF000000) SHR 24;
-  Hex[0] := chr(j);          { Length of STRING = 4 or 8}
+  Hex[0] := chr(j); { Length of STRING = 4 or 8}
   IF (j = 4) THEN
   BEGIN
     Hex[1] := hc[Two SHR 4];
@@ -234,13 +228,13 @@ BEGIN
     Com_Flush_Recv;
 END;
 
-PROCEDURE Check_Ansi;
+PROCEDURE Check_ANSI;
 VAR
   L: LongInt;
   C: Char;
   Ox,x,y: Byte;
   S: AStr;
-
+  
   PROCEDURE ANSIResponse(VAR x,y: Byte);
   VAR
     Xs,
@@ -279,18 +273,22 @@ VAR
   END;
 
 BEGIN
+  (*
   TextAttr := 10;
   Write(RGNoteStr(24,TRUE)); { "Attempting to detect emulation ... " }
+  *)
   Exclude(ThisUser.Flags,Avatar);
   Exclude(ThisUser.Flags,ANSI);
   Exclude(ThisUser.Flags,VT100);
   Exclude(ThisUser.Flags,RIP);
-  IF (ComPortSpeed = 0) THEN
+  IF (ComPortSpeed = 0) THEN {If Local Use ANSI}
   BEGIN
     Include(ThisUser.Flags,ANSI);
-	S := RGNoteStr(27,TRUE); { "ANSI" }
-	Print(S+RGNoteStr(30,TRUE)); { " detected." }
-    Exit;
+	(*
+	Print(RGNoteStr(27,TRUE)+RGNoteStr(30,TRUE)); { "ANSI"+" detected." }
+	NL;
+	*)
+    EXIT;
   END;
   Com_Flush_Recv;
   SerialOut(^M^M^['[!'#8#8#8);
@@ -321,12 +319,12 @@ BEGIN
   ANSIResponse(x,y);
   IF (x + y > 0) THEN
   BEGIN
-    Include(ThisUser.Flags,Ansi);
+    Include(ThisUser.Flags,ANSI);
   ANSIDetected := TRUE;
     IF (S <> '') THEN
-      S := S + RGNoteStr(26,TRUE) {'/Ansi'}
+      S := S + RGNoteStr(26,TRUE) {'/ANSI'}
     ELSE
-      S := RGNoteStr(27,TRUE); {'Ansi'}
+      S := RGNoteStr(27,TRUE); {'ANSI'}
     SerialOut(^V^F);
     SerialOut(^['[6n'#8#8);
     Ox := x;
@@ -343,13 +341,18 @@ BEGIN
       SerialOut(#8#8);
   END;
   IF (S <> '') THEN
-    Print(S+RGNoteStr(30,TRUE)) {' detected.'}
+    BEGIN
+    Prt('^9'+S+' Emulation Detected');
+	(* RGNoteStr(30,TRUE) { " detected. " }	*)
+	Delay(500);
+	REPEAT
+	BackSpace;
+	UNTIL WhereX = 1
+(*	END
   ELSE
-  BEGIN
-    TextAttr := 7;
-    { Should this be Print ??? }
-    WriteLn;
+BEGIN*)
   END;
+  {NL;}
 END;
 
 PROCEDURE GetPWS(VAR Ok: Boolean; VAR Tries: Integer);  (* Tries should be Byte *)
@@ -367,10 +370,7 @@ BEGIN
   BEGIN
     IF (IEMSIRec.Pw = '') THEN
     BEGIN
-      (*
-      Prompt(FString.Yourpassword);
-      *)
-      RGMainStr(3,FALSE);
+      RGMainStr(3,FALSE); (*Prompt(FString.Yourpassword);*)
       GetPassword(UserPw,20);
     END
     ELSE
@@ -381,10 +381,7 @@ BEGIN
     IF (General.Phonepw) THEN
       IF (IEMSIRec.Ph = '') THEN
       BEGIN
-        (*
-        Prompt(FString.YourPhoneNumber);
-        *)
-        RGMainStr(4,FALSE);
+        RGMainStr(4,FALSE); (*Prompt(FString.YourPhoneNumber);*)
         GetPassword(PhonePW,4);
       END
       ELSE
@@ -399,10 +396,7 @@ BEGIN
      (Copy(ThisUser.Ph,Length(ThisUser.Ph) - 3,4) <> PhonePW)) THEN
   BEGIN
     ok := FALSE;
-    (*
-    Prompt(FString.ILogon);
-    *)
-    RGNoteStr(9,FALSE);
+    RGNoteStr(9,FALSE); (*Prompt(FString.ILogon);*)
     IF (NOT HangUp) AND (UserNum <> 0) THEN
     BEGIN
       S := '* Illegal logon attempt! Tried: '+Caps(ThisUser.Name)+' #'+IntToStr(UserNum)+' PW='+UserPw;
@@ -616,10 +610,7 @@ BEGIN
            (MemCmd^[CmdToExec].Cmdkeys[1] <> 'H') AND (MemCmd^[CmdToExec].Cmdkeys[1] <> '-') AND
            (NOT GotName) THEN
         BEGIN
-          (*
-          Prompt(FString.Shuttleprompt);
-          *)
-          RGMainStr(9,FALSE);
+          RGMainStr(9,FALSE); (*Prompt(FString.Shuttleprompt);*)
           FindUser(UserNum);
           IF (UserNum >= 1) THEN
           BEGIN
@@ -659,10 +650,7 @@ BEGIN
           END
           ELSE
           BEGIN
-            (*
-            Print(FString.ILogon);
-            *)
-            RGNoteStr(9,FALSE);
+            RGNoteStr(9,FALSE); (*Print(FString.ILogon);*)
             Inc(Tries);
           END;
       END
@@ -729,7 +717,7 @@ VAR
   S,
   ACSReq: AStr;
   OverridePW: Str20;
-  Lng: SmallInt;
+  Lng: Integer;
   Tries,
   I,
   TTimes,
@@ -844,18 +832,21 @@ BEGIN
   Check_ANSI;
   IEMSI;
   GotName := FALSE;
-  IF ((General.ShuttleLog) AND (NOT FastLogon) AND (NOT HangUp)) THEN
-    DoShuttle;
+	
   {SetC(0);}
-  ClrScr;
-(*
-  PrintACR('^2GeneralCallerNum: '+IntToStr(General.CallerNum));
-  PrintACR('^7GeneralDaysOnline: '+IntToStr(General.DaysOnline));
-  PauseScr(FALSE); { LeeW: Testing... }
-*)
+  
+  CLS;
+
   Print(Centre(VerLine(1))); { Version & Copyright Information }
   Print(Centre(VerLine(2)));
+
   PrintF('PRELOGON');
+  
+  {Delay(1000);}
+  
+  IF ((General.ShuttleLog) AND (NOT FastLogon) AND (NOT HangUp)) THEN
+	DoShuttle;
+  
   IF (ACSUser) THEN
   BEGIN
     PrintF('ACSEA'+IntToStr(EventNum));
@@ -901,7 +892,7 @@ BEGIN
           IF (NoFile) THEN
             RGNoteStr(8,FALSE); (*Print('Name not found in user list.');*)
           IF NOT (General.ShuttleLog) AND (NOT General.ClosedSystem) THEN
-            IF PYNQ(RGMainStr(2,TRUE){FString.LogonAsNew},0,FALSE) THEN
+            IF PYNQ(RGMainStr(2,TRUE){FString.LogonAsNew},0,FALSE) THEN {logon as new?}
               UserNum := -1;
         END;
       END;
@@ -1133,7 +1124,7 @@ BEGIN
     *)
     InitTrapFile;
     UserOn := FALSE;
-    ClrScr;
+    {CLS;}
   END;
   IF (HangUp) THEN
     GetUser := FALSE;

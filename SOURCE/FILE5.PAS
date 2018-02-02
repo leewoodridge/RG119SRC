@@ -456,9 +456,9 @@ VAR
         Delete(s1,1,1);
       IF (s1 <> '') THEN
       BEGIN
-        Shel('Running "'+s1+'"');
+        {Shel('Running "'+s1+'"');}
         ShellDOS(FALSE,s1,RetLevel);
-        Shel2(FALSE);
+        {Shel2(FALSE);}
       END;
     END
     ELSE IF (s = 'CONVERT') OR (s = 'CVT') THEN

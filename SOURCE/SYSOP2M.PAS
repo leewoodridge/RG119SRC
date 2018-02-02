@@ -20,7 +20,7 @@ PROCEDURE NewUserTogglesConfiguration;
     Cmd1: Char;
     LowNum,
     HiNum,
-    TempInt: SmallInt;
+    TempInt: Integer;
     Changed: Boolean;
   BEGIN
 	REPEAT

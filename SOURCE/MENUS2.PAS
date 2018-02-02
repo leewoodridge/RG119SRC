@@ -1,6 +1,3 @@
-{$IFDEF WIN32}
-{$I DEFINES.INC}
-{$ENDIF}
 
 {$A+,B-,D+,E-,F+,I-,L+,N-,O+,R-,S+,V-}
 
@@ -358,6 +355,8 @@ VAR
     NL;
   END;
 
+{ menu header image somewhere up here ^ }
+  
   PROCEDURE GenTuto;
   VAR
     CmdToList,

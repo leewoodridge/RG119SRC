@@ -14,11 +14,7 @@ PROCEDURE LoadMenuPW;
 PROCEDURE MainMenuHandle(VAR Cmd: AStr);
 PROCEDURE FCmd(CONST Cmd: AStr; VAR CmdToExec: Byte; VAR CmdExists,CmdNotHid: Boolean);
 PROCEDURE DoMenuExec(Cmd: AStr; VAR NewMenuCmd: AStr);
-PROCEDURE DoMenuCommand(VAR Done: Boolean;
-                        Cmd,
-                        MenuOption: AStr;
-                        VAR NewMenuCmd: AStr;
-                        NodeActivityDesc: AStr);
+PROCEDURE DoMenuCommand(VAR Done: Boolean; Cmd, MenuOption: AStr; VAR NewMenuCmd: AStr; NodeActivityDesc: AStr);
 
 IMPLEMENTATION
 
@@ -32,6 +28,7 @@ USES
   Boot,
   Bulletin,
   CUser,
+  Common0,
   Doors,
   Email,
   Events,
@@ -62,7 +59,7 @@ USES
   OffLine,
   Script,
   Stats,
-  LineChat,
+  Chat,
   SysOp1,
   SysOp2,
   SysOp2F,
@@ -115,11 +112,7 @@ BEGIN
       IF (AACS(MemCmd^[Counter].ACS)) THEN
       BEGIN
         NewMenuCmd := AutoCmd;
-        DoMenuCommand(Done,
-                      MemCmd^[Counter].CmdKeys,
-                      MemCmd^[Counter].Options,
-                      NewMenuCmd,
-                      MemCmd^[Counter].NodeActivityDesc);
+        DoMenuCommand(Done, MemCmd^[Counter].CmdKeys, MemCmd^[Counter].Options, NewMenuCmd, MemCmd^[Counter].NodeActivityDesc);
       END;
     Inc(Counter);
   END;
@@ -305,7 +298,7 @@ BEGIN
       SaveSS := SS;
       IF (SS = '') THEN
       BEGIN
-        IF (C = #13) THEN
+		  IF (C = #13) THEN
           GotCmd := TRUE;
         IF ((C = '/') AND ((Has1) OR (Has2) OR (SysOp))) THEN
           SS := '/';
@@ -650,13 +643,13 @@ BEGIN
                         Print(SemiCmd(MenuOption,3));
                     END;
                   END;
-            'Y' : IF (SemiCmd(MenuOption,1) <> '') AND NOT (PYNQ(SemiCmd(MenuOption,1),0,FALSE)) THEN
+			'Y' : IF (SemiCmd(MenuOption,1) <> '') AND NOT (NewYN(SemiCmd(MenuOption,1){,0},FALSE)) THEN
                   BEGIN
                     Done := TRUE;
                     IF (SemiCmd(MenuOption,2) <> '') THEN
                       Print(SemiCmd(MenuOption,2));
                   END;
-            'N' : IF (SemiCmd(MenuOption,1) <> '') AND (PYNQ(SemiCmd(MenuOption,1),0,FALSE)) THEN
+			'N' : IF (SemiCmd(MenuOption,1) <> '') AND (NewYN(SemiCmd(MenuOption,1){,0},FALSE)) THEN
                   BEGIN
                     Done := TRUE;
                     IF (SemiCmd(MenuOption,2) <> '') THEN
@@ -668,7 +661,10 @@ BEGIN
             NoCmd := TRUE;
           END;
     '1' : CASE Cmd[2] OF
-            'L' : DoOneLiners;
+            'L' : BEGIN
+					DoOneLiners(MenuOption);
+				  END;
+			'R' : OneLiner_Random;
           END;
     'A' : CASE Cmd[2] OF
             'A','C','M','T' :

@@ -31,7 +31,7 @@ VAR
   MsgareaDefFile: FILE OF MessageAreaRecordType;
   TempMemMsgArea: MessageAreaRecordType;
   Cmd: Char;
-  RecNumToList: SmallInt;
+  RecNumToList: Integer;
   Ok,
   Changed,
   SaveTempPause: Boolean;
@@ -169,10 +169,10 @@ VAR
     END;
   END;
 
-  PROCEDURE ChangeMsgAreaDrive(Drive: Char; FirstRecNum: SmallInt);
+  PROCEDURE ChangeMsgAreaDrive(Drive: Char; FirstRecNum: Integer);
   VAR
     LastRecNum,
-    RecNum: SmallInt;
+    RecNum: Integer;
   BEGIN
     IF (NumMsgAreas = 0) THEN
       Messages(4,0,'message areas')
@@ -219,7 +219,7 @@ VAR
     END
   END;
 
-  PROCEDURE DeleteMsgArea(TempMemMsgArea1: MessageAreaRecordType; RecNumToDelete: SmallInt);
+  PROCEDURE DeleteMsgArea(TempMemMsgArea1: MessageAreaRecordType; RecNumToDelete: Integer);
   VAR
     RecNum: Integer;
     Ok,
@@ -321,7 +321,7 @@ VAR
   END;
 
   PROCEDURE EditMessageArea(TempMemMsgArea1: MessageAreaRecordType; VAR MemMsgArea: MessageAreaRecordType; VAR Cmd1: Char;
-                            VAR RecNumToEdit: SmallInt; VAR Changed: Boolean; Editing: Boolean);
+                            VAR RecNumToEdit: Integer; VAR Changed: Boolean; Editing: Boolean);
   VAR
     TempFileName: Str8;
     Path1,
@@ -342,49 +342,49 @@ VAR
           Next := FALSE;
           CLS;
           IF (RecNumToEdit = -1) THEN
-            PrintACR('^0Default Message Area Configuration:')
+		    ConfigHeader('Default Message Area Configuration')
           ELSE
           BEGIN
             IF (Editing) THEN
-              PrintACR('^0Editing '+AOnOff(RecNumToEdit = 0,'private mail','message area #'+IntToStr(RecNumToEdit)+
-                       ' of '+IntToStr(NumMsgAreas)))
+			  ConfigHeader('Editing '+AOnOff(RecNumToEdit = 0,'Private Messages','Message Area #'
+			  +IntToStr(RecNumToEdit)+' Of '+IntToStr(NumMsgAreas)))
             ELSE
-              PrintACR('^0Inserting message area #'+IntToStr(RecNumToEdit)+' of '+IntToStr(NumMsgAreas + 1));
+			  ConfigHeader('Inserting Message Area #'+IntToStr(RecNumToEdit)+' Of '+IntToStr(NumMsgAreas + 1));
           END;
-          NL;
-          PrintACR('^1A^0> Area Name    : ^1'+Name);
-          PrintACR('^1B^0> File Name    : ^1'+FileName+' ^0[^1'+General.MsgPath+MemMsgArea.FileName+'.*^0]');
-          PrintACR('^1C^0> Area Type    : ^1'+MATypeStr(MAType));
+          {NL;}
+          PrintACR('^0(^1A^0) Area Name    : ^1'+Name);
+          PrintACR('^0(^1B^0) File Name    : ^1'+FileName+' ^0[^1'+General.MsgPath+MemMsgArea.FileName+'.*^0]');
+          PrintACR('^0(^1C^0) Area Type    : ^1'+MATypeStr(MAType));
           IF (MAType IN [1,2]) THEN
-            PrintACR('^1   Message Path : ^5'+MsgPath);
-          PrintACR('^1D^0> ACS Required : ^1'+AOnOff(ACS = '','*None*',ACS));
-          PrintACR('^1E^0> Post/MCI ACS : ^1'+AOnOff(PostACS = '','*None*',PostACS)+'^0 / ^1'
+            PrintACR('^0   Message Path : ^1'+MsgPath);
+          PrintACR('^0(^1D^0) ACS Required : ^1'+AOnOff(ACS = '','*None*',ACS));
+          PrintACR('^0(^1E^0) Post/MCI ACS : ^1'+AOnOff(PostACS = '','*None*',PostACS)+'^0 / ^1'
 											+AOnOff(MCIACS = '','*None*',MCIACS));
-          PrintACR('^1G^0> SysOp ACS    : ^1'+AOnOff(SysOpACS = '','*None*',SysOpACS));
-          PrintACR('^1H^0> Max Messages : ^1'+IntToStr(MaxMsgs));
-          PrintACR('^1I^0> Anonymous    : ^1'+AnonTypeStr(Anonymous));
-          PrintACR('^1K^0> Password     : ^1'+AOnOff(Password = '','*None*',Password));
+          PrintACR('^0(^1G^0) SysOp ACS    : ^1'+AOnOff(SysOpACS = '','*None*',SysOpACS));
+          PrintACR('^0(^1H^0) Max Messages : ^1'+IntToStr(MaxMsgs));
+          PrintACR('^0(^1I^0) Anonymous    : ^1'+AnonTypeStr(Anonymous));
+          PrintACR('^0(^1K^0) Password     : ^1'+AOnOff(Password = '','*None*',Password));
           IF (MAType IN [1,2]) THEN
-            PrintACR('^1M^0> Net Address  : ^1'+NodeStr(AKA));
- (*         PrintACR('^1N^0> Colors       : ^1Text=^'+IntToStr(Text_Color)+IntToStr(Text_Color)+
+            PrintACR('^0(^1M^0) Net Address  : ^1'+NodeStr(AKA));
+ (*         PrintACR('^1N^0) Colors       : ^1Text=^'+IntToStr(Text_Color)+IntToStr(Text_Color)+
 									  '^1, Quote=^'+IntToStr(Quote_Color)+IntToStr(Quote_Color)+
                                       '^1, Tear=^'+IntToStr(Tear_Color)+IntToStr(Tear_Color)+
                                       '^1, Origin=^'+IntToStr(Origin_Color)+IntToStr(Origin_Color)); *)
-          PrintACR('^1N^0> Colors       : ^'+IntToStr(Text_Color)+'Text^0 '+
+          PrintACR('^0(^1N^0) Colors       : ^'+IntToStr(Text_Color)+'Text^0 '+
 										 '^'+IntToStr(Quote_Color)+'Quote^0 '+
 										 '^'+IntToStr(Tear_Color)+'Tear^0 '+
 										 '^'+IntToStr(Origin_Color)+'Origin');
 
-          PrintACR('^1O^0> Read Menu    : ^1'+IntToStr(MessageReadMenu));
+          PrintACR('^0(^1O^0) Read Menu    : ^1'+IntToStr(MessageReadMenu));
           IF (MAType IN [1,2]) THEN
-            PrintACR('^1P^0> Mail Flags   : ^1'+DisplayNetFlags(MAFlags,'1','0'));
+            PrintACR('^1P^0) Mail Flags   : ^1'+DisplayNetFlags(MAFlags,'1','0'));
           IF (MAType IN [1..3]) THEN
-            PrintACR('^1R^0> Origin Line  : ^1'+Origin);
-          PrintACR('^1S^0> Start Quote  : ^1'+AOnOff(QuoteStart = '','*None*',QuoteStart));
-          PrintACR('^1T^0> End Quote    : ^1'+AOnOff(QuoteEnd = '','*None*',QuoteEnd));
-          PrintACR('^1U^0> Post File    : ^1'+AOnOff(PrePostFile = '','*None*',PrePostFile));
-          PrintACR('^1V^0> QWK Index    : ^1'+IntToStr(QWKIndex));
-          PrintACR('^1W^0> Flags        : ^1'+DisplayMAFlags(MAFlags,'1','0'));
+            PrintACR('^0(^1R^0) Origin Line  : ^1'+Origin);
+          PrintACR('^0(^1S^0) Start Quote  : ^1'+AOnOff(QuoteStart = '','*None*',QuoteStart));
+          PrintACR('^0(^1T^0) End Quote    : ^1'+AOnOff(QuoteEnd = '','*None*',QuoteEnd));
+          PrintACR('^0(^1U^0) Post File    : ^1'+AOnOff(PrePostFile = '','*None*',PrePostFile));
+          PrintACR('^0(^1V^0) QWK Index    : ^1'+IntToStr(QWKIndex));
+          PrintACR('^0(^1W^0) Flags        : ^1'+DisplayMAFlags(MAFlags,'1','0'));
           MCIAllowed := TRUE;
         END;
         IF (RecNumToEdit = 0) THEN
@@ -400,7 +400,8 @@ VAR
           IF (MAType IN [1..3]) THEN
             CmdStr := CmdStr + 'R';
         END;
-        LOneK('^0%LFModify Menu [^5?^4=^5Help^4]: ',Cmd1,'Q?'+CmdStr+^M,TRUE,TRUE);
+		NL;
+        LOneK('^0Message Area Editor [(^1?^0)Help]: ',Cmd1,'Q?'+CmdStr+^M,TRUE,TRUE);
         CASE Cmd1 OF
           'A' : REPEAT
                   TempMemMsgArea1.Name := MemMsgArea.Name;
@@ -698,12 +699,12 @@ VAR
       UNTIL (Pos(Cmd1,'Q[]FJL') <> 0) OR (HangUp);
   END;
 
-  PROCEDURE InsertMsgArea(TempMemMsgArea1: MessageAreaRecordType; Cmd1: Char; RecNumToInsertBefore: SmallInt);
+  PROCEDURE InsertMsgArea(TempMemMsgArea1: MessageAreaRecordType; Cmd1: Char; RecNumToInsertBefore: Integer);
   VAR
     MsgAreaScanFile: FILE OF ScanRec;
     RecNum,
     RecNum1,
-    RecNumToEdit: SmallInt;
+    RecNumToEdit: Integer;
     Ok,
     Changed: Boolean;
   BEGIN
@@ -803,7 +804,7 @@ VAR
     END;
   END;
 
-  PROCEDURE ModifyMsgArea(TempMemMsgArea1: MessageAreaRecordType; Cmd1: Char; RecNumToEdit: SmallInt);
+  PROCEDURE ModifyMsgArea(TempMemMsgArea1: MessageAreaRecordType; Cmd1: Char; RecNumToEdit: Integer);
   VAR
     User: UserRecordType;
     MsgAreaScanFile: FILE OF ScanRec;
@@ -927,11 +928,11 @@ VAR
     END;
   END;
 
-  PROCEDURE PositionMsgArea(TempMemMsgArea1: MessageAreaRecordType; RecNumToPosition: SmallInt);
+  PROCEDURE PositionMsgArea(TempMemMsgArea1: MessageAreaRecordType; RecNumToPosition: Integer);
   VAR
     RecNumToPositionBefore,
     RecNum1,
-    RecNum2: SmallInt;
+    RecNum2: Integer;
   BEGIN
     IF (NumMsgAreas = 0) THEN
       Messages(4,0,'message areas')
@@ -1032,7 +1033,7 @@ VAR
       END;
   END;
 
-  PROCEDURE ListMsgAreas(VAR RecNumToList1: SmallInt);
+  PROCEDURE ListMsgAreas(VAR RecNumToList1: Integer);
   VAR
     NumDone: Integer;
   BEGIN
@@ -1044,11 +1045,13 @@ VAR
     CLS;
     CASE DisplayType OF
       1 : BEGIN
+			ConfigHeader('Message Area Editor');
 			PrintACR('^4+------+----------------------------------+---+-------+---------+---------+---+');
 			PrintACR('^4| ^3#### ^4| ^3Message Area Name                ^4| ^3T ^4| ^3Flags ^4| ^3ReadACS ^4| ^3PostACS ^4| ^3A ^4|');
 			PrintACR('^4+------+----------------------------------+---+-------+---------+---------+---+');
           END;
       2 : BEGIN
+			ConfigHeader('Message Area Editor');
             PrintACR('^4+------+----------------------------------+------------+----------------------+');
 			PrintACR('^4| ^3#### ^4| ^3Message Area Name                ^4| ^3Addresss   ^4| ^3Path                 ^4|');
             PrintACR('^4+------+----------------------------------+------------+----------------------+');
@@ -1091,7 +1094,8 @@ BEGIN
   REPEAT
     IF (Cmd <> '?') THEN
       ListMsgAreas(RecNumToList);
-    LOneK('^0%LFMessage Area Editor: ',Cmd,'QCDIMPRTX?'^M,TRUE,TRUE);
+	NL;
+    LOneK('^0Message Area Editor [(^1?^0)Help]: ',Cmd,'QCDIMPRTX?'^M,TRUE,TRUE);
     CASE Cmd OF
       ^M  : IF (RecNumToList < 0) OR (RecNumToList > NumMsgAreas) THEN
               RecNumToList := 0;
@@ -1125,11 +1129,11 @@ BEGIN
       '?' : BEGIN
               Print('^0%LF<^1CR^0> Next Page / Refresh');
               {Print('^1(^3?^1)Help/First message area');} { LeeW: useless }
-              LCmds(24,1,'C Change Message Storage Drive','');
-              LCmds(24,1,'D Delete Message Area','I Insert Message Area');
-              LCmds(24,1,'M Modify Message Area','P Position Message Area');
-              LCmds(24,1,'T Toggle Display Format','X Default Configuration');
-			  LCmds(24,1,'Q Quit','R Renumber QWK Index');
+              LCmds(24,1,'C Change Message Storage Drive',	'');
+              LCmds(24,1,'D Delete Message Area',			'I Insert Message Area');
+              LCmds(24,1,'M Modify Message Area',			'P Position Message Area');
+              LCmds(24,1,'T Toggle Display Format',			'X Default Configuration');
+			  LCmds(24,1,'Q Quit',							'R Renumber QWK Index');
             END;
     END;
     IF (Cmd <> ^M) THEN

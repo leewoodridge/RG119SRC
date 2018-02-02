@@ -6,7 +6,7 @@
 
   FILE AREA EDITOR
   
-  remove all of the strings from lang files that need not be there
+  remove all of the strings from lang files that need not be there UGH!
 }
 
 UNIT SysOp9;
@@ -31,7 +31,7 @@ TYPE
     Drive: Char;
     FirstRecNum,
     LastRecNum,
-    RecNumToEdit: SmallInt;
+    RecNumToEdit: Integer;
   END;
 
 CONST
@@ -357,7 +357,7 @@ VAR
   PROCEDURE DeleteFileArea(TempMemFileArea1: FileAreaRecordType; MCIVars1: MCIVarRecord);
   VAR
     RecNum,
-    RecNumToDelete: SmallInt;
+    RecNumToDelete: Integer;
     Ok,
     OK1,
     Ok2: Boolean;
@@ -876,7 +876,7 @@ VAR
     Cmd1: Char;
     RecNum,
     RecNum1,
-    RecNumToInsertBefore: SmallInt;
+    RecNumToInsertBefore: Integer;
     Ok,
     Changed: Boolean;
   BEGIN
@@ -1108,7 +1108,7 @@ VAR
     RecNumToPosition,
     RecNumToPositionBefore,
     RecNum1,
-    RecNum2: SmallInt;
+    RecNum2: Integer;
   BEGIN
     IF (NumFileAreas = 0) THEN
       FAELngStr(5,MemFileArea,MCIVars1,FALSE)
@@ -1170,11 +1170,13 @@ VAR
     CLS;
     CASE DisplayType OF
       1 : BEGIN {FAELngStr(0,MemFileArea,MCIVars1,FALSE);}
+			ConfigHeader('File Area Editor');
 			PrintACR('^4+------+-----------------------------------+----------+-------+-------+-------+');
 			PrintACR('^4| ^3#### ^4| ^3File Area Name                    ^4| ^3Flags    ^4| ^3ACS   ^4| ^3ULACS ^4| ^3DLACS ^4|');
 			PrintACR('^4+------+-----------------------------------+----------+-------+-------+-------+');
 		END;
       2 : BEGIN {FAELngStr(1,MemFileArea,MCIVars1,FALSE);}
+			ConfigHeader('File Area Editor');
 			PrintACR('^4+------+-------------------+----------+-------------------+-------------------+');
 			PrintACR('^4| ^3#### ^4| ^3File Area Name    ^4| ^3File Nm  ^4| ^3Download Path     ^4| ^3Upload Path       ^4|');
 			PrintACR('^4+------+-------------------+----------+-------------------+-------------------+');
@@ -1235,7 +1237,9 @@ BEGIN
   REPEAT
     IF (Cmd <> '?') THEN
       ListFileAreas(RecNumToList,MCIVars);
-    LOneK(FAELngStr(3,MemFileArea,MCIVars,TRUE),Cmd,'QCDIMPT?'^M,TRUE,TRUE);
+	NL;
+    LOneK('^0File Area Editor [(^1?^0)Help]: ',Cmd,'QCDIMPT?'^M,TRUE,TRUE);
+	{LOneK(FAELngStr(3,MemFileArea,MCIVars,TRUE),Cmd,'QCDIMPT?'^M,TRUE,TRUE);}
     CASE Cmd OF
       ^M  : IF (RecNumToList < 1) OR (RecNumToList > NumFileAreas) THEN
               RecNumToList := 1;

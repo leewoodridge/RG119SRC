@@ -190,7 +190,7 @@ END;
 PROCEDURE ExtractToTemp;
 TYPE
   TotalsRecordType = RECORD
-    TotalFiles: SmallInt;
+    TotalFiles: Integer;
     TotalSize: LongInt;
   END;
 VAR

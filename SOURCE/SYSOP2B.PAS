@@ -96,7 +96,7 @@ BEGIN
     BEGIN
       Abort := FALSE;
       Next := FALSE;
-      ClrScr;
+      CLS;
 	  PrintACR(PadLeftStr('^2 '#240' Renegade BBS : Modem / Node #'+IntToStr(ThisNode)+' Configuration',80));
 	  Print('Here you can configure...');
       NL;
